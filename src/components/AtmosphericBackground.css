@@ -4,30 +4,40 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  pointer-events: none;
+  pointer-events: none !important;
   z-index: 0;
-  background-color: var(--bg-base);
+  background-color: var(--bg-base, #0B0B0D);
 }
 
-.shader-layer {
+.base-canvas-layer {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: auto; /* allows mouse interaction with the shader */
-  opacity: 0.9;
-}
-
-.shader-instance {
-  width: 100%;
-  height: 100%;
+  background-color: var(--bg-base, #0B0B0D);
+  pointer-events: none !important;
+  z-index: 0;
 }
 
 .halo-layer {
   position: absolute;
   inset: 0;
-  pointer-events: none;
+  pointer-events: none !important;
   z-index: 1;
+}
+
+.waves-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none !important;
+  z-index: 2;
+  opacity: 0.8;
+}
+
+.waves-instance {
+  width: 100%;
+  height: 100%;
+  pointer-events: none !important;
 }
 
 .particles-layer {
@@ -35,32 +45,36 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  pointer-events: auto; /* allows mouse interaction with particles */
-  z-index: 2;
+  pointer-events: none !important;
+  z-index: 3;
   mix-blend-mode: screen;
 }
 
 .particles-instance {
   width: 100%;
   height: 100%;
+  pointer-events: none !important;
 }
 
 /* Atmospheric Vignette: Deepens contrast around content while keeping edges and ambient glow classy */
 .atmospheric-vignette {
   position: absolute;
   inset: 0;
-  z-index: 3;
-  pointer-events: none;
+  z-index: 4;
+  pointer-events: none !important;
   background: radial-gradient(
-    ellipse at 50% 38%,
-    rgba(11, 11, 13, 0.4) 0%,
-    rgba(11, 11, 13, 0.65) 55%,
-    var(--bg-base) 95%
+    circle at 50% 35%,
+    transparent 30%,
+    rgba(11, 11, 13, 0.45) 65%,
+    var(--bg-base, #0B0B0D) 95%
   );
 }
 
 @media (max-width: 768px) {
-  .particles-layer {
+  .waves-layer {
     opacity: 0.6;
+  }
+  .particles-layer {
+    opacity: 0.4;
   }
 }

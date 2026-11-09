@@ -15,7 +15,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   typographyPreset: 'inter',
   fontSize: 1,
   haloMotion: true,
-  backgroundStyle: 'dark-veil',
+  backgroundStyle: 'combined',
   enableParticles: true,
   theme: 'midnight',
   blurLevel: 8,
@@ -27,7 +27,14 @@ export const App: React.FC = () => {
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
     try {
       const stored = localStorage.getItem('lyrixer_preferences');
-      return stored ? { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) } : DEFAULT_PREFERENCES;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.backgroundStyle === 'dark-veil' || parsed.backgroundStyle === 'aurora') {
+          parsed.backgroundStyle = 'combined';
+        }
+        return { ...DEFAULT_PREFERENCES, ...parsed };
+      }
+      return DEFAULT_PREFERENCES;
     } catch {
       return DEFAULT_PREFERENCES;
     }

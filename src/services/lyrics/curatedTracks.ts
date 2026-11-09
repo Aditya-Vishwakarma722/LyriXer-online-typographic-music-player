@@ -123,3 +123,4 @@ export const CURATED_TRACKS: Record<string, LyricTrack> = {
   easyonme: parseLrc(ADELE_EASY_ON_ME_LRC, 'curated'),
   bohemianrhapsody: parseLrc(BOHEMIAN_RHAPSODY_LRC, 'curated'),
 };
+

@@ -30,7 +30,7 @@ export interface RecentSession {
 
 export type TypographyPreset = 'inter' | 'serif' | 'geometric' | 'rounded' | 'mono';
 
-export type BackgroundStyle = 'dark-veil' | 'aurora' | 'halo';
+export type BackgroundStyle = 'combined' | 'waves' | 'halo';
 
 export interface UserPreferences {
   typographyPreset: TypographyPreset;

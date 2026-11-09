@@ -19,9 +19,9 @@ const TYPOGRAPHY_PRESETS: { id: TypographyPreset; label: string; desc: string }[
 ];
 
 const BACKGROUND_STYLES: { id: BackgroundStyle; label: string; desc: string }[] = [
-  { id: 'dark-veil', label: 'Dark Veil (React Bits)', desc: 'Silky shader light mesh drifting with the cursor' },
-  { id: 'aurora', label: 'Aurora (React Bits)', desc: 'Soft calm violet & lavender color flow' },
-  { id: 'halo', label: 'Concentric Halo', desc: 'Restrained acoustic geometric halo rings' },
+  { id: 'combined', label: 'Harmonic Waves & Halo', desc: 'Silky flowing audio waves over central luminous halo' },
+  { id: 'waves', label: 'Audio Silk Waves (React Bits)', desc: 'Interactive flowing wave lines reacting to cursor' },
+  { id: 'halo', label: 'Minimalist Concentric Halo', desc: 'Restrained acoustic geometric halo rings' },
 ];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({

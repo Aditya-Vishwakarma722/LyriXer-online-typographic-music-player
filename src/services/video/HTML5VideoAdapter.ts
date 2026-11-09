@@ -163,3 +163,4 @@ export class HTML5VideoAdapter implements VideoPlayerAdapter {
     }
   }
 }
+

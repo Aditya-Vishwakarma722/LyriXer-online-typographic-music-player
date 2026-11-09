@@ -135,3 +135,4 @@ export function parseLrc(content: string, source: LyricTrack['source'] = 'file')
     source,
   };
 }
+
