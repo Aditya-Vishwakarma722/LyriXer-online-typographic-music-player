@@ -12,9 +12,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+      html, body {
+        background-color: #0B0B0D;
+        color: #F5F5F5;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <noscript>
+        <div style="padding: 40px; text-align: center;">
+          <h2>JavaScript Required</h2>
+          <p>Please enable JavaScript to run LyriXer.</p>
+        </div>
+      </noscript>
+      <script>
+        if (window.location.protocol === 'file:') {
+          document.addEventListener('DOMContentLoaded', function() {
+            var root = document.getElementById('root');
+            if (root) {
+              root.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;background:#0B0B0D;color:#F5F5F5;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;"><div style="max-width:540px;background:#141417;padding:36px;border-radius:18px;border:1px solid rgba(255,255,255,0.12);box-shadow:0 24px 60px rgba(0,0,0,0.6),0 0 24px rgba(167,139,250,0.15);"><div style="font-size:20px;font-weight:700;margin-bottom:8px;color:#F5F5F5;">LyriXer</div><div style="font-size:14px;font-weight:600;margin-bottom:16px;color:#A78BFA;">Local Development Server Required</div><p style="color:#92929A;font-size:14px;line-height:1.6;margin-bottom:24px;">You opened <code>index.html</code> directly via the filesystem (<code>file://</code>). Vite + React applications run TypeScript modules and require the local server to be viewed.</p><a href="http://localhost:5173" style="display:inline-flex;align-items:center;justify-content:center;background:#F5F5F5;color:#0B0B0D;padding:12px 24px;border-radius:10px;font-weight:600;text-decoration:none;font-size:14px;box-shadow:0 0 16px rgba(245,245,245,0.2);">Open http://localhost:5173</a><div style="margin-top:18px;font-size:12px;color:#63636E;">Or run: <code>npm run dev</code> in your terminal</div></div></div>';
+            }
+          });
+        }
+      </script>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
