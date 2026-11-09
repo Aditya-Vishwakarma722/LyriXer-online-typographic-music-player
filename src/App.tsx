@@ -8,11 +8,14 @@ import { Footer } from './features/home/Footer';
 import { AboutModal } from './features/home/AboutModal';
 import { SettingsModal } from './features/home/SettingsModal';
 import { PlayerShell } from './features/player/PlayerShell';
+import { ArtistPage } from './features/artist/ArtistPage';
 import type { UserPreferences, VideoSource, RecentSession } from './types/session';
+import type { ArtistTrack } from './types/artist';
+import { ArrowRight } from 'lucide-react';
 import './App.css';
 
 const DEFAULT_PREFERENCES: UserPreferences = {
-  typographyPreset: 'inter',
+  typographyPreset: 'kinetic',
   fontSize: 1,
   haloMotion: true,
   theme: 'midnight',
@@ -22,8 +25,15 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 
 const STORAGE_KEY_RECENT = 'lyrixer_recent_sessions';
 
+type AppView = 'home' | 'artist' | 'player';
+
 export const App: React.FC = () => {
-  // User Preferences with LocalStorage Persistence (FR-10)
+  // Navigation View State
+  const [currentView, setCurrentView] = useState<AppView>('home');
+  const [selectedArtistId, setSelectedArtistId] = useState<string>('coldplay');
+  const [previousView, setPreviousView] = useState<'home' | 'artist'>('home');
+
+  // User Preferences with LocalStorage Persistence
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
     try {
       const stored = localStorage.getItem('lyrixer_preferences');
@@ -78,12 +88,13 @@ export const App: React.FC = () => {
 
   const handleStartSession = (source: VideoSource) => {
     setActiveSession(source);
+    setCurrentView('player');
 
     // Record to recent sessions
     const newSession: RecentSession = {
       id: `session-${Date.now()}`,
       title: source.title,
-      artist: source.kind === 'youtube' ? 'YouTube Music' : 'Local Video',
+      artist: source.artist || (source.kind === 'youtube' ? 'YouTube Music' : 'Local Video'),
       thumbnailUrl: source.thumbnailUrl,
       kind: source.kind,
       sourceId: source.sourceId,
@@ -103,22 +114,53 @@ export const App: React.FC = () => {
     });
   };
 
+  const handleSelectArtistTrack = (track: ArtistTrack) => {
+    setPreviousView('artist');
+    const source: VideoSource = {
+      kind: 'youtube',
+      sourceId: track.videoId,
+      title: track.title,
+      artist: track.artist,
+      thumbnailUrl: track.thumbnailUrl,
+      duration: track.duration,
+    };
+    handleStartSession(source);
+  };
+
+  const handleOpenArtist = (artistName?: string) => {
+    if (artistName) {
+      const cleanId = artistName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      setSelectedArtistId(cleanId || 'coldplay');
+    }
+    setCurrentView('artist');
+  };
+
   const handleExitPlayer = () => {
-    setActiveSession(null);
+    setCurrentView(previousView);
   };
 
   return (
     <div className={`app-shell theme-${preferences.theme}`}>
-      {/* Active Session: Full Immersion Player View */}
-      {activeSession ? (
+      {/* View 1: Immersive Player View */}
+      {currentView === 'player' && activeSession ? (
         <PlayerShell
           source={activeSession}
           preferences={preferences}
           onExit={handleExitPlayer}
           onUpdatePreferences={handleUpdatePreferences}
+          onOpenArtist={handleOpenArtist}
+        />
+      ) : currentView === 'artist' ? (
+        /* View 2: Full-Screen Cinematic Editorial Artist Profile Page */
+        <ArtistPage
+          initialArtistId={selectedArtistId}
+          activeSession={activeSession}
+          onSelectTrack={handleSelectArtistTrack}
+          onBackToHome={() => setCurrentView('home')}
+          onOpenPlayer={() => setCurrentView('player')}
         />
       ) : (
-        /* Default: Clean Homepage UI */
+        /* View 3: Clean Homepage UI */
         <>
           {/* Ambient Halo concentric lighting */}
           <HaloBackground enablePulse={preferences.haloMotion} />
@@ -127,19 +169,31 @@ export const App: React.FC = () => {
           <Navbar
             onOpenAbout={() => setIsAboutOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenArtists={() => {
+              setSelectedArtistId('coldplay');
+              setCurrentView('artist');
+            }}
           />
 
           {/* Main Page Layout */}
           <main className="main-viewport">
             {/* Centered Hero & Video Input */}
             <Hero>
-              <VideoInput onStartSession={handleStartSession} />
+              <VideoInput
+                onStartSession={(src) => {
+                  setPreviousView('home');
+                  handleStartSession(src);
+                }}
+              />
             </Hero>
 
             {/* Quiet Recently Played Area */}
             <RecentSessions
               sessions={recentSessions}
-              onSelectSession={handleStartSession}
+              onSelectSession={(src) => {
+                setPreviousView('home');
+                handleStartSession(src);
+              }}
             />
           </main>
 
@@ -148,12 +202,34 @@ export const App: React.FC = () => {
             onOpenAbout={() => setIsAboutOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
           />
+
+          {/* Floating Active Player Pill (Preserves existing listening session on Home) */}
+          {activeSession && (
+            <div className="home-active-dock">
+              <div className="home-dock-info">
+                <span className="dock-status-dot" />
+                <div className="dock-text">
+                  <span className="dock-title">{activeSession.title}</span>
+                  <span className="dock-subtitle">Playing now &middot; LRCLIB synchronized</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="home-dock-btn"
+                onClick={() => setCurrentView('player')}
+                title="Resume immersive player"
+              >
+                <span>Return to Player</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          )}
         </>
       )}
 
       {/* Dialog Modals */}
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
-      
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

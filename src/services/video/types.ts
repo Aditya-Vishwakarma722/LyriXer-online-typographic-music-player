@@ -22,6 +22,7 @@ export interface VideoPlayerListener {
   onStateChange?: (state: Partial<VideoPlayerState>) => void;
   onError?: (errorMessage: string) => void;
   onDurationChange?: (duration: number) => void;
+  onMetadata?: (meta: { title: string; author: string; videoId?: string }) => void;
 }
 
 export interface VideoPlayerAdapter {

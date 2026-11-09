@@ -75,6 +75,45 @@
   text-overflow: ellipsis;
 }
 
+.header-track-artist {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.player-intro-notice {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 18, 22, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(167, 139, 250, 0.2);
+  animation: slideDownFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .header-lrclib-badge {
   display: inline-flex;
   align-items: center;
@@ -113,6 +152,18 @@
 .header-btn:hover {
   background: rgba(167, 139, 250, 0.22);
   border-color: rgba(167, 139, 250, 0.45);
+  color: #FFFFFF;
+}
+
+.header-artist-btn {
+  background: rgba(167, 139, 250, 0.12);
+  border-color: rgba(167, 139, 250, 0.28);
+  color: var(--accent-violet-light);
+}
+
+.header-artist-btn:hover {
+  background: rgba(167, 139, 250, 0.25);
+  border-color: var(--accent-violet);
   color: #FFFFFF;
 }
 

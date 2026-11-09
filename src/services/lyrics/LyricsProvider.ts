@@ -1,5 +1,6 @@
 import { parseLrc, type LyricTrack } from './lrcParser';
 import { CURATED_TRACKS } from './curatedTracks';
+import { cleanTrackTitle } from '../../utils/youtube';
 
 // In-memory cache for fetched lyrics
 const lyricsCache = new Map<string, LyricTrack>();
@@ -21,27 +22,138 @@ export interface LrclibSearchResult {
   plainLyrics?: string;
 }
 
+/**
+ * Calculates a match score (0 to 100+) evaluating how closely an LRCLIB candidate
+ * matches the currently playing song's title, artist, and duration.
+ *
+ * CRITICAL RULE: The candidate MUST match the requested song title. If the title
+ * doesn't match, it is an entirely different song and is rejected (-999).
+ */
+function scoreCandidate(
+  candidate: LrclibSearchResult,
+  targetTitle: string,
+  targetArtist?: string,
+  targetDuration?: number
+): number {
+  const candTitle = (candidate.trackName || '').toLowerCase().trim();
+  const candArtist = (candidate.artistName || '').toLowerCase().trim();
+  const tTitle = targetTitle.toLowerCase().trim();
+  const tArtist = (targetArtist || '').toLowerCase().trim();
+
+  // Strip non-alphanumeric for resilient token matching
+  const normCandTitle = candTitle.replace(/[^a-z0-9]/g, '');
+  const normTargetTitle = tTitle.replace(/[^a-z0-9]/g, '');
+
+  // 1. Mandatory Title Match Check
+  const exactTitleMatch = candTitle === tTitle || normCandTitle === normTargetTitle;
+  const partialTitleMatch =
+    candTitle.includes(tTitle) ||
+    tTitle.includes(candTitle) ||
+    normCandTitle.includes(normTargetTitle) ||
+    normTargetTitle.includes(normCandTitle);
+
+  if (!exactTitleMatch && !partialTitleMatch) {
+    // If title has no match, reject immediately so unrelated songs are NEVER returned
+    return -999;
+  }
+
+  let score = 0;
+
+  if (exactTitleMatch) {
+    score += 60;
+  } else if (candTitle.startsWith(tTitle) || tTitle.startsWith(candTitle)) {
+    score += 45;
+  } else {
+    score += 30;
+  }
+
+  // 2. Artist Match (Max 35 pts)
+  if (tArtist) {
+    const normCandArtist = candArtist.replace(/[^a-z0-9]/g, '');
+    const normTargetArtist = tArtist.replace(/[^a-z0-9]/g, '');
+
+    if (candArtist === tArtist || normCandArtist === normTargetArtist) {
+      score += 35;
+    } else if (candArtist.includes(tArtist) || tArtist.includes(candArtist)) {
+      score += 25;
+    } else {
+      // Check word tokens (e.g. "juice" in "juice wrld") to tolerate typos/re-orderings
+      const targetTokens = tArtist.split(/\s+/).filter((w) => w.length > 2);
+      const matchesToken = targetTokens.some((w) => candArtist.includes(w));
+      if (matchesToken) {
+        score += 20;
+      }
+    }
+  }
+
+  // 3. Synced Lyrics Preference (Max 30 pts)
+  if (candidate.syncedLyrics && candidate.syncedLyrics.trim().length > 20) {
+    score += 30;
+  }
+
+  // 4. Duration Match (Max 20 pts / Penalty for gross mismatch)
+  if (targetDuration && targetDuration > 10 && candidate.duration && candidate.duration > 10) {
+    const diff = Math.abs(candidate.duration - targetDuration);
+    if (diff <= 5) {
+      score += 20;
+    } else if (diff <= 15) {
+      score += 10;
+    } else if (diff > 45) {
+      score -= 25; // Significant duration mismatch penalty
+    }
+  }
+
+  return score;
+}
+
 export class LyricsProvider {
   /**
    * Searches for synchronized lyrics directly from LRCLIB (https://lrclib.net).
-   * Checks curated fallback tracks, in-memory cache, and the live open LRCLIB database API.
+   * Intelligently cleans artist/title, scores candidates against playback metadata,
+   * and prioritizes accurate timestamped lyrics.
    */
   static async getLyrics(params: LyricsSearchParams): Promise<LyricTrack | null> {
     const { trackName, artistName, duration, videoId } = params;
 
-    // 1. Check curated catalog by videoId first (instant precision for demo tracks)
+    // 1. Check curated catalog by verified videoId first (guarantees instantaneous precision for demo tracks)
     if (videoId && CURATED_TRACKS[videoId]) {
       return CURATED_TRACKS[videoId];
     }
 
-    // 2. Check curated catalog by track name key
-    const normalizedKey = trackName.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (CURATED_TRACKS[normalizedKey]) {
-      return CURATED_TRACKS[normalizedKey];
+    // 2. Clean track and artist tokens with robust delimiter separation
+    const cleaned = cleanTrackTitle(trackName, artistName);
+    const cleanTitle = cleaned.title.trim();
+    const cleanArtist = (cleaned.artist || artistName || '').trim();
+
+    // If title is an unresolved placeholder or empty, wait until real metadata is retrieved
+    if (!cleanTitle || cleanTitle.startsWith('YouTube Video (')) {
+      return null;
+    }
+
+    // 2b. Direct check for curated tracks by title/artist to guarantee video-calibrated lyrics
+    const lowerTitle = cleanTitle.toLowerCase();
+    const lowerArtist = cleanArtist.toLowerCase();
+    if (lowerTitle === 'robbery' && (lowerArtist.includes('juice') || lowerArtist === '' || !artistName)) {
+      return CURATED_TRACKS['iI34LYmJ1Fs'] || CURATED_TRACKS['robbery'];
+    }
+    if (lowerTitle === 'chihiro' && (lowerArtist.includes('billie') || lowerArtist === '' || !artistName)) {
+      return CURATED_TRACKS['BY_XwvKogC8'] || CURATED_TRACKS['chihiro'];
+    }
+    if (lowerTitle === 'yellow' && (lowerArtist.includes('coldplay') || lowerArtist === '' || !artistName)) {
+      return CURATED_TRACKS['yKNxeF4KMsY'] || CURATED_TRACKS['yellow'];
+    }
+    if (lowerTitle.includes('get lucky') && (lowerArtist.includes('daft') || lowerArtist === '' || !artistName)) {
+      return CURATED_TRACKS['5NV6Rdv1a3I'] || CURATED_TRACKS['getlucky'];
+    }
+    if (lowerTitle.includes('easy on me') && (lowerArtist.includes('adele') || lowerArtist === '' || !artistName)) {
+      return CURATED_TRACKS['U3ASj1L6_sY'] || CURATED_TRACKS['easyonme'];
+    }
+    if (lowerTitle.includes('bohemian rhapsody')) {
+      return CURATED_TRACKS['fJ9rUzIMcZQ'] || CURATED_TRACKS['bohemianrhapsody'];
     }
 
     // 3. Check memory cache
-    const cacheKey = `${trackName}_${artistName || ''}_${duration || ''}`.toLowerCase();
+    const cacheKey = `${cleanTitle}_${cleanArtist}_${duration ? Math.round(duration) : ''}`.toLowerCase();
     if (lyricsCache.has(cacheKey)) {
       return lyricsCache.get(cacheKey)!;
     }
@@ -49,46 +161,80 @@ export class LyricsProvider {
     // 4. Query live LRCLIB API (https://lrclib.net)
     try {
       let data: LrclibSearchResult | null = null;
+      let allCandidates: LrclibSearchResult[] = [];
 
-      // First attempt: exact get match if artist & duration available
-      if (artistName && duration) {
+      // Query A: Structured search using track_name and artist_name
+      if (cleanTitle) {
+        const queryParams = new URLSearchParams();
+        queryParams.set('track_name', cleanTitle);
+        if (cleanArtist) {
+          queryParams.set('artist_name', cleanArtist);
+        }
         try {
-          const query = new URLSearchParams({
-            track_name: trackName,
-            artist_name: artistName,
-            duration: Math.round(duration).toString(),
-          });
-          const resp = await fetch(`https://lrclib.net/api/get?${query.toString()}`, {
+          const resp = await fetch(`https://lrclib.net/api/search?${queryParams.toString()}`, {
             headers: { 'User-Agent': 'LyriXer/1.0.0 (https://github.com/LyriXer)' },
           });
           if (resp.ok) {
-            data = await resp.json();
+            const results = await resp.json();
+            if (Array.isArray(results)) {
+              allCandidates.push(...results);
+            }
           }
         } catch {
-          // ignore and fallback to search
+          // ignore
         }
       }
 
-      // Second attempt: general search with both artist and track name
-      if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
-        const queryTerm = artistName ? `${artistName} ${trackName}` : trackName;
-        const results = await this.searchLrclib(queryTerm);
-        if (results.length > 0) {
-          // Prefer first result that has syncedLyrics
-          data = results.find((r) => Boolean(r.syncedLyrics)) || results[0];
+      // Query B: Fallback to structured search by track_name only (if artist was empty or had a typo)
+      if (allCandidates.length === 0 && cleanTitle && cleanArtist) {
+        try {
+          const qp = new URLSearchParams({ track_name: cleanTitle });
+          const resp = await fetch(`https://lrclib.net/api/search?${qp.toString()}`, {
+            headers: { 'User-Agent': 'LyriXer/1.0.0 (https://github.com/LyriXer)' },
+          });
+          if (resp.ok) {
+            const results = await resp.json();
+            if (Array.isArray(results)) {
+              allCandidates.push(...results);
+            }
+          }
+        } catch {
+          // ignore
         }
       }
 
-      // Third attempt: fallback search using track name alone
-      if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
-        const results = await this.searchLrclib(trackName);
-        if (results.length > 0) {
-          data = results.find((r) => Boolean(r.syncedLyrics)) || results[0];
+      // Query C: Combined keyword search fallback if structured results are empty
+      if (allCandidates.length === 0 && cleanTitle) {
+        const qTerm = cleanArtist ? `${cleanArtist} ${cleanTitle}` : cleanTitle;
+        const qResults = await this.searchLrclib(qTerm);
+        allCandidates.push(...qResults);
+      }
+
+      // 5. Score all candidate tracks and select the highest scoring match
+      if (allCandidates.length > 0) {
+        // De-duplicate candidates by id
+        const uniqueMap = new Map<number, LrclibSearchResult>();
+        for (const item of allCandidates) {
+          if (!uniqueMap.has(item.id)) {
+            uniqueMap.set(item.id, item);
+          }
+        }
+
+        const scored = Array.from(uniqueMap.values()).map((cand) => ({
+          candidate: cand,
+          score: scoreCandidate(cand, cleanTitle, cleanArtist, duration),
+        }));
+
+        scored.sort((a, b) => b.score - a.score);
+
+        // Pick top scored candidate if it meets quality threshold and is not disqualified
+        if (scored[0] && scored[0].score >= 35) {
+          data = scored[0].candidate;
         }
       }
 
       if (data) {
-        const track = this.convertLrclibItemToTrack(data, trackName, artistName);
+        const track = this.convertLrclibItemToTrack(data, cleanTitle, cleanArtist);
         if (track) {
           lyricsCache.set(cacheKey, track);
           return track;
@@ -137,10 +283,12 @@ export class LyricsProvider {
       track = parseLrc(item.syncedLyrics, 'provider');
       track.title = item.trackName || fallbackTitle || 'Untitled';
       track.artist = item.artistName || fallbackArtist;
+      track.duration = item.duration;
     } else if (item.plainLyrics) {
       track = parseLrc(item.plainLyrics, 'plain');
       track.title = item.trackName || fallbackTitle || 'Untitled';
       track.artist = item.artistName || fallbackArtist;
+      track.duration = item.duration;
     }
 
     return track;
@@ -156,4 +304,3 @@ export class LyricsProvider {
     return track;
   }
 }
-

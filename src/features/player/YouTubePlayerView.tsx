@@ -21,6 +21,8 @@ interface YouTubePlayerViewProps {
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
   onSearchLrclibClick: () => void;
+  onAutoSync?: () => void;
+  onAlignVocalsToNow?: () => void;
 }
 
 export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
@@ -38,6 +40,8 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   onSeekTo,
   onUploadLrcClick,
   onSearchLrclibClick,
+  onAutoSync,
+  onAlignVocalsToNow,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const adapterRef = useRef<YouTubeAdapter | null>(null);
@@ -62,6 +66,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
       onTimeUpdate: (t) => listenerRef.current?.onTimeUpdate?.(t),
       onStateChange: (s) => listenerRef.current?.onStateChange?.(s),
       onDurationChange: (d) => listenerRef.current?.onDurationChange?.(d),
+      onMetadata: (m) => listenerRef.current?.onMetadata?.(m),
     });
     adapterRef.current = adapter;
     onAdapterReadyRef.current?.(adapter);
@@ -107,6 +112,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
           onSeekTo={onSeekTo}
           onUploadLrcClick={onUploadLrcClick}
           onSearchLrclibClick={onSearchLrclibClick}
+          onAutoSync={onAutoSync || onAlignVocalsToNow}
         />
       </div>
     </div>

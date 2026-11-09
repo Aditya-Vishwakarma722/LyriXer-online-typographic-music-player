@@ -10,6 +10,7 @@ export interface LyricTrack {
   artist?: string;
   album?: string;
   offset?: number; // in seconds
+  duration?: number; // duration in seconds
   synced: boolean;
   lines: LyricLine[];
   source: 'provider' | 'file' | 'curated' | 'plain';

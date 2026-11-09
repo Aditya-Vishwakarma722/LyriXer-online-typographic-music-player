@@ -5,10 +5,11 @@ import { PlayerControls } from './PlayerControls';
 import { LrclibSearchModal } from './LrclibSearchModal';
 import { LyricsProvider } from '../../services/lyrics/LyricsProvider';
 import { useLyricsSync } from '../../hooks/useLyricsSync';
+import { cleanTrackTitle, KNOWN_VIDEO_INTROS } from '../../utils/youtube';
 import type { VideoPlayerAdapter, VideoPlayerState, VideoPlayerListener } from '../../services/video/types';
 import type { VideoSource, UserPreferences } from '../../types/session';
 import type { LyricTrack } from '../../services/lyrics/lrcParser';
-import { Sparkles, Search, Upload, X, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Search, Upload, X, CheckCircle2, UserRound, Clock } from 'lucide-react';
 import './PlayerShell.css';
 
 interface PlayerShellProps {
@@ -16,6 +17,7 @@ interface PlayerShellProps {
   preferences: UserPreferences;
   onExit: () => void;
   onUpdatePreferences: (updates: Partial<UserPreferences>) => void;
+  onOpenArtist?: (artistName?: string) => void;
 }
 
 export const PlayerShell: React.FC<PlayerShellProps> = ({
@@ -23,6 +25,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
   preferences,
   onExit,
   onUpdatePreferences,
+  onOpenArtist,
 }) => {
   const [adapter, setAdapter] = useState<VideoPlayerAdapter | null>(null);
   const [playerState, setPlayerState] = useState<VideoPlayerState>({
@@ -36,7 +39,52 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
 
   const [lyrics, setLyrics] = useState<LyricTrack | null>(null);
   const [isLoadingLyrics, setIsLoadingLyrics] = useState(true);
-  const [manualOffset, setManualOffset] = useState(0);
+  const [trackInfo, setTrackInfo] = useState({
+    title: source.title,
+    artist: source.artist || '',
+  });
+
+  // Load saved intro/vocal timing offset:
+  // 1. Verified intro offset from KNOWN_VIDEO_INTROS (e.g. 0.0 for curated tracks)
+  // 2. Saved offset from localStorage
+  // 3. Fallback to 0
+  const [manualOffset, setManualOffset] = useState<number>(() => {
+    if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
+      return KNOWN_VIDEO_INTROS[source.sourceId];
+    }
+    try {
+      const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
+      if (saved !== null) {
+        const parsed = parseFloat(saved);
+        if (!isNaN(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return 0;
+  });
+
+  // Ensure manualOffset resets appropriately whenever the active video source changes
+  useEffect(() => {
+    let offset = 0;
+    if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
+      offset = KNOWN_VIDEO_INTROS[source.sourceId];
+    } else {
+      try {
+        const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
+        if (saved !== null) {
+          const parsed = parseFloat(saved);
+          if (!isNaN(parsed)) offset = parsed;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    setManualOffset(offset);
+    manualOffsetRef.current = offset;
+  }, [source.sourceId]);
+
+  const [introNotice, setIntroNotice] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [lyricsVisible, setLyricsVisible] = useState(true);
@@ -46,14 +94,104 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
   const lrcFileInputRef = useRef<HTMLInputElement>(null);
   const hideControlsTimerRef = useRef<number | null>(null);
 
-  // Sync hook
+  // Sync refs to avoid stale closures in adapter listeners
+  const lyricsRef = useRef(lyrics);
+  const manualOffsetRef = useRef(manualOffset);
+  const playerStateRef = useRef(playerState);
+  const trackInfoRef = useRef(trackInfo);
+
+  useEffect(() => {
+    lyricsRef.current = lyrics;
+    manualOffsetRef.current = manualOffset;
+    playerStateRef.current = playerState;
+    trackInfoRef.current = trackInfo;
+  });
+
+  // Sync hook (manualOffset shifts effective lyric time to compensate for music video intros)
   const { activeIndex } = useLyricsSync(lyrics, playerState.currentTime, manualOffset);
+
+  // Detect intro preamble if video duration exceeds lyrics audio duration by 5s+
+  const detectedIntroGap = React.useMemo(() => {
+    if (
+      lyrics &&
+      lyrics.source !== 'curated' &&
+      lyrics.duration &&
+      playerState.duration > lyrics.duration + 5
+    ) {
+      return Number((playerState.duration - lyrics.duration).toFixed(1));
+    }
+    return null;
+  }, [lyrics, playerState.duration]);
+
+  const handleOffsetChange = (newOffset: number) => {
+    setManualOffset(newOffset);
+    manualOffsetRef.current = newOffset;
+    try {
+      localStorage.setItem(`lyrixer_offset_${source.sourceId}`, newOffset.toString());
+    } catch {
+      // ignore
+    }
+  };
+
+  /**
+   * The Sync button synchronizes lyrics directly to the point where the song begins,
+   * or snaps the active vocal line to current playback time if a mid-song pause/interlude caused drift.
+   */
+  const handleAutoSync = () => {
+    const curLyrics = lyricsRef.current;
+    const curState = playerStateRef.current;
+
+    if (!curLyrics || !curLyrics.lines || curLyrics.lines.length === 0) {
+      setIntroNotice('No lyrics loaded to sync');
+      setTimeout(() => setIntroNotice(null), 3000);
+      return;
+    }
+
+    const firstTimestamp = curLyrics.lines[0].timestamp; // e.g. 0.95s or 4.8s
+    const t = curState.currentTime;
+
+    let newOffset = 0;
+    // If the video is in the intro before the vocals start, or within 4s of the opening line:
+    if (t <= firstTimestamp + 4 || activeIndex <= 0) {
+      newOffset = Number(Math.max(0, t - firstTimestamp).toFixed(1));
+    } else {
+      // Song is actively playing mid-track. The user pressed Sync right as a line is being sung.
+      // Find the closest lyric line to current effective playback:
+      const currentEffective = Math.max(0, t - manualOffsetRef.current);
+      let closestLine = curLyrics.lines[0];
+      let minDiff = Infinity;
+      for (const line of curLyrics.lines) {
+        const d = Math.abs(line.timestamp - currentEffective);
+        if (d < minDiff) {
+          minDiff = d;
+          closestLine = line;
+        }
+      }
+      newOffset = Number(Math.max(0, t - closestLine.timestamp).toFixed(1));
+    }
+
+    handleOffsetChange(newOffset);
+    setIntroNotice(`Lyrics synchronized (+${newOffset}s)`);
+    setTimeout(() => setIntroNotice(null), 3500);
+  };
+
+  const handleResetSync = () => {
+    handleOffsetChange(0);
+    setIntroNotice('Sync offset reset to 0:00');
+    setTimeout(() => setIntroNotice(null), 3000);
+  };
 
   // Fetch lyrics from LRCLIB (https://lrclib.net) on mount or source change
   useEffect(() => {
     let isCancelled = false;
 
     const fetchLyrics = async () => {
+      // Avoid searching with placeholder title
+      if (!source.title || source.title.startsWith('YouTube Video (')) {
+        setIsLoadingLyrics(true);
+        return;
+      }
+
       setIsLoadingLyrics(true);
       const track = await LyricsProvider.getLyrics({
         trackName: source.title,
@@ -63,7 +201,21 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       });
 
       if (!isCancelled) {
-        setLyrics(track);
+        if (track) {
+          setLyrics(track);
+          // Check for automatic music video intro delay (only for non-curated tracks)
+          if (track.source !== 'curated' && track.duration && playerStateRef.current.duration > 0 && manualOffsetRef.current === 0) {
+            const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
+            if (!saved) {
+              const diff = Number((playerStateRef.current.duration - track.duration).toFixed(1));
+              if (diff >= 1.5 && diff <= 90) {
+                handleOffsetChange(diff);
+                setIntroNotice(`Music video intro detected (+${diff}s) · Synchronized`);
+                setTimeout(() => setIntroNotice(null), 4500);
+              }
+            }
+          }
+        }
         setIsLoadingLyrics(false);
       }
     };
@@ -85,6 +237,50 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     },
     onDurationChange: (duration) => {
       setPlayerState((prev) => ({ ...prev, duration }));
+      // Check for automatic music video intro delay (only for non-curated tracks)
+      const curLyrics = lyricsRef.current;
+      if (duration > 0 && curLyrics && curLyrics.source !== 'curated' && curLyrics.duration && manualOffsetRef.current === 0) {
+        const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
+        if (!saved) {
+          const diff = Number((duration - curLyrics.duration).toFixed(1));
+          if (diff >= 1.5 && diff <= 90) {
+            handleOffsetChange(diff);
+            setIntroNotice(`Music video intro detected (+${diff}s) · Synchronized`);
+            setTimeout(() => setIntroNotice(null), 4500);
+          }
+        }
+      }
+    },
+    onMetadata: (meta) => {
+      if (!meta.title) return;
+      const { artist, title } = cleanTrackTitle(meta.title, meta.author);
+      const curTrack = trackInfoRef.current;
+      const curLyrics = lyricsRef.current;
+      if (title && (title !== curTrack.title || artist !== curTrack.artist || !curLyrics)) {
+        setTrackInfo({ title, artist: artist || '' });
+        setIsLoadingLyrics(true);
+        LyricsProvider.getLyrics({
+          trackName: title,
+          artistName: artist,
+          duration: playerStateRef.current.duration || source.duration,
+          videoId: meta.videoId || source.sourceId,
+        }).then((track) => {
+          if (track) {
+            setLyrics(track);
+            // Check for music video intro delay (only for non-curated tracks)
+            if (track.source !== 'curated' && track.duration && playerStateRef.current.duration > 0 && manualOffsetRef.current === 0) {
+              const diff = Number((playerStateRef.current.duration - track.duration).toFixed(1));
+              const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
+              if (!saved && diff >= 1.5 && diff <= 90) {
+                handleOffsetChange(diff);
+                setIntroNotice(`Music video intro detected (+${diff}s) · Synchronized`);
+                setTimeout(() => setIntroNotice(null), 4500);
+              }
+            }
+          }
+          setIsLoadingLyrics(false);
+        });
+      }
     },
   };
 
@@ -196,9 +392,12 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           </div>
 
           <div className="header-track-info">
-            <span className="header-track-title" title={source.title}>
-              {source.title}
+            <span className="header-track-title" title={trackInfo.title}>
+              {trackInfo.title}
             </span>
+            {trackInfo.artist && (
+              <span className="header-track-artist"> &middot; {trackInfo.artist}</span>
+            )}
             {lyrics?.synced && (
               <span className="header-lrclib-badge" title="Synchronized lyrics active from lrclib.net">
                 <CheckCircle2 size={12} /> lrclib.net
@@ -208,6 +407,18 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         </div>
 
         <div className="header-actions">
+          {onOpenArtist && (
+            <button
+              type="button"
+              className="header-btn header-artist-btn"
+              onClick={() => onOpenArtist(trackInfo.artist || source.artist)}
+              title={trackInfo.artist ? `Open ${trackInfo.artist} profile & songs` : 'Open Artist Profile'}
+            >
+              <UserRound size={14} />
+              <span>Artist</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="header-btn"
@@ -239,6 +450,14 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         </div>
       </header>
 
+      {/* Floating Intro Alignment Notification Toast */}
+      {introNotice && (
+        <div className="player-intro-notice" role="status">
+          <Clock size={13} className="text-accent" />
+          <span>{introNotice}</span>
+        </div>
+      )}
+
       {/* Primary Video Background with Overlayed Lyrics */}
       {source.kind === 'youtube' ? (
         <YouTubePlayerView
@@ -256,6 +475,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onSeekTo={(sec) => adapter?.seekTo(sec)}
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
+          onAutoSync={handleAutoSync}
         />
       ) : (
         <LocalPlayerView
@@ -273,6 +493,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onSeekTo={(sec) => adapter?.seekTo(sec)}
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
+          onAutoSync={handleAutoSync}
         />
       )}
 
@@ -280,20 +501,24 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       <div className={`controls-wrapper ${controlsVisible ? 'visible' : 'hidden'}`}>
         <PlayerControls
           playerState={playerState}
-          title={source.title}
+          title={trackInfo.title}
           sourceKind={source.kind}
           manualOffset={manualOffset}
           preferences={preferences}
           isFullScreen={isFullScreen}
           lyricsVisible={lyricsVisible}
+          detectedIntroGap={detectedIntroGap}
           onPlay={() => adapter?.play()}
           onPause={() => adapter?.pause()}
           onSeek={(sec) => adapter?.seekTo(sec)}
           onVolumeChange={(vol) => adapter?.setVolume(vol)}
           onToggleMute={() => adapter?.setMuted(!playerState.muted)}
-          onOffsetChange={setManualOffset}
+          onAutoSync={handleAutoSync}
+          onOffsetChange={handleOffsetChange}
+          onResetSync={handleResetSync}
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
+          onOpenArtist={onOpenArtist ? () => onOpenArtist(trackInfo.artist || source.artist) : undefined}
           onToggleLyricsVisible={() => setLyricsVisible(!lyricsVisible)}
           onToggleFullScreen={handleToggleFullScreen}
           onExitPlayer={onExit}
@@ -305,7 +530,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       <LrclibSearchModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
-        initialQuery={source.artist ? `${source.artist} ${source.title}` : source.title}
+        initialQuery={trackInfo.artist ? `${trackInfo.artist} ${trackInfo.title}` : trackInfo.title}
         onSelectLyrics={handleSelectFromLrclib}
       />
     </div>

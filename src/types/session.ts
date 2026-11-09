@@ -29,7 +29,7 @@ export interface RecentSession {
   playedAt: string;
 }
 
-export type TypographyPreset = 'inter' | 'serif' | 'geometric' | 'rounded' | 'mono';
+export type TypographyPreset = 'kinetic' | 'focus-stack' | 'inter' | 'serif' | 'geometric' | 'mono';
 
 export interface UserPreferences {
   typographyPreset: TypographyPreset;

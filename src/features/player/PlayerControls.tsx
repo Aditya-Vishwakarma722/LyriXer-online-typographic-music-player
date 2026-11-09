@@ -10,10 +10,14 @@ import {
   Upload,
   Type,
   Sliders,
+  Sparkles,
   RotateCcw,
   Search,
   Eye,
   EyeOff,
+  Timer,
+  UserRound,
+  X,
 } from 'lucide-react';
 import type { VideoPlayerState } from '../../services/video/types';
 import type { TypographyPreset, UserPreferences } from '../../types/session';
@@ -28,14 +32,18 @@ interface PlayerControlsProps {
   preferences: UserPreferences;
   isFullScreen: boolean;
   lyricsVisible: boolean;
+  detectedIntroGap?: number | null;
   onPlay: () => void;
   onPause: () => void;
   onSeek: (seconds: number) => void;
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
-  onOffsetChange: (offset: number) => void;
+  onAutoSync?: () => void;
+  onOffsetChange?: (offset: number) => void;
+  onResetSync?: () => void;
   onUploadLrcClick: () => void;
   onSearchLrclibClick?: () => void;
+  onOpenArtist?: () => void;
   onToggleLyricsVisible: () => void;
   onToggleFullScreen: () => void;
   onExitPlayer: () => void;
@@ -50,14 +58,18 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   preferences,
   isFullScreen,
   lyricsVisible,
+  detectedIntroGap,
   onPlay,
   onPause,
   onSeek,
   onVolumeChange,
   onToggleMute,
+  onAutoSync,
   onOffsetChange,
+  onResetSync,
   onUploadLrcClick,
   onSearchLrclibClick,
+  onOpenArtist,
   onToggleLyricsVisible,
   onToggleFullScreen,
   onExitPlayer,
@@ -65,6 +77,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
 }) => {
   const [showTypographyMenu, setShowTypographyMenu] = useState(false);
   const [showEffectsMenu, setShowEffectsMenu] = useState(false);
+  const [isSyncManagerOpen, setIsSyncManagerOpen] = useState(false);
 
   const { currentTime, duration, paused, volume, muted } = playerState;
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -156,7 +169,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           </div>
         </div>
 
-        {/* Right Section: Volume, LRC Offset, Typo Preset, Fullscreen */}
+        {/* Right Section: Volume, Sync Manager, Artist, Search, Upload, Typography, Blur, Fullscreen */}
         <div className="controls-right">
           {/* Volume Control */}
           <div className="volume-group">
@@ -179,35 +192,151 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             />
           </div>
 
-          {/* Sync Offset Adjuster */}
-          <div className="offset-adjuster" title="Adjust lyric timing forward or backward">
-            <button
-              type="button"
-              className="offset-step-btn"
-              onClick={() => onOffsetChange(Number((manualOffset - 0.2).toFixed(1)))}
-              title="Shift lyrics earlier (-0.2s)"
-            >
-              -0.2s
-            </button>
-            {manualOffset !== 0 && (
+          {/* Lyrics Sync Manager Icon Button */}
+          {onAutoSync && (
+            <div className="dropdown-wrapper">
               <button
                 type="button"
-                className="offset-reset-btn"
-                onClick={() => onOffsetChange(0)}
-                title="Reset timing offset"
+                className={`ctrl-btn sync-ctrl-btn ${isSyncManagerOpen || manualOffset !== 0 ? 'active' : ''}`}
+                onClick={() => {
+                  setIsSyncManagerOpen(!isSyncManagerOpen);
+                  setShowTypographyMenu(false);
+                  setShowEffectsMenu(false);
+                }}
+                title={
+                  manualOffset !== 0
+                    ? `Lyrics Sync: ${manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`} active`
+                    : 'Lyrics Synchronization'
+                }
+                aria-label="Manage lyrics synchronization"
               >
-                <RotateCcw size={12} />
+                <Timer size={17} />
+                {manualOffset !== 0 && <span className="sync-active-dot" />}
               </button>
-            )}
+
+              {isSyncManagerOpen && (
+                <div className="player-popover sync-popover">
+                  <div className="sync-popover-header">
+                    <span className="popover-title">Lyrics Synchronization</span>
+                    <button
+                      type="button"
+                      className="popover-close-btn"
+                      onClick={() => setIsSyncManagerOpen(false)}
+                      aria-label="Close sync manager"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+
+                  {/* 1-Click Catch & Sync Action */}
+                  <div className="sync-section">
+                    <button
+                      type="button"
+                      className="sync-catch-hero-btn"
+                      onClick={() => {
+                        onAutoSync();
+                      }}
+                      title="Catch and align lyrics to current playback position"
+                    >
+                      <Sparkles size={16} />
+                      <div className="sync-btn-text">
+                        <strong>Sync Lyrics to Video</strong>
+                        <span>Aligns lyrics to {formatDuration(currentTime)}</span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Auto-detected Intro Gap */}
+                  {detectedIntroGap && detectedIntroGap > 0 && onOffsetChange && (
+                    <div className="sync-detected-intro">
+                      <div className="intro-info">
+                        <span className="intro-label">Intro scene detected:</span>
+                        <span className="intro-time">+{detectedIntroGap}s</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="apply-intro-btn"
+                        onClick={() => onOffsetChange(detectedIntroGap)}
+                      >
+                        Apply Offset
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Fine Adjust Steppers (Nudge Delay / Forward) */}
+                  {onOffsetChange && (
+                    <div className="sync-section">
+                      <div className="sync-section-title">
+                        <span>Fine Adjust (Delay / Rush)</span>
+                        <span className="current-offset-tag">
+                          {manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`}
+                        </span>
+                      </div>
+                      <div className="sync-stepper-row">
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => onOffsetChange(Number((manualOffset - 0.5).toFixed(1)))}
+                          title="Advance lyrics by 0.5s"
+                        >
+                          -0.5s
+                        </button>
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => onOffsetChange(Number((manualOffset - 0.1).toFixed(1)))}
+                          title="Advance lyrics by 0.1s"
+                        >
+                          -0.1s
+                        </button>
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => onOffsetChange(Number((manualOffset + 0.1).toFixed(1)))}
+                          title="Delay lyrics by 0.1s"
+                        >
+                          +0.1s
+                        </button>
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => onOffsetChange(Number((manualOffset + 0.5).toFixed(1)))}
+                          title="Delay lyrics by 0.5s"
+                        >
+                          +0.5s
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Reset Offset */}
+                  {onResetSync && manualOffset !== 0 && (
+                    <button
+                      type="button"
+                      className="sync-reset-action-btn"
+                      onClick={() => onResetSync()}
+                    >
+                      <RotateCcw size={13} />
+                      <span>Reset Offset to 0:00</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Artist Profile Button */}
+          {onOpenArtist && (
             <button
               type="button"
-              className="offset-step-btn"
-              onClick={() => onOffsetChange(Number((manualOffset + 0.2).toFixed(1)))}
-              title="Shift lyrics later (+0.2s)"
+              className="ctrl-btn ctrl-btn-artist"
+              onClick={onOpenArtist}
+              title="Open Artist Profile"
+              aria-label="Open Artist Profile"
             >
-              +0.2s
+              <UserRound size={17} />
             </button>
-          </div>
+          )}
 
           {/* Search LRCLIB Button */}
           {onSearchLrclibClick && (
@@ -264,6 +393,8 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                 <span className="popover-title">Lyric Typography</span>
                 {(
                   [
+                    { id: 'kinetic', name: 'Kinetic Screen (Cinema Edit)' },
+                    { id: 'focus-stack', name: 'Focus Stack' },
                     { id: 'inter', name: 'Modern Sans' },
                     { id: 'geometric', name: 'Geometric' },
                     { id: 'serif', name: 'Editorial Serif' },

@@ -21,6 +21,8 @@ interface LocalPlayerViewProps {
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
   onSearchLrclibClick: () => void;
+  onAutoSync?: () => void;
+  onAlignVocalsToNow?: () => void;
 }
 
 export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
@@ -38,6 +40,8 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
   onSeekTo,
   onUploadLrcClick,
   onSearchLrclibClick,
+  onAutoSync,
+  onAlignVocalsToNow,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const adapterRef = useRef<HTML5VideoAdapter | null>(null);
@@ -102,6 +106,7 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
           onSeekTo={onSeekTo}
           onUploadLrcClick={onUploadLrcClick}
           onSearchLrclibClick={onSearchLrclibClick}
+          onAutoSync={onAutoSync || onAlignVocalsToNow}
         />
       </div>
     </div>

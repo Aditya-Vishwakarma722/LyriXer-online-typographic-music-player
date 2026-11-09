@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Info } from 'lucide-react';
+import { SlidersHorizontal, Info, Mic2 } from 'lucide-react';
 import './Navbar.css';
 
 interface NavbarProps {
   onOpenAbout: () => void;
   onOpenSettings: () => void;
+  onOpenArtists?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenAbout, onOpenSettings }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  onOpenAbout,
+  onOpenSettings,
+  onOpenArtists,
+}) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -41,6 +46,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAbout, onOpenSettings }) =
 
         {/* Minimal Navigation */}
         <nav className="navbar-nav" aria-label="Main Navigation">
+          {onOpenArtists && (
+            <button
+              type="button"
+              className="navbar-link"
+              onClick={onOpenArtists}
+              aria-label="Artists Catalogue"
+            >
+              <Mic2 size={15} className="navbar-link-icon" />
+              <span>Artists</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="navbar-link"

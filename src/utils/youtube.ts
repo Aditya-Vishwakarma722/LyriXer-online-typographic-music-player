@@ -93,27 +93,62 @@ export interface YouTubeMetadata {
 }
 
 /**
- * Strips common YouTube video noise such as "(Official Video)", "[Remastered]", etc.
- * and attempts to isolate the artist and song title.
+ * Strips common YouTube video noise such as "(Official Video)", "[Remastered]", "(Directed by ...)", "ft. ...", etc.
+ * and cleanly isolates the artist and song title for exact lyrics matching.
  */
 export function cleanTrackTitle(rawTitle: string, authorName?: string): { artist: string; title: string } {
-  // Strip common YouTube tag fluff: (Official Music Video), [Official Audio], (4K 60FPS), etc.
-  const clean = rawTitle
-    .replace(/\s*[[([][^\])]*(?:official|video|audio|remaster|hd|4k|lyric|visualizer|clip|explicit)[^\])]*[)\]]/gi, '')
+  if (!rawTitle) return { artist: authorName || '', title: '' };
+
+  // 1. Clean author name if provided (strip VEVO, - Topic, Official, etc.)
+  const cleanAuthor = authorName
+    ? authorName
+        .replace(/VEVO$/i, '')
+        .replace(/\s*-\s*Topic$/i, '')
+        .replace(/\s*(?:official|channel|music|records|media|entertainment)$/i, '')
+        .trim()
+    : '';
+
+  // 2. Strip bracketed and parenthetical noise from raw title
+  let clean = rawTitle
+    .replace(/\s*[[({][^\])}]*[\])}]/g, ' ')
+    // Remove decorative quotes around title e.g. Artist - "Title"
+    .replace(/["“”'‘’]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 
-  // If there's a delimiter like "Artist - Title" or "Artist : Title"
-  const delimiterMatch = clean.match(/^(.+?)\s*[-–—:|]\s*(.+)$/);
-  if (delimiterMatch) {
-    return {
-      artist: delimiterMatch[1].trim(),
-      title: delimiterMatch[2].trim(),
-    };
+  let artist = '';
+  let title = clean;
+
+  // 3. Delimiter split: "Artist - Title", "Artist — Title", "Artist : Title", "Artist | Title"
+  const delimRegex = /\s+[-–—:|/]\s+/;
+  if (delimRegex.test(clean)) {
+    const parts = clean.split(delimRegex).map((p) => p.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      const p0 = parts[0];
+      const p1 = parts.slice(1).join(' - ');
+
+      // Check if cleanAuthor matches Part 2 (e.g. Title - Artist)
+      if (cleanAuthor && p1.toLowerCase().includes(cleanAuthor.toLowerCase())) {
+        artist = p1;
+        title = p0;
+      } else {
+        artist = p0;
+        title = p1;
+      }
+    }
   }
 
+  // 4. Fallback artist to cleaned author if not isolated from title
+  if (!artist && cleanAuthor) {
+    artist = cleanAuthor;
+  }
+
+  // 5. Strip trailing "ft. ..." or "feat. ..." from title for clean metadata lookup
+  title = title.replace(/\s*(?:ft\.?|feat\.?|featuring)\s+.*$/i, '').trim();
+
   return {
-    artist: authorName?.replace(/\s*-\s*Topic$/i, '').trim() || '',
-    title: clean,
+    artist: artist || cleanAuthor || '',
+    title: title || rawTitle,
   };
 }
 
@@ -125,15 +160,17 @@ export async function fetchYouTubeMetadata(videoId: string): Promise<YouTubeMeta
     const resp = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
     if (resp.ok) {
       const data = await resp.json();
-      const rawTitle = data.title || `YouTube Video (${videoId})`;
-      const author = data.author_name || '';
-      const { artist, title } = cleanTrackTitle(rawTitle, author);
-      return {
-        title: rawTitle,
-        author,
-        cleanArtist: artist,
-        cleanTitle: title,
-      };
+      if (!data.error && data.title) {
+        const rawTitle = data.title;
+        const author = data.author_name || '';
+        const { artist, title } = cleanTrackTitle(rawTitle, author);
+        return {
+          title: rawTitle,
+          author,
+          cleanArtist: artist,
+          cleanTitle: title,
+        };
+      }
     }
   } catch (err) {
     console.warn('YouTube oEmbed metadata fetch failed:', err);
@@ -143,6 +180,22 @@ export async function fetchYouTubeMetadata(videoId: string): Promise<YouTubeMeta
     title: `YouTube Video (${videoId})`,
     author: '',
     cleanArtist: '',
-    cleanTitle: `YouTube Video (${videoId})`,
+    cleanTitle: '',
   };
 }
+
+/**
+ * Verified intro scene durations (in seconds) for official music videos.
+ * Accounts for acting, director title sequences, and cinematic preambles
+ * before the musical track begins.
+ */
+export const KNOWN_VIDEO_INTROS: Record<string, number> = {
+  BY_XwvKogC8: 0.0, // Billie Eilish - CHIHIRO (Official Music Video - Calibrated in CuratedTracks)
+  iI34LYmJ1Fs: 0.0, // Juice WRLD - Robbery (Official Music Video - Calibrated in CuratedTracks)
+  i9AHJkHqkpw: 0.0, // Juice WRLD - Robbery (Calibrated)
+  U3ASj1L6_sY: 0.0, // Adele - Easy On Me (Curated)
+  yKNxeF4KMsY: 0.0, // Coldplay - Yellow
+  '5NV6Rdv1a3I': 0.0, // Daft Punk - Get Lucky
+  fJ9rUzIMcZQ: 0.0, // Queen - Bohemian Rhapsody
+  '4NRXx6U8ABQ': 28.0, // The Weeknd - Blinding Lights (Car driving scene intro)
+};

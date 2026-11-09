@@ -27,7 +27,8 @@ export function useLyricsSync(
       };
     }
 
-    const effectiveTime = Math.max(0, currentTime + offsetSeconds);
+    // When offsetSeconds is positive, lyrics are delayed to account for music video intro scenes
+    const effectiveTime = Math.max(0, currentTime - offsetSeconds);
     const lines = lyrics.lines;
 
     // Before the first lyric line begins
