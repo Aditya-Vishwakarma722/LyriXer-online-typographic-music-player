@@ -1,0 +1,35 @@
+.local-player-layout {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-base);
+}
+
+.local-bg-video {
+  position: absolute;
+  inset: -20px; /* Slight bleed to avoid blur edges */
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1;
+  transition: filter var(--transition-normal);
+}
+
+.local-dark-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  transition: background-color var(--transition-normal);
+}
+
+.local-lyrics-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}

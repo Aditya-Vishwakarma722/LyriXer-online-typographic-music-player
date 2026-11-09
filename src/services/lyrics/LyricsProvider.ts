@@ -105,3 +105,4 @@ export class LyricsProvider {
     return track;
   }
 }
+

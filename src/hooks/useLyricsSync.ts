@@ -79,3 +79,4 @@ export function useLyricsSync(
     };
   }, [lyrics, currentTime, offsetSeconds]);
 }
+

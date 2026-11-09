@@ -7,8 +7,8 @@ import { RecentSessions } from './features/home/RecentSessions';
 import { Footer } from './features/home/Footer';
 import { AboutModal } from './features/home/AboutModal';
 import { SettingsModal } from './features/home/SettingsModal';
-import { SessionLaunchModal } from './features/home/SessionLaunchModal';
-import type { UserPreferences, VideoSource } from './types/session';
+import { PlayerShell } from './features/player/PlayerShell';
+import type { UserPreferences, VideoSource, RecentSession } from './types/session';
 import './App.css';
 
 const DEFAULT_PREFERENCES: UserPreferences = {
@@ -22,15 +22,23 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   overlayOpacity: 0.5,
 };
 
+const STORAGE_KEY_PREFS = 'lyrixer_preferences';
+const STORAGE_KEY_RECENT = 'lyrixer_recent_sessions';
+
 export const App: React.FC = () => {
-  // User Preferences with LocalStorage Persistence (FR-10)
+  // User Preferences with LocalStorage Persistence & automatic purge of legacy grey styles
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
     try {
-      const stored = localStorage.getItem('lyrixer_preferences');
+      const stored = localStorage.getItem(STORAGE_KEY_PREFS);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.backgroundStyle === 'dark-veil' || parsed.backgroundStyle === 'aurora') {
+        if (
+          parsed.backgroundStyle === 'dark-veil' ||
+          parsed.backgroundStyle === 'aurora' ||
+          !parsed.backgroundStyle
+        ) {
           parsed.backgroundStyle = 'combined';
+          localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(parsed));
         }
         return { ...DEFAULT_PREFERENCES, ...parsed };
       }
@@ -38,6 +46,19 @@ export const App: React.FC = () => {
     } catch {
       return DEFAULT_PREFERENCES;
     }
+  });
+
+  // Recent Sessions State
+  const [recentSessions, setRecentSessions] = useState<RecentSession[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_RECENT);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch {
+      // ignore
+    }
+    return [];
   });
 
   // Modal Dialog States
@@ -50,7 +71,7 @@ export const App: React.FC = () => {
     setPreferences((prev) => {
       const updated = { ...prev, ...updates };
       try {
-        localStorage.setItem('lyrixer_preferences', JSON.stringify(updated));
+        localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(updated));
       } catch {
         // Storage quota / privacy mode fallback
       }
@@ -72,39 +93,77 @@ export const App: React.FC = () => {
 
   const handleStartSession = (source: VideoSource) => {
     setActiveSession(source);
+
+    // Record to recent sessions
+    const newSession: RecentSession = {
+      id: `session-${Date.now()}`,
+      title: source.title,
+      artist: source.kind === 'youtube' ? 'YouTube Music' : 'Local Video',
+      thumbnailUrl: source.thumbnailUrl,
+      kind: source.kind,
+      sourceId: source.sourceId,
+      duration: source.duration,
+      playedAt: new Date().toISOString(),
+    };
+
+    setRecentSessions((prev) => {
+      const filtered = prev.filter((s) => s.sourceId !== source.sourceId);
+      const updated = [newSession, ...filtered].slice(0, 8);
+      try {
+        localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
+
+  const handleExitPlayer = () => {
+    setActiveSession(null);
   };
 
   return (
     <div className={`app-shell theme-${preferences.theme}`}>
-      {/* Authentic Classy Atmospheric Background (React Bits DarkVeil / Aurora + Particles + Halo) */}
+      {/* Authentic Classy Atmospheric Background (Concentric Halo + React Bits Waves & Particles) */}
       <AtmosphericBackground
         style={preferences.backgroundStyle}
         enableParticles={preferences.enableParticles}
         enablePulse={preferences.haloMotion}
       />
 
-      {/* Sparse Navigation */}
-      <Navbar
-        onOpenAbout={() => setIsAboutOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
+      {/* Active Session: Immersive Player Shell */}
+      {activeSession ? (
+        <PlayerShell
+          source={activeSession}
+          preferences={preferences}
+          onExit={handleExitPlayer}
+          onUpdatePreferences={handleUpdatePreferences}
+        />
+      ) : (
+        /* Default: Clean Atmospheric Homepage UI */
+        <>
+          <Navbar
+            onOpenAbout={() => setIsAboutOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+          />
 
-      {/* Main Page Layout */}
-      <main className="main-viewport">
-        {/* Centered Hero & Video Input */}
-        <Hero>
-          <VideoInput onStartSession={handleStartSession} />
-        </Hero>
+          <main className="main-viewport">
+            <Hero>
+              <VideoInput onStartSession={handleStartSession} />
+            </Hero>
 
-        {/* Quiet Recently Played Area */}
-        <RecentSessions onSelectSession={handleStartSession} />
-      </main>
+            <RecentSessions
+              sessions={recentSessions}
+              onSelectSession={handleStartSession}
+            />
+          </main>
 
-      {/* Minimal Footer */}
-      <Footer
-        onOpenAbout={() => setIsAboutOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
+          <Footer
+            onOpenAbout={() => setIsAboutOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+          />
+        </>
+      )}
 
       {/* Dialog Modals */}
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
@@ -114,11 +173,6 @@ export const App: React.FC = () => {
         onClose={() => setIsSettingsOpen(false)}
         preferences={preferences}
         onUpdatePreferences={handleUpdatePreferences}
-      />
-
-      <SessionLaunchModal
-        session={activeSession}
-        onClose={() => setActiveSession(null)}
       />
     </div>
   );
