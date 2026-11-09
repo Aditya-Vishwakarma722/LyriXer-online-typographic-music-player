@@ -1,0 +1,38 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  width: fit-content;
+  user-select: none;
+}
+
+.badge-violet {
+  background: rgba(167, 139, 250, 0.08);
+  color: var(--accent-violet-light);
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.12);
+}
+
+.badge-subtle {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.badge-default {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+
+.badge-icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+}
