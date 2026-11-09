@@ -11,15 +11,25 @@ export interface LyricsSearchParams {
   videoId?: string;
 }
 
+export interface LrclibSearchResult {
+  id: number;
+  trackName: string;
+  artistName: string;
+  albumName?: string;
+  duration?: number;
+  syncedLyrics?: string;
+  plainLyrics?: string;
+}
+
 export class LyricsProvider {
   /**
-   * Searches for synchronized lyrics using curated offline tracks,
-   * in-memory cache, and the open LRCLIB database API.
+   * Searches for synchronized lyrics directly from LRCLIB (https://lrclib.net).
+   * Checks curated fallback tracks, in-memory cache, and the live open LRCLIB database API.
    */
   static async getLyrics(params: LyricsSearchParams): Promise<LyricTrack | null> {
     const { trackName, artistName, duration, videoId } = params;
 
-    // 1. Check curated catalog by videoId first (guarantees instantaneous millisecond precision for demos)
+    // 1. Check curated catalog by videoId first (instant precision for demo tracks)
     if (videoId && CURATED_TRACKS[videoId]) {
       return CURATED_TRACKS[videoId];
     }
@@ -36,63 +46,104 @@ export class LyricsProvider {
       return lyricsCache.get(cacheKey)!;
     }
 
-    // 4. Query LRCLIB API
+    // 4. Query live LRCLIB API (https://lrclib.net)
     try {
+      let data: LrclibSearchResult | null = null;
+
       // First attempt: exact get match if artist & duration available
-      let data: any = null;
       if (artistName && duration) {
-        const query = new URLSearchParams({
-          track_name: trackName,
-          artist_name: artistName,
-          duration: Math.round(duration).toString(),
-        });
-        const resp = await fetch(`https://lrclib.net/api/get?${query.toString()}`, {
-          headers: { 'User-Agent': 'LyriXer-Web-App/0.1.0' },
-        });
-        if (resp.ok) {
-          data = await resp.json();
+        try {
+          const query = new URLSearchParams({
+            track_name: trackName,
+            artist_name: artistName,
+            duration: Math.round(duration).toString(),
+          });
+          const resp = await fetch(`https://lrclib.net/api/get?${query.toString()}`, {
+            headers: { 'User-Agent': 'LyriXer/1.0.0 (https://github.com/LyriXer)' },
+          });
+          if (resp.ok) {
+            data = await resp.json();
+          }
+        } catch {
+          // ignore and fallback to search
         }
       }
 
-      // Second attempt: general search if exact match returned nothing
+      // Second attempt: general search with both artist and track name
       if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
-        const searchQuery = new URLSearchParams({
-          q: artistName ? `${artistName} ${trackName}` : trackName,
-        });
-        const resp = await fetch(`https://lrclib.net/api/search?${searchQuery.toString()}`, {
-          headers: { 'User-Agent': 'LyriXer-Web-App/0.1.0' },
-        });
-        if (resp.ok) {
-          const results = await resp.json();
-          if (Array.isArray(results) && results.length > 0) {
-            // Prefer first result that has syncedLyrics
-            data = results.find((r: any) => r.syncedLyrics) || results[0];
-          }
+        const queryTerm = artistName ? `${artistName} ${trackName}` : trackName;
+        const results = await this.searchLrclib(queryTerm);
+        if (results.length > 0) {
+          // Prefer first result that has syncedLyrics
+          data = results.find((r) => Boolean(r.syncedLyrics)) || results[0];
+        }
+      }
+
+      // Third attempt: fallback search using track name alone
+      if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
+        const results = await this.searchLrclib(trackName);
+        if (results.length > 0) {
+          data = results.find((r) => Boolean(r.syncedLyrics)) || results[0];
         }
       }
 
       if (data) {
-        let track: LyricTrack | null = null;
-        if (data.syncedLyrics) {
-          track = parseLrc(data.syncedLyrics, 'provider');
-          track.title = data.trackName || trackName;
-          track.artist = data.artistName || artistName;
-        } else if (data.plainLyrics) {
-          track = parseLrc(data.plainLyrics, 'plain');
-          track.title = data.trackName || trackName;
-          track.artist = data.artistName || artistName;
-        }
-
+        const track = this.convertLrclibItemToTrack(data, trackName, artistName);
         if (track) {
           lyricsCache.set(cacheKey, track);
           return track;
         }
       }
     } catch (err) {
-      console.warn('LRCLIB network fetch failed or blocked:', err);
+      console.warn('LRCLIB network fetch failed:', err);
     }
 
     return null;
+  }
+
+  /**
+   * Direct search on LRCLIB API (https://lrclib.net/api/search?q=...)
+   */
+  static async searchLrclib(query: string): Promise<LrclibSearchResult[]> {
+    if (!query.trim()) return [];
+    try {
+      const resp = await fetch(
+        `https://lrclib.net/api/search?${new URLSearchParams({ q: query.trim() }).toString()}`,
+        {
+          headers: { 'User-Agent': 'LyriXer/1.0.0 (https://github.com/LyriXer)' },
+        }
+      );
+      if (resp.ok) {
+        const json = await resp.json();
+        return Array.isArray(json) ? json : [];
+      }
+    } catch (err) {
+      console.warn('LRCLIB search request failed:', err);
+    }
+    return [];
+  }
+
+  /**
+   * Converts an LRCLIB API item into our parsed LyricTrack.
+   */
+  static convertLrclibItemToTrack(
+    item: LrclibSearchResult,
+    fallbackTitle?: string,
+    fallbackArtist?: string
+  ): LyricTrack | null {
+    let track: LyricTrack | null = null;
+
+    if (item.syncedLyrics) {
+      track = parseLrc(item.syncedLyrics, 'provider');
+      track.title = item.trackName || fallbackTitle || 'Untitled';
+      track.artist = item.artistName || fallbackArtist;
+    } else if (item.plainLyrics) {
+      track = parseLrc(item.plainLyrics, 'plain');
+      track.title = item.trackName || fallbackTitle || 'Untitled';
+      track.artist = item.artistName || fallbackArtist;
+    }
+
+    return track;
   }
 
   /**

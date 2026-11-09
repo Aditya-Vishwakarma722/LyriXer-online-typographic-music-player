@@ -14,7 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { validateYouTubeUrl } from '../../utils/youtube';
+import { validateYouTubeUrl, fetchYouTubeMetadata } from '../../utils/youtube';
 import { formatFileSize } from '../../utils/formatters';
 import type { VideoSource } from '../../types/session';
 import './VideoInput.css';
@@ -85,24 +85,35 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
 
     setErrorMessage(null);
     setIsLoading(true);
-    setLoadingStep('Verifying YouTube video link...');
+    setLoadingStep('Fetching track details from YouTube...');
 
-    // Simulate preparation step smoothly
-    setTimeout(() => {
-      setLoadingStep('Initializing lyrics synchronization engine...');
+    try {
+      const meta = await fetchYouTubeMetadata(validation.videoId);
+      setLoadingStep('Connecting to LRCLIB (https://lrclib.net)...');
+
       setTimeout(() => {
         setIsLoading(false);
         const source: VideoSource = {
           kind: 'youtube',
           sourceId: validation.videoId!,
-          title: `YouTube Video (${validation.videoId})`,
+          title: meta.cleanTitle || meta.title,
+          artist: meta.cleanArtist || meta.author,
           thumbnailUrl: `https://img.youtube.com/vi/${validation.videoId}/hqdefault.jpg`,
         };
         onStartSession(source);
-        setSessionSuccessToast(`Loaded YouTube session: ID ${validation.videoId}`);
+        setSessionSuccessToast(`Loaded track: ${source.title}`);
         setTimeout(() => setSessionSuccessToast(null), 4000);
-      }, 700);
-    }, 600);
+      }, 500);
+    } catch {
+      setIsLoading(false);
+      const source: VideoSource = {
+        kind: 'youtube',
+        sourceId: validation.videoId,
+        title: `YouTube Video (${validation.videoId})`,
+        thumbnailUrl: `https://img.youtube.com/vi/${validation.videoId}/hqdefault.jpg`,
+      };
+      onStartSession(source);
+    }
   };
 
   // Local File Selection

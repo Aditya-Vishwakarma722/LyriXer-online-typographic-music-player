@@ -13,10 +13,14 @@ interface YouTubePlayerViewProps {
   isLoadingLyrics: boolean;
   typographyPreset: TypographyPreset;
   fontSizeScale: number;
+  blurLevel: number;
+  overlayOpacity: number;
+  lyricsVisible: boolean;
   onAdapterReady: (adapter: VideoPlayerAdapter) => void;
   listener: VideoPlayerListener;
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
+  onSearchLrclibClick: () => void;
 }
 
 export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
@@ -26,10 +30,14 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   isLoadingLyrics,
   typographyPreset,
   fontSizeScale,
+  blurLevel,
+  overlayOpacity,
+  lyricsVisible,
   onAdapterReady,
   listener,
   onSeekTo,
   onUploadLrcClick,
+  onSearchLrclibClick,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const adapterRef = useRef<YouTubeAdapter | null>(null);
@@ -65,16 +73,31 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   }, [videoId]);
 
   return (
-    <div className="yt-player-layout">
-      {/* Left/Top Video Column: Official Unobscured YouTube Player */}
-      <div className="yt-video-column">
-        <div className="yt-frame-container">
-          <div ref={containerRef} className="yt-embed-host" />
-        </div>
+    <div className="yt-fullscreen-player-root">
+      {/* 1. Full-Viewport YouTube Video Backdrop */}
+      <div
+        className="yt-fullscreen-video-viewport"
+        style={{
+          filter: blurLevel > 0 ? `blur(${blurLevel}px)` : 'none',
+        }}
+      >
+        <div ref={containerRef} className="yt-fullscreen-host" />
       </div>
 
-      {/* Right/Bottom Lyrics Column: Clean Adjacent Synchronized View */}
-      <div className="yt-lyrics-column">
+      {/* 2. Atmospheric Translucent Contrast Overlay */}
+      <div
+        className="yt-fullscreen-contrast-overlay"
+        style={{
+          backgroundColor: `rgba(11, 11, 13, ${overlayOpacity})`,
+        }}
+      />
+
+      {/* 3. Centered Lyrics Overlay (Floating directly above the playing video) */}
+      <div
+        className={`yt-fullscreen-lyrics-overlay ${
+          lyricsVisible ? 'lyrics-visible' : 'lyrics-hidden'
+        }`}
+      >
         <LyricsView
           lyrics={lyrics}
           activeIndex={activeIndex}
@@ -83,6 +106,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
           fontSizeScale={fontSizeScale}
           onSeekTo={onSeekTo}
           onUploadLrcClick={onUploadLrcClick}
+          onSearchLrclibClick={onSearchLrclibClick}
         />
       </div>
     </div>

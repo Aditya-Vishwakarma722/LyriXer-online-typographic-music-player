@@ -11,6 +11,7 @@ export interface VideoSource {
   kind: VideoSourceKind;
   sourceId: string;
   title: string;
+  artist?: string;
   duration?: number;
   thumbnailUrl?: string;
   localFile?: File;

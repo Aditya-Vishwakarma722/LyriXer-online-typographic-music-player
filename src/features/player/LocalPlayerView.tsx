@@ -15,10 +15,12 @@ interface LocalPlayerViewProps {
   fontSizeScale: number;
   blurLevel: number;
   overlayOpacity: number;
+  lyricsVisible: boolean;
   onAdapterReady: (adapter: VideoPlayerAdapter) => void;
   listener: VideoPlayerListener;
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
+  onSearchLrclibClick: () => void;
 }
 
 export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
@@ -30,10 +32,12 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
   fontSizeScale,
   blurLevel,
   overlayOpacity,
+  lyricsVisible,
   onAdapterReady,
   listener,
   onSeekTo,
   onUploadLrcClick,
+  onSearchLrclibClick,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const adapterRef = useRef<HTML5VideoAdapter | null>(null);
@@ -64,18 +68,18 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
 
   return (
     <div className="local-player-layout">
-      {/* Background Video Layer with Configurable Blur */}
+      {/* 1. Background Full-Viewport Video Layer with Configurable Blur */}
       <video
         ref={videoRef}
         className="local-bg-video"
         style={{
-          filter: `blur(${blurLevel}px) saturate(1.2)`,
+          filter: blurLevel > 0 ? `blur(${blurLevel}px) saturate(1.2)` : 'saturate(1.2)',
         }}
         muted={false}
         playsInline
       />
 
-      {/* Dark Translucent Overlay */}
+      {/* 2. Atmospheric Dark Translucent Overlay */}
       <div
         className="local-dark-overlay"
         style={{
@@ -83,8 +87,12 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
         }}
       />
 
-      {/* Centered Lyrics View */}
-      <div className="local-lyrics-container">
+      {/* 3. Centered Overlay Lyrics View */}
+      <div
+        className={`local-lyrics-container ${
+          lyricsVisible ? 'lyrics-visible' : 'lyrics-hidden'
+        }`}
+      >
         <LyricsView
           lyrics={lyrics}
           activeIndex={activeIndex}
@@ -93,6 +101,7 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
           fontSizeScale={fontSizeScale}
           onSeekTo={onSeekTo}
           onUploadLrcClick={onUploadLrcClick}
+          onSearchLrclibClick={onSearchLrclibClick}
         />
       </div>
     </div>

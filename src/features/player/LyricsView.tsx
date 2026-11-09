@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import type { LyricTrack, LyricLine } from '../../services/lyrics/lrcParser';
 import type { TypographyPreset } from '../../types/session';
-import { Loader2, Music, Upload } from 'lucide-react';
+import { Loader2, Music, Upload, Search } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import './LyricsView.css';
 
@@ -14,6 +14,7 @@ interface LyricsViewProps {
   fontSizeScale?: number; // 0.8 to 1.4
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
+  onSearchLrclibClick?: () => void;
 }
 
 export const LyricsView: React.FC<LyricsViewProps> = ({
@@ -24,6 +25,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   fontSizeScale = 1,
   onSeekTo,
   onUploadLrcClick,
+  onSearchLrclibClick,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeLineRef = useRef<HTMLDivElement>(null);
@@ -41,8 +43,8 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   if (isLoadingLyrics) {
     return (
       <div className="lyrics-loading-state">
-        <Loader2 size={24} className="animate-spin text-accent" />
-        <p className="loading-text">Synchronizing lyrics...</p>
+        <Loader2 size={26} className="animate-spin text-accent" />
+        <p className="loading-text">Fetching lyrics from https://lrclib.net...</p>
       </div>
     );
   }
@@ -55,17 +57,28 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         </div>
         <h3 className="empty-title">No Lyrics Found</h3>
         <p className="empty-desc">
-          We couldn't automatically match synchronized lyrics for this track. You can upload an LRC
-          file to follow along.
+          We couldn't automatically match synchronized lyrics for this track on LRCLIB. You can search manually by title or load a local LRC file.
         </p>
-        <Button
-          variant="secondary"
-          size="md"
-          leftIcon={<Upload size={14} />}
-          onClick={onUploadLrcClick}
-        >
-          Load .LRC File
-        </Button>
+        <div className="empty-actions-row">
+          {onSearchLrclibClick && (
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={<Search size={14} />}
+              onClick={onSearchLrclibClick}
+            >
+              Search LRCLIB
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            size="md"
+            leftIcon={<Upload size={14} />}
+            onClick={onUploadLrcClick}
+          >
+            Load .LRC File
+          </Button>
+        </div>
       </div>
     );
   }

@@ -11,6 +11,9 @@ import {
   Type,
   Sliders,
   RotateCcw,
+  Search,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import type { VideoPlayerState } from '../../services/video/types';
 import type { TypographyPreset, UserPreferences } from '../../types/session';
@@ -24,6 +27,7 @@ interface PlayerControlsProps {
   manualOffset: number;
   preferences: UserPreferences;
   isFullScreen: boolean;
+  lyricsVisible: boolean;
   onPlay: () => void;
   onPause: () => void;
   onSeek: (seconds: number) => void;
@@ -31,6 +35,8 @@ interface PlayerControlsProps {
   onToggleMute: () => void;
   onOffsetChange: (offset: number) => void;
   onUploadLrcClick: () => void;
+  onSearchLrclibClick?: () => void;
+  onToggleLyricsVisible: () => void;
   onToggleFullScreen: () => void;
   onExitPlayer: () => void;
   onUpdatePreferences: (updates: Partial<UserPreferences>) => void;
@@ -43,6 +49,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   manualOffset,
   preferences,
   isFullScreen,
+  lyricsVisible,
   onPlay,
   onPause,
   onSeek,
@@ -50,6 +57,8 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   onToggleMute,
   onOffsetChange,
   onUploadLrcClick,
+  onSearchLrclibClick,
+  onToggleLyricsVisible,
   onToggleFullScreen,
   onExitPlayer,
   onUpdatePreferences,
@@ -200,6 +209,19 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             </button>
           </div>
 
+          {/* Search LRCLIB Button */}
+          {onSearchLrclibClick && (
+            <button
+              type="button"
+              className="ctrl-btn"
+              onClick={onSearchLrclibClick}
+              title="Search lyrics on lrclib.net"
+              aria-label="Search lyrics on LRCLIB"
+            >
+              <Search size={17} />
+            </button>
+          )}
+
           {/* Manual LRC File Upload */}
           <button
             type="button"
@@ -209,6 +231,17 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             aria-label="Upload LRC file"
           >
             <Upload size={17} />
+          </button>
+
+          {/* Toggle Lyrics Visibility */}
+          <button
+            type="button"
+            className={`ctrl-btn ${!lyricsVisible ? 'active' : ''}`}
+            onClick={onToggleLyricsVisible}
+            title={lyricsVisible ? 'Hide lyrics overlay' : 'Show lyrics overlay'}
+            aria-label="Toggle lyrics overlay visibility"
+          >
+            {lyricsVisible ? <Eye size={17} /> : <EyeOff size={17} />}
           </button>
 
           {/* Typography Preset Picker Trigger */}
@@ -255,54 +288,52 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             )}
           </div>
 
-          {/* Local Mode Blur & Atmosphere Slider (Only for Local/Licensed source) */}
-          {sourceKind === 'local' && (
-            <div className="dropdown-wrapper">
-              <button
-                type="button"
-                className={`ctrl-btn ${showEffectsMenu ? 'active' : ''}`}
-                onClick={() => {
-                  setShowEffectsMenu(!showEffectsMenu);
-                  setShowTypographyMenu(false);
-                }}
-                title="Background Blur & Dim"
-                aria-label="Background visual settings"
-              >
-                <Sliders size={17} />
-              </button>
+          {/* Background Blur & Atmosphere Slider (Available for all sources) */}
+          <div className="dropdown-wrapper">
+            <button
+              type="button"
+              className={`ctrl-btn ${showEffectsMenu ? 'active' : ''}`}
+              onClick={() => {
+                setShowEffectsMenu(!showEffectsMenu);
+                setShowTypographyMenu(false);
+              }}
+              title="Background Blur & Dim"
+              aria-label="Background visual atmosphere settings"
+            >
+              <Sliders size={17} />
+            </button>
 
-              {showEffectsMenu && (
-                <div className="player-popover effects-popover">
-                  <span className="popover-title">Background Atmosphere</span>
-                  <div className="popover-slider-row">
-                    <label>Blur ({preferences.blurLevel}px)</label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="24"
-                      value={preferences.blurLevel}
-                      onChange={(e) =>
-                        onUpdatePreferences({ blurLevel: Number(e.target.value) })
-                      }
-                    />
-                  </div>
-                  <div className="popover-slider-row">
-                    <label>Dim Overlay ({Math.round(preferences.overlayOpacity * 100)}%)</label>
-                    <input
-                      type="range"
-                      min="0.2"
-                      max="0.85"
-                      step="0.05"
-                      value={preferences.overlayOpacity}
-                      onChange={(e) =>
-                        onUpdatePreferences({ overlayOpacity: Number(e.target.value) })
-                      }
-                    />
-                  </div>
+            {showEffectsMenu && (
+              <div className="player-popover effects-popover">
+                <span className="popover-title">Background Atmosphere</span>
+                <div className="popover-slider-row">
+                  <label>Blur ({preferences.blurLevel}px)</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    value={preferences.blurLevel}
+                    onChange={(e) =>
+                      onUpdatePreferences({ blurLevel: Number(e.target.value) })
+                    }
+                  />
                 </div>
-              )}
-            </div>
-          )}
+                <div className="popover-slider-row">
+                  <label>Dim Overlay ({Math.round(preferences.overlayOpacity * 100)}%)</label>
+                  <input
+                    type="range"
+                    min="0.15"
+                    max="0.9"
+                    step="0.05"
+                    value={preferences.overlayOpacity}
+                    onChange={(e) =>
+                      onUpdatePreferences({ overlayOpacity: Number(e.target.value) })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Fullscreen Toggle */}
           <button
