@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from '../../components/ui/Modal';
-import { Sparkles, Type, Moon, Check } from 'lucide-react';
-import type { UserPreferences, TypographyPreset } from '../../types/session';
+import { Sparkles, Type, Moon, Check, Waves, Flame } from 'lucide-react';
+import type { UserPreferences, TypographyPreset, BackgroundStyle } from '../../types/session';
 import './SettingsModal.css';
 
 interface SettingsModalProps {
@@ -18,6 +18,12 @@ const TYPOGRAPHY_PRESETS: { id: TypographyPreset; label: string; desc: string }[
   { id: 'mono', label: 'Monospace', desc: 'Technical & structured (JetBrains)' },
 ];
 
+const BACKGROUND_STYLES: { id: BackgroundStyle; label: string; desc: string }[] = [
+  { id: 'dark-veil', label: 'Dark Veil (React Bits)', desc: 'Silky shader light mesh drifting with the cursor' },
+  { id: 'aurora', label: 'Aurora (React Bits)', desc: 'Soft calm violet & lavender color flow' },
+  { id: 'halo', label: 'Concentric Halo', desc: 'Restrained acoustic geometric halo rings' },
+];
+
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
@@ -28,20 +34,72 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Preferences & Style"
-      description="Customize typography, atmospheric lighting, and display settings."
-      maxWidth="560px"
+      title="Preferences & Atmosphere"
+      description="Customize backgrounds from React Bits, typography, and motion."
+      maxWidth="580px"
     >
       <div className="settings-modal-content">
-        {/* Ambient Halo Pulse Setting */}
+        {/* Animated Background Style Selection */}
+        <div className="settings-group">
+          <div className="label-with-icon mb-2">
+            <Waves size={16} className="settings-icon" />
+            <span className="settings-title">Background Atmosphere (React Bits)</span>
+          </div>
+          <p className="settings-desc mb-3">
+            Choose the animated visual backdrop engine for the homepage.
+          </p>
+
+          <div className="preset-grid">
+            {BACKGROUND_STYLES.map((bg) => {
+              const isSelected = preferences.backgroundStyle === bg.id;
+              return (
+                <button
+                  key={bg.id}
+                  type="button"
+                  className={`preset-card ${isSelected ? 'selected' : ''}`}
+                  onClick={() => onUpdatePreferences({ backgroundStyle: bg.id })}
+                >
+                  <div className="preset-card-header">
+                    <span className="preset-label">{bg.label}</span>
+                    {isSelected && <Check size={14} className="preset-check" />}
+                  </div>
+                  <span className="preset-desc">{bg.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Ambient Particles Setting */}
         <div className="settings-row">
           <div className="settings-row-label">
             <div className="label-with-icon">
               <Sparkles size={16} className="settings-icon" />
-              <span className="settings-title">Ambient Halo Animation</span>
+              <span className="settings-title">Floating Stardust Particles</span>
             </div>
             <p className="settings-desc">
-              Enable subtle breathing animation on the central hero light halo.
+              Gentle audio motes and stardust reacting subtly to cursor movement.
+            </p>
+          </div>
+          <button
+            type="button"
+            className={`toggle-switch ${preferences.enableParticles ? 'active' : ''}`}
+            onClick={() => onUpdatePreferences({ enableParticles: !preferences.enableParticles })}
+            aria-label="Toggle floating stardust particles"
+          >
+            <div className="toggle-thumb" />
+          </button>
+        </div>
+
+        {/* Ambient Halo Pulse Setting */}
+        <div className="settings-row">
+          <div className="settings-row-label">
+            <div className="label-with-icon">
+              <Flame size={16} className="settings-icon" />
+              <span className="settings-title">Halo Breathing Pulse</span>
+            </div>
+            <p className="settings-desc">
+              Enable rhythmic breathing animation on the central hero light halo.
             </p>
           </div>
           <button

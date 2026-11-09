@@ -39,10 +39,8 @@
 }
 
 .hero-headline-accent {
-  background: linear-gradient(180deg, #FFFFFF 0%, #D8B4FE 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   display: inline-block;
+  font-weight: 700;
 }
 
 /* Supporting Description */
@@ -84,3 +82,4 @@
     margin-bottom: 28px;
   }
 }
+

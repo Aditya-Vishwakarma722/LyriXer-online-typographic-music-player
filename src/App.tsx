@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HaloBackground } from './components/HaloBackground';
+import { AtmosphericBackground } from './components/AtmosphericBackground';
 import { Navbar } from './features/home/Navbar';
 import { Hero } from './features/home/Hero';
 import { VideoInput } from './features/home/VideoInput';
@@ -15,6 +15,8 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   typographyPreset: 'inter',
   fontSize: 1,
   haloMotion: true,
+  backgroundStyle: 'dark-veil',
+  enableParticles: true,
   theme: 'midnight',
   blurLevel: 8,
   overlayOpacity: 0.5,
@@ -67,8 +69,12 @@ export const App: React.FC = () => {
 
   return (
     <div className={`app-shell theme-${preferences.theme}`}>
-      {/* Ambient Halo concentric lighting */}
-      <HaloBackground enablePulse={preferences.haloMotion} />
+      {/* Authentic Classy Atmospheric Background (React Bits DarkVeil / Aurora + Particles + Halo) */}
+      <AtmosphericBackground
+        style={preferences.backgroundStyle}
+        enableParticles={preferences.enableParticles}
+        enablePulse={preferences.haloMotion}
+      />
 
       {/* Sparse Navigation */}
       <Navbar

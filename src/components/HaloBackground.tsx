@@ -141,3 +141,4 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
     </div>
   );
 };
+
