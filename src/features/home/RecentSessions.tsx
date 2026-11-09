@@ -7,6 +7,7 @@ import { formatDuration, formatRelativeTime } from '../../utils/formatters';
 import './RecentSessions.css';
 
 interface RecentSessionsProps {
+  sessions?: RecentSession[];
   onSelectSession?: (source: VideoSource) => void;
 }
 
@@ -44,18 +45,18 @@ const MOCK_RECENT_SESSIONS: RecentSession[] = [
   },
 ];
 
-export const RecentSessions: React.FC<RecentSessionsProps> = ({ onSelectSession }) => {
+export const RecentSessions: React.FC<RecentSessionsProps> = ({
+  sessions: initialSessions = [],
+  onSelectSession,
+}) => {
   const [showMockHistory, setShowMockHistory] = useState(false);
-  const [sessions, setSessions] = useState<RecentSession[]>([]);
+
+  const displaySessions = showMockHistory
+    ? MOCK_RECENT_SESSIONS
+    : initialSessions;
 
   const handleToggleMock = () => {
-    if (showMockHistory) {
-      setSessions([]);
-      setShowMockHistory(false);
-    } else {
-      setSessions(MOCK_RECENT_SESSIONS);
-      setShowMockHistory(true);
-    }
+    setShowMockHistory((prev) => !prev);
   };
 
   const handleCardClick = (session: RecentSession) => {
@@ -94,7 +95,7 @@ export const RecentSessions: React.FC<RecentSessionsProps> = ({ onSelectSession 
 
         {/* Content: Empty State vs Cards */}
         <AnimatePresence mode="wait">
-          {sessions.length === 0 ? (
+          {displaySessions.length === 0 ? (
             /* Quiet Minimal Empty State */
             <motion.div
               key="empty-state"
@@ -121,7 +122,7 @@ export const RecentSessions: React.FC<RecentSessionsProps> = ({ onSelectSession 
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.3 }}
             >
-              {sessions.map((session) => (
+              {displaySessions.map((session) => (
                 <div
                   key={session.id}
                   className="recent-card"

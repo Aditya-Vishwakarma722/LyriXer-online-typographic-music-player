@@ -226,3 +226,4 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
     }
   }
 }
+

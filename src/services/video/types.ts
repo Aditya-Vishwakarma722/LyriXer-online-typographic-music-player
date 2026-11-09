@@ -34,3 +34,4 @@ export interface VideoPlayerAdapter {
   getDuration(): number;
   destroy(): void;
 }
+
