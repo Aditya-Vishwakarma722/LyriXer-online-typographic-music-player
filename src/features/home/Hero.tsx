@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Badge } from '../../components/ui/Badge';
+import ShinyText from '../../components/reactbits/ShinyText';
 import { Sparkles } from 'lucide-react';
 import './Hero.css';
 
@@ -12,7 +13,7 @@ export const Hero: React.FC<HeroProps> = ({ children }) => {
   return (
     <section className="hero-section" aria-label="Hero Introduction">
       <div className="hero-content">
-        {/* Eyebrow Label */}
+        {/* Eyebrow Label with Shimmer */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -23,7 +24,13 @@ export const Hero: React.FC<HeroProps> = ({ children }) => {
             variant="violet"
             icon={<Sparkles size={11} className="hero-eyebrow-sparkle" />}
           >
-            YOUR MUSIC, YOUR MOMENT
+            <ShinyText
+              text="YOUR MUSIC, YOUR MOMENT"
+              color="#C4B5FD"
+              shineColor="#FFFFFF"
+              speed={4}
+              glow={0.1}
+            />
           </Badge>
         </motion.div>
 
@@ -35,7 +42,14 @@ export const Hero: React.FC<HeroProps> = ({ children }) => {
           transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
           Feel the music. <br className="hero-headline-break" />
-          <span className="hero-headline-accent">See the lyrics.</span>
+          <ShinyText
+            text="See the lyrics."
+            color="#D8B4FE"
+            shineColor="#FFFFFF"
+            speed={2.8}
+            glow={0.3}
+            className="hero-headline-accent"
+          />
         </motion.h1>
 
         {/* Supporting Copy */}

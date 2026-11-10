@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HaloBackground } from './components/HaloBackground';
+import { AtmosphericBackground } from './components/AtmosphericBackground';
 import { Navbar } from './features/home/Navbar';
 import { Hero } from './features/home/Hero';
 import { VideoInput } from './features/home/VideoInput';
@@ -18,11 +18,14 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   typographyPreset: 'kinetic',
   fontSize: 1,
   haloMotion: true,
+  backgroundStyle: 'combined',
+  enableParticles: true,
   theme: 'midnight',
   blurLevel: 8,
   overlayOpacity: 0.5,
 };
 
+const STORAGE_KEY_PREFS = 'lyrixer_preferences';
 const STORAGE_KEY_RECENT = 'lyrixer_recent_sessions';
 
 type AppView = 'home' | 'artist' | 'player';
@@ -33,11 +36,23 @@ export const App: React.FC = () => {
   const [selectedArtistName, setSelectedArtistName] = useState<string>('Juice WRLD');
   const [previousView, setPreviousView] = useState<'home' | 'artist' | 'player'>('home');
 
-  // User Preferences with LocalStorage Persistence
+  // User Preferences with LocalStorage Persistence & automatic purge of legacy grey styles
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
     try {
-      const stored = localStorage.getItem('lyrixer_preferences');
-      return stored ? { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) } : DEFAULT_PREFERENCES;
+      const stored = localStorage.getItem(STORAGE_KEY_PREFS);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (
+          parsed.backgroundStyle === 'dark-veil' ||
+          parsed.backgroundStyle === 'aurora' ||
+          !parsed.backgroundStyle
+        ) {
+          parsed.backgroundStyle = 'combined';
+          localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(parsed));
+        }
+        return { ...DEFAULT_PREFERENCES, ...parsed };
+      }
+      return DEFAULT_PREFERENCES;
     } catch {
       return DEFAULT_PREFERENCES;
     }
@@ -66,7 +81,7 @@ export const App: React.FC = () => {
     setPreferences((prev) => {
       const updated = { ...prev, ...updates };
       try {
-        localStorage.setItem('lyrixer_preferences', JSON.stringify(updated));
+        localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(updated));
       } catch {
         // Storage quota / privacy mode fallback
       }
@@ -161,10 +176,14 @@ export const App: React.FC = () => {
           onOpenPlayer={() => setCurrentView('player')}
         />
       ) : (
-        /* View 3: Clean Homepage UI */
+        /* View 3: Clean Atmospheric Homepage UI */
         <>
-          {/* Ambient Halo concentric lighting */}
-          <HaloBackground enablePulse={preferences.haloMotion} />
+          {/* Authentic Classy Atmospheric Background (Concentric Halo + React Bits Waves & Particles) */}
+          <AtmosphericBackground
+            style={preferences.backgroundStyle}
+            enableParticles={preferences.enableParticles}
+            enablePulse={preferences.haloMotion}
+          />
 
           {/* Sparse Navigation */}
           <Navbar

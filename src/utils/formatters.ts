@@ -34,3 +34,4 @@ export function formatRelativeTime(dateString: string): string {
   if (diffInDays === 1) return 'Yesterday';
   return `${diffInDays}d ago`;
 }
+

@@ -135,9 +135,7 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
           />
         </svg>
       </motion.div>
-
-      {/* Vignette Overlay to guarantee seamless blending into base canvas */}
-      <div className="halo-vignette" />
     </div>
   );
 };
+

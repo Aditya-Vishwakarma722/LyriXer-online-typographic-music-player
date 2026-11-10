@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import SpotlightCard from '../../components/reactbits/SpotlightCard';
 import { validateYouTubeUrl, fetchYouTubeMetadata } from '../../utils/youtube';
 import { formatFileSize } from '../../utils/formatters';
 import type { VideoSource } from '../../types/session';
@@ -204,11 +205,18 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
         aria-label="Upload local video file"
       />
 
-      {/* Main Glass Input Card */}
-      <div
+      {/* Main Glass Input Card with React Bits Spotlight */}
+      <SpotlightCard
         className={`input-glass-card ${isFocused ? 'card-focused' : ''} ${
           errorMessage ? 'card-error' : ''
         }`}
+        spotlightColor="rgba(167, 139, 250, 0.25)"
+        intensity={0.25}
+        spotlightSize={300}
+        borderGlow={0.7}
+        ambient={true}
+        flare={true}
+        grain={0.06}
       >
         {selectedFile ? (
           /* State: Local File Selected */
@@ -319,7 +327,7 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
             </div>
           </form>
         )}
-      </div>
+      </SpotlightCard>
 
       {/* Inline Validation Feedback - layout height reserved without shifting */}
       <div className="validation-area" role="alert" aria-live="polite">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock, Music2, Play, FileVideo, Sparkles } from 'lucide-react';
 import { YoutubeIcon } from '../../components/ui/Icons';
+import SpotlightCard from '../../components/reactbits/SpotlightCard';
 import type { RecentSession, VideoSource } from '../../types/session';
 import { formatDuration, formatRelativeTime } from '../../utils/formatters';
 import './RecentSessions.css';
@@ -123,9 +124,13 @@ export const RecentSessions: React.FC<RecentSessionsProps> = ({
               transition={{ duration: 0.3 }}
             >
               {displaySessions.map((session) => (
-                <div
+                <SpotlightCard
                   key={session.id}
                   className="recent-card"
+                  spotlightColor="rgba(167, 139, 250, 0.2)"
+                  intensity={0.2}
+                  spotlightSize={180}
+                  borderGlow={0.5}
                   onClick={() => handleCardClick(session)}
                   role="button"
                   tabIndex={0}
@@ -183,7 +188,7 @@ export const RecentSessions: React.FC<RecentSessionsProps> = ({
                       <span>{formatRelativeTime(session.playedAt)}</span>
                     </div>
                   </div>
-                </div>
+                </SpotlightCard>
               ))}
             </motion.div>
           )}

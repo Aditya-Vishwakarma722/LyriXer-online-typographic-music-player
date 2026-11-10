@@ -31,11 +31,16 @@ export interface RecentSession {
 
 export type TypographyPreset = 'kinetic' | 'focus-stack' | 'inter' | 'serif' | 'geometric' | 'mono';
 
+export type BackgroundStyle = 'combined' | 'waves' | 'halo';
+
 export interface UserPreferences {
   typographyPreset: TypographyPreset;
   fontSize: number; // in rem or px
   haloMotion: boolean;
+  backgroundStyle: BackgroundStyle;
+  enableParticles: boolean;
   theme: 'midnight' | 'abyss' | 'obsidian';
   blurLevel: number; // 0 to 20 px
   overlayOpacity: number; // 0.2 to 0.8
 }
+
