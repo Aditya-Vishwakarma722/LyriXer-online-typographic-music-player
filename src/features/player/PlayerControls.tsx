@@ -27,6 +27,7 @@ import './PlayerControls.css';
 interface PlayerControlsProps {
   playerState: VideoPlayerState;
   title: string;
+  artistName?: string;
   sourceKind: 'youtube' | 'local';
   manualOffset: number;
   preferences: UserPreferences;
@@ -39,6 +40,7 @@ interface PlayerControlsProps {
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
   onAutoSync?: () => void;
+  onAlignVocalsToNow?: () => void;
   onOffsetChange?: (offset: number) => void;
   onResetSync?: () => void;
   onUploadLrcClick: () => void;
@@ -53,6 +55,7 @@ interface PlayerControlsProps {
 export const PlayerControls: React.FC<PlayerControlsProps> = ({
   playerState,
   title,
+  artistName,
   sourceKind,
   manualOffset,
   preferences,
@@ -65,6 +68,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   onVolumeChange,
   onToggleMute,
   onAutoSync,
+  onAlignVocalsToNow,
   onOffsetChange,
   onResetSync,
   onUploadLrcClick,
@@ -228,23 +232,42 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                     </button>
                   </div>
 
-                  {/* 1-Click Catch & Sync Action */}
+                  {/* 1-Click Vocal Start Alignment */}
                   <div className="sync-section">
                     <button
                       type="button"
-                      className="sync-catch-hero-btn"
+                      className="sync-catch-hero-btn primary"
                       onClick={() => {
-                        onAutoSync();
+                        if (onAlignVocalsToNow) onAlignVocalsToNow();
+                        else if (onAutoSync) onAutoSync();
                       }}
-                      title="Catch and align lyrics to current playback position"
+                      title="Align the opening vocal line to the current playback second"
                     >
                       <Sparkles size={16} />
                       <div className="sync-btn-text">
-                        <strong>Sync Lyrics to Video</strong>
-                        <span>Aligns lyrics to {formatDuration(currentTime)}</span>
+                        <strong>Sync to Vocal Start</strong>
+                        <span>Sets opening line to {formatDuration(currentTime)}</span>
                       </div>
                     </button>
                   </div>
+
+                  {/* Mid-Song Catch & Sync Action */}
+                  {onAutoSync && (
+                    <div className="sync-section">
+                      <button
+                        type="button"
+                        className="sync-catch-hero-btn secondary"
+                        onClick={() => onAutoSync()}
+                        title="Catch and align lyrics to current playback position"
+                      >
+                        <Timer size={15} />
+                        <div className="sync-btn-text">
+                          <strong>Snap Lyrics to Video</strong>
+                          <span>Fine-aligns active line to audio</span>
+                        </div>
+                      </button>
+                    </div>
+                  )}
 
                   {/* Auto-detected Intro Gap */}
                   {detectedIntroGap && detectedIntroGap > 0 && onOffsetChange && (
@@ -273,6 +296,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                         </span>
                       </div>
                       <div className="sync-stepper-row">
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => onOffsetChange(Number((manualOffset - 1.0).toFixed(1)))}
+                          title="Advance lyrics by 1.0s"
+                        >
+                          -1s
+                        </button>
                         <button
                           type="button"
                           className="stepper-btn"
@@ -305,9 +336,22 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                         >
                           +0.5s
                         </button>
+                        <button
+                          type="button"
+                          className="stepper-btn"
+                          onClick={() => onOffsetChange(Number((manualOffset + 1.0).toFixed(1)))}
+                          title="Delay lyrics by 1.0s"
+                        >
+                          +1s
+                        </button>
                       </div>
                     </div>
                   )}
+
+                  {/* Keyboard Shortcuts Hint */}
+                  <div className="sync-tip-hint">
+                    <span>Tip: Press <strong>'S'</strong> to sync vocals · <strong>'['</strong> / <strong>']'</strong> to nudge ±0.2s</span>
+                  </div>
 
                   {/* Reset Offset */}
                   {onResetSync && manualOffset !== 0 && (
@@ -331,7 +375,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               type="button"
               className="ctrl-btn ctrl-btn-artist"
               onClick={onOpenArtist}
-              title="Open Artist Profile"
+              title={artistName ? `Explore ${artistName} music videos & songs` : 'Open Artist Profile'}
               aria-label="Open Artist Profile"
             >
               <UserRound size={17} />

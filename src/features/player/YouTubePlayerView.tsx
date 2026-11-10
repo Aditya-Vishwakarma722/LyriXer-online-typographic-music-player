@@ -4,6 +4,7 @@ import { LyricsView } from './LyricsView';
 import type { VideoPlayerListener, VideoPlayerAdapter } from '../../services/video/types';
 import type { LyricTrack } from '../../services/lyrics/lrcParser';
 import type { TypographyPreset } from '../../types/session';
+import { Sparkles, RotateCcw, UserRound } from 'lucide-react';
 import './YouTubePlayerView.css';
 
 interface YouTubePlayerViewProps {
@@ -23,6 +24,10 @@ interface YouTubePlayerViewProps {
   onSearchLrclibClick: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
+  isEnded?: boolean;
+  trackTitle?: string;
+  trackArtist?: string;
+  onOpenArtist?: () => void;
 }
 
 export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
@@ -42,6 +47,10 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   onSearchLrclibClick,
   onAutoSync,
   onAlignVocalsToNow,
+  isEnded,
+  trackTitle,
+  trackArtist,
+  onOpenArtist,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const adapterRef = useRef<YouTubeAdapter | null>(null);
@@ -100,7 +109,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
       {/* 3. Centered Lyrics Overlay (Floating directly above the playing video) */}
       <div
         className={`yt-fullscreen-lyrics-overlay ${
-          lyricsVisible ? 'lyrics-visible' : 'lyrics-hidden'
+          lyricsVisible && !isEnded ? 'lyrics-visible' : 'lyrics-hidden'
         }`}
       >
         <LyricsView
@@ -112,9 +121,48 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
           onSeekTo={onSeekTo}
           onUploadLrcClick={onUploadLrcClick}
           onSearchLrclibClick={onSearchLrclibClick}
-          onAutoSync={onAutoSync || onAlignVocalsToNow}
+          onAutoSync={onAutoSync}
+          onAlignVocalsToNow={onAlignVocalsToNow}
         />
       </div>
+
+      {/* 4. Complete End-Screen Blocker (Hides all YouTube recommendations & suggested video cards) */}
+      {isEnded && (
+        <div className="yt-end-screen-blocker" role="dialog" aria-label="Playback Finished">
+          <div className="yt-end-screen-content">
+            <div className="end-sparkle-badge">
+              <Sparkles size={16} className="text-accent" />
+              <span>Track Completed</span>
+            </div>
+            <h2 className="end-track-title">{trackTitle || 'Track Finished'}</h2>
+            {trackArtist && <p className="end-track-artist">{trackArtist}</p>}
+
+            <div className="end-action-buttons">
+              <button
+                type="button"
+                className="end-action-btn primary"
+                onClick={() => {
+                  onSeekTo(0);
+                  adapterRef.current?.play();
+                }}
+              >
+                <RotateCcw size={15} />
+                <span>Replay Song</span>
+              </button>
+              {onOpenArtist && (
+                <button
+                  type="button"
+                  className="end-action-btn secondary"
+                  onClick={onOpenArtist}
+                >
+                  <UserRound size={15} />
+                  <span>Explore {trackArtist || 'Artist'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

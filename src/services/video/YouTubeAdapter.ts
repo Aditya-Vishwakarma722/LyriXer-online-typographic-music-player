@@ -178,7 +178,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
       if (typeof p.setOption === 'function') {
         p.setOption('captions', 'track', {});
         p.setOption('cc', 'track', {});
-        p.setOption('captions', 'fontSize', 0);
+        p.setOption('captions', 'fontSize', -1);
         p.setOption('captions', 'reload', false);
       }
     } catch {
@@ -259,8 +259,23 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
     if (this.player && typeof this.player.getCurrentTime === 'function') {
       try {
         const time = this.player.getCurrentTime();
+        const duration = typeof this.player.getDuration === 'function' ? this.player.getDuration() : 0;
+
         if (typeof time === 'number' && !isNaN(time)) {
           this.listener.onTimeUpdate?.(time);
+
+          // During the first 5 seconds, keep suppressing YouTube captions
+          if (time < 5 && Math.random() < 0.1) {
+            this.disableYouTubeCaptions();
+          }
+
+          // Pre-emptively intercept video end right before YouTube renders its recommendation grid
+          if (duration > 5 && time >= duration - 0.6) {
+            this.pause();
+            this.listener.onStateChange?.({ status: 'ended', paused: true });
+            this.stopClock();
+            return;
+          }
         }
         // Poll for metadata if not yet resolved
         if (!this.lastEmittedTitle) {

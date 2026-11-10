@@ -129,16 +129,21 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
                     <span className="kb-bar kb-3" />
                     <span className="kb-bar kb-4" />
                   </div>
-                  <span className="kinetic-intro-label">Intro Scene · Song Starts Shortly</span>
+                  <span className="kinetic-intro-label">Music Video Intro Scene</span>
+                  {lyrics.lines[0]?.text && (
+                    <span className="kinetic-next-line-preview">
+                      Opening line: "{lyrics.lines[0].text}"
+                    </span>
+                  )}
                   {handleSyncTrigger && (
                     <button
                       type="button"
                       className="kinetic-sync-now-pill"
                       onClick={handleSyncTrigger}
-                      title="Click when the music or song starts playing in the video to lock in perfect sync"
+                      title="Click the exact second the vocals start singing to lock in lyrics sync"
                     >
-                      <Sparkles size={14} />
-                      <span>Song Starts Here — Click to Sync</span>
+                      <Sparkles size={15} />
+                      <span>Vocals Start Here — Tap to Sync (or Press 'S')</span>
                     </button>
                   )}
                 </motion.div>
@@ -161,12 +166,30 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         {activeIndex === -1 && lyrics.synced && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
-            className="lyric-line-item lyric-instrumental"
+            animate={{ opacity: 1 }}
+            className="lyric-intro-banner"
           >
-            <span className="instrumental-dot" />
-            <span>Intro Instrumental</span>
-            <span className="instrumental-dot" />
+            <div className="lyric-instrumental-pill">
+              <span className="instrumental-dot" />
+              <span>Music Video Intro</span>
+              <span className="instrumental-dot" />
+            </div>
+            {lyrics.lines[0]?.text && (
+              <span className="lyric-intro-first-line">
+                Opening line: "{lyrics.lines[0].text}"
+              </span>
+            )}
+            {handleSyncTrigger && (
+              <button
+                type="button"
+                className="list-sync-now-btn"
+                onClick={handleSyncTrigger}
+                title="Click when vocals start"
+              >
+                <Sparkles size={13} />
+                <span>Vocals Start Here — Tap to Sync (Press 'S')</span>
+              </button>
+            )}
           </motion.div>
         )}
 

@@ -344,6 +344,33 @@
   color: var(--text-secondary);
 }
 
+.sync-catch-hero-btn.primary {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.28) 0%, rgba(59, 130, 246, 0.22) 100%);
+  border-color: rgba(167, 139, 250, 0.55);
+}
+
+.sync-catch-hero-btn.secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sync-catch-hero-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.sync-tip-hint {
+  font-size: 0.6875rem;
+  color: #71717A;
+  text-align: center;
+  padding: 4px 0;
+  line-height: 1.35;
+}
+
+.sync-tip-hint strong {
+  color: #C4B5FD;
+}
+
 .sync-detected-intro {
   display: flex;
   align-items: center;

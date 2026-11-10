@@ -30,8 +30,8 @@ type AppView = 'home' | 'artist' | 'player';
 export const App: React.FC = () => {
   // Navigation View State
   const [currentView, setCurrentView] = useState<AppView>('home');
-  const [selectedArtistId, setSelectedArtistId] = useState<string>('coldplay');
-  const [previousView, setPreviousView] = useState<'home' | 'artist'>('home');
+  const [selectedArtistName, setSelectedArtistName] = useState<string>('Juice WRLD');
+  const [previousView, setPreviousView] = useState<'home' | 'artist' | 'player'>('home');
 
   // User Preferences with LocalStorage Persistence
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
@@ -128,15 +128,15 @@ export const App: React.FC = () => {
   };
 
   const handleOpenArtist = (artistName?: string) => {
-    if (artistName) {
-      const cleanId = artistName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      setSelectedArtistId(cleanId || 'coldplay');
+    setPreviousView(currentView);
+    if (artistName && artistName.trim()) {
+      setSelectedArtistName(artistName.trim());
     }
     setCurrentView('artist');
   };
 
   const handleExitPlayer = () => {
-    setCurrentView(previousView);
+    setCurrentView(previousView === 'player' ? 'home' : previousView);
   };
 
   return (
@@ -153,10 +153,11 @@ export const App: React.FC = () => {
       ) : currentView === 'artist' ? (
         /* View 2: Full-Screen Cinematic Editorial Artist Profile Page */
         <ArtistPage
-          initialArtistId={selectedArtistId}
+          initialArtistName={selectedArtistName}
           activeSession={activeSession}
           onSelectTrack={handleSelectArtistTrack}
           onBackToHome={() => setCurrentView('home')}
+          onBackToPlayer={previousView === 'player' ? () => setCurrentView('player') : undefined}
           onOpenPlayer={() => setCurrentView('player')}
         />
       ) : (
@@ -170,8 +171,7 @@ export const App: React.FC = () => {
             onOpenAbout={() => setIsAboutOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onOpenArtists={() => {
-              setSelectedArtistId('coldplay');
-              setCurrentView('artist');
+              handleOpenArtist('Juice WRLD');
             }}
           />
 

@@ -82,3 +82,115 @@
   transform: scale(0.98);
   pointer-events: none !important;
 }
+
+/* 4. Complete End-Screen Blocker (Hides all YouTube recommendations & suggested video cards) */
+.yt-end-screen-blocker {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(14, 13, 20, 0.98) 0%,
+    rgba(8, 8, 11, 0.99) 75%,
+    #08080B 100%
+  );
+  backdrop-filter: blur(28px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.yt-end-screen-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px;
+  max-width: 520px;
+}
+
+.end-sparkle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.03em;
+}
+
+.end-track-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 4px 0 0;
+}
+
+.end-track-artist {
+  font-size: 1rem;
+  color: #A5A1AD;
+  margin: 0;
+}
+
+.end-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.end-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+}
+
+.end-action-btn.primary {
+  color: #FFFFFF;
+  background: var(--accent-violet-deep);
+}
+
+.end-action-btn.primary:hover {
+  background: var(--accent-violet);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.35);
+}
+
+.end-action-btn.secondary {
+  color: #EDE9FE;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.end-action-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(167, 139, 250, 0.35);
+  transform: translateY(-1px);
+}

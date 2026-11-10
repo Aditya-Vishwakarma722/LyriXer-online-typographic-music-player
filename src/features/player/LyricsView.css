@@ -105,6 +105,64 @@
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
 }
 
+.kinetic-next-line-preview {
+  font-size: 0.84rem;
+  color: #C4B5FD;
+  font-style: italic;
+  max-width: 520px;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  margin-top: 4px;
+}
+
+.lyric-intro-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.lyric-instrumental-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #A5A1AD;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.lyric-intro-first-line {
+  font-size: 0.8125rem;
+  color: #A5A1AD;
+  font-style: italic;
+}
+
+.list-sync-now-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: rgba(167, 139, 250, 0.2);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.list-sync-now-btn:hover {
+  background: var(--accent-violet);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.4);
+}
+
 .kinetic-sync-now-pill {
   display: inline-flex;
   align-items: center;
