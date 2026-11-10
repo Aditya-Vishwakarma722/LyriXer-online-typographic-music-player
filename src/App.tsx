@@ -99,7 +99,8 @@ export const App: React.FC = () => {
     } else {
       root.style.setProperty('--bg-base', '#0B0B0D');
     }
-  }, [preferences.theme]);
+    root.style.setProperty('--bg-blur', `${preferences.blurLevel ?? 8}px`);
+  }, [preferences.theme, preferences.blurLevel]);
 
   const handleStartSession = (source: VideoSource) => {
     setActiveSession(source);

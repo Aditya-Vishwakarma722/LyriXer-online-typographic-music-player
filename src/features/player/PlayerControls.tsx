@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Play,
   Pause,
@@ -11,12 +11,12 @@ import {
   Type,
   Sliders,
   Sparkles,
-  RotateCcw,
   Search,
   Eye,
   EyeOff,
-  Timer,
   UserRound,
+  Timer,
+  RotateCcw,
   X,
 } from 'lucide-react';
 import type { VideoPlayerState } from '../../services/video/types';
@@ -82,6 +82,21 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   const [showTypographyMenu, setShowTypographyMenu] = useState(false);
   const [showEffectsMenu, setShowEffectsMenu] = useState(false);
   const [isSyncManagerOpen, setIsSyncManagerOpen] = useState(false);
+  const syncMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (syncMenuRef.current && !syncMenuRef.current.contains(e.target as Node)) {
+        setIsSyncManagerOpen(false);
+      }
+    };
+    if (isSyncManagerOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSyncManagerOpen]);
 
   const { currentTime, duration, paused, volume, muted } = playerState;
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -143,9 +158,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             <div className="track-meta">
               <span className="source-pill">{sourceKind.toUpperCase()}</span>
               {manualOffset !== 0 && (
-                <span className="offset-pill">
-                  Offset: {manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`}
-                </span>
+                <button
+                  type="button"
+                  className="offset-pill offset-pill-interactive"
+                  onClick={onResetSync}
+                  title="Lyrics intro offset applied. Click to reset to 0.0s."
+                >
+                  Offset: {manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`} ×
+                </button>
               )}
             </div>
           </div>
@@ -196,9 +216,9 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             />
           </div>
 
-          {/* Lyrics Sync Manager Icon Button */}
+          {/* Lyrics Synchronization Mode Popover */}
           {onAutoSync && (
-            <div className="dropdown-wrapper">
+            <div className="dropdown-wrapper" ref={syncMenuRef}>
               <button
                 type="button"
                 className={`ctrl-btn sync-ctrl-btn ${isSyncManagerOpen || manualOffset !== 0 ? 'active' : ''}`}
@@ -209,7 +229,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                 }}
                 title={
                   manualOffset !== 0
-                    ? `Lyrics Sync: ${manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`} active`
+                    ? `Lyrics Synced (${manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`}) — Open Sync Mode`
                     : 'Lyrics Synchronization'
                 }
                 aria-label="Manage lyrics synchronization"
@@ -226,13 +246,23 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                       type="button"
                       className="popover-close-btn"
                       onClick={() => setIsSyncManagerOpen(false)}
-                      aria-label="Close sync manager"
+                      aria-label="Close sync mode"
                     >
                       <X size={14} />
                     </button>
                   </div>
 
-                  {/* 1-Click Vocal Start Alignment */}
+                  {/* Current Status Indicator */}
+                  <div className="sync-status-indicator">
+                    <span className="sync-status-label">Current Offset:</span>
+                    <span className={`sync-status-value ${manualOffset !== 0 ? 'offset-applied' : ''}`}>
+                      {manualOffset === 0
+                        ? '0.0s (Direct / In Sync)'
+                        : `${manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`} (Intro delay)`}
+                    </span>
+                  </div>
+
+                  {/* 1-Click Vocal Start Alignment (Hero Action) */}
                   <div className="sync-section">
                     <button
                       type="button"
@@ -241,7 +271,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                         if (onAlignVocalsToNow) onAlignVocalsToNow();
                         else if (onAutoSync) onAutoSync();
                       }}
-                      title="Align the opening vocal line to the current playback second"
+                      title="Align opening line to current video playback position"
                     >
                       <Sparkles size={16} />
                       <div className="sync-btn-text">
@@ -251,14 +281,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                     </button>
                   </div>
 
-                  {/* Mid-Song Catch & Sync Action */}
+                  {/* Snap Lyrics to Video */}
                   {onAutoSync && (
                     <div className="sync-section">
                       <button
                         type="button"
                         className="sync-catch-hero-btn secondary"
                         onClick={() => onAutoSync()}
-                        title="Catch and align lyrics to current playback position"
+                        title="Fine-align active line to current audio position"
                       >
                         <Timer size={15} />
                         <div className="sync-btn-text">
@@ -300,7 +330,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                           type="button"
                           className="stepper-btn"
                           onClick={() => onOffsetChange(Number((manualOffset - 1.0).toFixed(1)))}
-                          title="Advance lyrics by 1.0s"
+                          title="Advance lyrics earlier by 1.0s"
                         >
                           -1s
                         </button>
@@ -308,7 +338,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                           type="button"
                           className="stepper-btn"
                           onClick={() => onOffsetChange(Number((manualOffset - 0.5).toFixed(1)))}
-                          title="Advance lyrics by 0.5s"
+                          title="Advance lyrics earlier by 0.5s"
                         >
                           -0.5s
                         </button>
@@ -316,7 +346,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                           type="button"
                           className="stepper-btn"
                           onClick={() => onOffsetChange(Number((manualOffset - 0.1).toFixed(1)))}
-                          title="Advance lyrics by 0.1s"
+                          title="Advance lyrics earlier by 0.1s"
                         >
                           -0.1s
                         </button>
@@ -324,7 +354,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                           type="button"
                           className="stepper-btn"
                           onClick={() => onOffsetChange(Number((manualOffset + 0.1).toFixed(1)))}
-                          title="Delay lyrics by 0.1s"
+                          title="Delay lyrics later by 0.1s"
                         >
                           +0.1s
                         </button>
@@ -332,7 +362,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                           type="button"
                           className="stepper-btn"
                           onClick={() => onOffsetChange(Number((manualOffset + 0.5).toFixed(1)))}
-                          title="Delay lyrics by 0.5s"
+                          title="Delay lyrics later by 0.5s"
                         >
                           +0.5s
                         </button>
@@ -340,7 +370,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                           type="button"
                           className="stepper-btn"
                           onClick={() => onOffsetChange(Number((manualOffset + 1.0).toFixed(1)))}
-                          title="Delay lyrics by 1.0s"
+                          title="Delay lyrics later by 1.0s"
                         >
                           +1s
                         </button>
@@ -348,22 +378,23 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                     </div>
                   )}
 
-                  {/* Keyboard Shortcuts Hint */}
-                  <div className="sync-tip-hint">
-                    <span>Tip: Press <strong>'S'</strong> to sync vocals · <strong>'['</strong> / <strong>']'</strong> to nudge ±0.2s</span>
-                  </div>
-
-                  {/* Reset Offset */}
+                  {/* Reset Offset Button */}
                   {onResetSync && manualOffset !== 0 && (
                     <button
                       type="button"
                       className="sync-reset-action-btn"
-                      onClick={() => onResetSync()}
+                      onClick={onResetSync}
+                      title="Reset lyrics offset to 0.0s"
                     >
-                      <RotateCcw size={13} />
-                      <span>Reset Offset to 0:00</span>
+                      <RotateCcw size={12} />
+                      <span>Reset to 0.0s</span>
                     </button>
                   )}
+
+                  {/* Keyboard Shortcuts Hint */}
+                  <div className="sync-tip-hint">
+                    <span>Tip: Press <strong>'S'</strong> to sync vocals &middot; <strong>'['</strong> / <strong>']'</strong> to nudge &plusmn;0.2s</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -425,6 +456,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               onClick={() => {
                 setShowTypographyMenu(!showTypographyMenu);
                 setShowEffectsMenu(false);
+                setIsSyncManagerOpen(false);
               }}
               title="Lyric Typography Presets"
               aria-label="Select typography preset"
@@ -471,6 +503,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               onClick={() => {
                 setShowEffectsMenu(!showEffectsMenu);
                 setShowTypographyMenu(false);
+                setIsSyncManagerOpen(false);
               }}
               title="Background Blur & Dim"
               aria-label="Background visual atmosphere settings"
@@ -497,9 +530,9 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                   <label>Dim Overlay ({Math.round(preferences.overlayOpacity * 100)}%)</label>
                   <input
                     type="range"
-                    min="0.15"
-                    max="0.9"
-                    step="0.05"
+                    min="0"
+                    max="1"
+                    step="0.02"
                     value={preferences.overlayOpacity}
                     onChange={(e) =>
                       onUpdatePreferences({ overlayOpacity: Number(e.target.value) })

@@ -16,6 +16,7 @@ export interface VideoSource {
   thumbnailUrl?: string;
   localFile?: File;
   fileMetadata?: LocalFileMetadata;
+  startOffset?: number; // lyrics start timestamp offset in seconds
 }
 
 export interface RecentSession {

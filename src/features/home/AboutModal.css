@@ -1,61 +1,144 @@
 .about-modal-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 28px;
 }
 
-.about-feature-card {
+/* 1. Manifesto / Lead Section */
+.about-manifesto {
   display: flex;
-  gap: 16px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.about-icon-box {
-  display: flex;
+.about-kicker {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  background: rgba(167, 139, 250, 0.1);
-  border: 1px solid rgba(167, 139, 250, 0.25);
-  color: var(--accent-violet-light);
-  flex-shrink: 0;
+  gap: 8px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-violet-light, #C4B5FD);
 }
 
-.about-text-box h4 {
+.about-kicker-sparkle {
+  color: var(--accent-violet, #A78BFA);
+}
+
+.about-lead-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+}
+
+.about-lead-title span {
+  color: var(--accent-violet-light, #D8B4FE);
+}
+
+.about-lead-body {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--text-secondary, #A5A1AD);
+  margin-top: 4px;
+}
+
+/* 2. Seamless Editorial Pillars (No Boxes) */
+.about-pillars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.about-pillar-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 16px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all var(--transition-fast);
+}
+
+.about-pillar-row:last-child {
+  border-bottom: none;
+}
+
+.about-pillar-row:hover .about-pillar-num {
+  color: var(--accent-violet-light, #C4B5FD);
+}
+
+.about-pillar-row:hover .about-pillar-title {
+  color: #FFFFFF;
+}
+
+.about-pillar-num {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(167, 139, 250, 0.65);
+  padding-top: 2px;
+  letter-spacing: 0.05em;
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+  min-width: 24px;
+}
+
+.about-pillar-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.about-pillar-title {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+  color: var(--text-primary, #F5F4F7);
+  letter-spacing: -0.015em;
+  transition: color var(--transition-fast);
 }
 
-.about-text-box p {
+.about-pillar-text {
   font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
+  line-height: 1.55;
+  color: var(--text-secondary, #94909D);
 }
 
-.about-modal-footer {
+/* 3. Refined Colophon Footer */
+.about-modal-colophon {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 16px;
-  margin-top: 8px;
-  border-top: 1px solid var(--border-subtle);
+  padding-top: 18px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-muted, #726E7A);
 }
 
-.about-status-badge {
-  padding: 3px 8px;
-  background: rgba(167, 139, 250, 0.1);
-  color: var(--accent-violet-light);
-  border-radius: var(--radius-full);
-  font-weight: 500;
+.about-colophon-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.about-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-violet, #A78BFA);
+  box-shadow: 0 0 8px var(--accent-violet, #A78BFA);
+}
+
+.about-colophon-version {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #726E7A);
 }
 

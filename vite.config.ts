@@ -119,9 +119,11 @@ function lyrixerApiPlugin(): Plugin {
           const dzData: any = await dzRes.json();
           const first = dzData.data?.[0];
           if (first) {
-            if (first.picture_xl) {
-              heroImageUrl = first.picture_xl;
-              imageAttribution = 'Official artist photography via Deezer';
+            const rawPic = first.picture_xl || first.picture_big || first.picture_medium;
+            if (rawPic) {
+              // Upscale Deezer studio image to crisp 1920x1920 100% quality
+              heroImageUrl = rawPic.replace(/\/\d+x\d+-[^/]+\.jpg$/, '/1920x1920-000000-100-0-0.jpg');
+              imageAttribution = 'Official upscale studio photography via Deezer Master';
             }
             if (first.nb_fan) {
               monthlyListeners = `${first.nb_fan.toLocaleString()} fans on Deezer`;

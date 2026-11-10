@@ -71,7 +71,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
 
   return (
     <div className="artist-cinematic-page">
-      {/* 1. Full-Screen Cinematic Photograph (Authentic high-resolution artist photo) */}
+      {/* 1. Extended Full-Screen Backdrop: Upscaled Clear Quality Artist Image covering entire screen (100vw x 100vh) */}
       <div className="artist-bg-viewport" aria-hidden="true">
         <motion.img
           key={profile.heroImageUrl}
@@ -84,13 +84,13 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         />
-        {/* Editorial Gradients for readability */}
+        {/* Soft atmospheric gradients for text legibility without box backgrounds */}
         <div className="artist-gradient-left" />
         <div className="artist-gradient-bottom" />
         <div className="artist-vignette-overlay" />
       </div>
 
-      {/* 2. Left-Side Editorial Content Area */}
+      {/* 2. Previous Editorial Design in Transparent Overlay Mode (No Element Box Backgrounds) */}
       <div className="artist-stage-left">
         {/* Top Minimal Navigation Bar */}
         <header className="artist-top-bar">
@@ -239,3 +239,5 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
     </div>
   );
 };
+
+export default ArtistPage;

@@ -45,10 +45,14 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
   });
 
   // Load saved intro/vocal timing offset:
-  // 1. Verified intro offset from KNOWN_VIDEO_INTROS (e.g. 0.0 for curated tracks)
-  // 2. Saved offset from localStorage
-  // 3. Fallback to 0
+  // 1. Explicit startOffset from source (e.g. from URL ?t=23 or video input)
+  // 2. Verified intro offset from KNOWN_VIDEO_INTROS
+  // 3. Saved offset from localStorage
+  // 4. Fallback to 0
   const [manualOffset, setManualOffset] = useState<number>(() => {
+    if (source.startOffset !== undefined && source.startOffset >= 0) {
+      return source.startOffset;
+    }
     if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
       return KNOWN_VIDEO_INTROS[source.sourceId];
     }
@@ -64,10 +68,14 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     return 0;
   });
 
+  const [introNotice, setIntroNotice] = useState<string | null>(null);
+
   // Ensure manualOffset resets appropriately whenever the active video source changes
   useEffect(() => {
     let offset = 0;
-    if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
+    if (source.startOffset !== undefined && source.startOffset >= 0) {
+      offset = source.startOffset;
+    } else if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
       offset = KNOWN_VIDEO_INTROS[source.sourceId];
     } else {
       try {
@@ -82,9 +90,13 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     }
     setManualOffset(offset);
     manualOffsetRef.current = offset;
-  }, [source.sourceId]);
+    if (offset > 0) {
+      setIntroNotice(`Music video intro calibrated (+${offset.toFixed(1)}s) · Synchronized`);
+      const timer = setTimeout(() => setIntroNotice(null), 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [source.sourceId, source.startOffset]);
 
-  const [introNotice, setIntroNotice] = useState<string | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [lyricsVisible, setLyricsVisible] = useState(true);
@@ -134,76 +146,86 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
   };
 
   /**
-   * Directly sets the vocal start point:
-   * Aligns the very first lyric line (the beginning of the vocals)
-   * to the current playback second in the video.
+   * The Sync button synchronizes lyrics directly to the video:
+   * Catches the opening vocal line (if early in track or forced) or snaps the nearest lyric line to now.
    */
-  const handleAlignVocalsToNow = () => {
+  const handleAutoSync = (forceVocalStart?: boolean) => {
     const curLyrics = lyricsRef.current;
     const curState = playerStateRef.current;
 
     if (!curLyrics || !curLyrics.lines || curLyrics.lines.length === 0) {
-      setIntroNotice('No lyrics loaded to sync');
-      setTimeout(() => setIntroNotice(null), 3000);
       return;
     }
 
-    const firstVocalTime = curLyrics.lines[0].timestamp; // e.g. 0.95s or 5.0s
     const t = curState.currentTime;
-    const newOffset = Number(Math.max(0, t - firstVocalTime).toFixed(1));
-
-    handleOffsetChange(newOffset);
-    setIntroNotice(`Lyrics synchronized to vocal start (+${newOffset}s)`);
-    setTimeout(() => setIntroNotice(null), 3500);
-  };
-
-  /**
-   * The Sync button synchronizes lyrics directly to the vocal start point
-   * (if in intro or early in the song), or snaps the nearest lyric line to now if mid-track.
-   */
-  const handleAutoSync = (forceVocalStart = false) => {
-    const curLyrics = lyricsRef.current;
-    const curState = playerStateRef.current;
-
-    if (!curLyrics || !curLyrics.lines || curLyrics.lines.length === 0) {
-      setIntroNotice('No lyrics loaded to sync');
-      setTimeout(() => setIntroNotice(null), 3000);
-      return;
-    }
-
-    const firstTimestamp = curLyrics.lines[0].timestamp; // e.g. 0.95s or 4.8s
-    const t = curState.currentTime;
+    const lines = curLyrics.lines;
+    const firstTimestamp = lines[0].timestamp; // e.g. 0.95s or 4.8s
 
     let newOffset = 0;
-    // If explicitly requested, or within opening 45s of video, or before first vocal:
-    if (forceVocalStart || t < 45 || activeIndex <= 0) {
+    // If forced to vocal start, or before vocals start, or activeIndex is 0 / not started yet:
+    if (forceVocalStart || activeIndex <= 0 || t < firstTimestamp + 2) {
       newOffset = Number(Math.max(0, t - firstTimestamp).toFixed(1));
-      setIntroNotice(`Lyrics aligned to vocal start (+${newOffset}s)`);
     } else {
-      // Song is actively playing mid-track. The user pressed Sync right as a line is being sung.
-      // Find the closest lyric line to current effective playback:
+      // Song is actively playing mid-track: snap closest line
       const currentEffective = Math.max(0, t - manualOffsetRef.current);
-      let closestLine = curLyrics.lines[0];
-      let minDiff = Infinity;
-      for (const line of curLyrics.lines) {
-        const d = Math.abs(line.timestamp - currentEffective);
-        if (d < minDiff) {
-          minDiff = d;
-          closestLine = line;
+      let bestLine = lines[activeIndex] || lines[0];
+      let minDiff = Math.abs(bestLine.timestamp - currentEffective);
+
+      for (let i = 0; i < lines.length; i++) {
+        const diff = Math.abs(lines[i].timestamp - currentEffective);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestLine = lines[i];
         }
       }
-      newOffset = Number(Math.max(0, t - closestLine.timestamp).toFixed(1));
-      setIntroNotice(`Lyrics synchronized (+${newOffset}s)`);
+      newOffset = Number(Math.max(0, t - bestLine.timestamp).toFixed(1));
     }
 
     handleOffsetChange(newOffset);
-    setTimeout(() => setIntroNotice(null), 3500);
+    setIntroNotice(`Lyrics synchronized (+${newOffset.toFixed(1)}s) · Vocal timing locked`);
+    setTimeout(() => setIntroNotice(null), 4000);
   };
 
   const handleResetSync = () => {
     handleOffsetChange(0);
-    setIntroNotice('Sync offset reset to 0:00');
+    setIntroNotice('Lyrics offset reset to 0.0s');
     setTimeout(() => setIntroNotice(null), 3000);
+  };
+
+  /**
+   * Aligns lyrics to video intro when verified in KNOWN_VIDEO_INTROS
+   * or within a safe conservative threshold (1.5s - 18s).
+   */
+  const alignIntroOffset = (duration: number, targetLyrics: LyricTrack | null) => {
+    if (!targetLyrics) return;
+    if (manualOffsetRef.current > 0) return;
+    try {
+      const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
+      if (saved !== null) return;
+    } catch {
+      // ignore
+    }
+
+    if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
+      const known = KNOWN_VIDEO_INTROS[source.sourceId];
+      if (known > 0) {
+        handleOffsetChange(known);
+        setIntroNotice(`Music video intro aligned (+${known}s) · Synchronized`);
+        setTimeout(() => setIntroNotice(null), 4000);
+      }
+    } else if (duration > 0) {
+      const audioDur = targetLyrics.duration || (targetLyrics.lines.length > 0 ? targetLyrics.lines[targetLyrics.lines.length - 1].timestamp + 8 : 0);
+      if (audioDur > 0) {
+        const diff = Number((duration - audioDur).toFixed(1));
+        // Only automatically apply small gaps (1.5s - 18s).
+        // Larger gaps (>18s) in official music videos are almost always outros, credits, or PSAs.
+        if (diff >= 1.5 && diff <= 18.0) {
+          handleOffsetChange(diff);
+          setIntroNotice(`Music video intro detected (+${diff}s) · Lyrics aligned to vocal start`);
+          setTimeout(() => setIntroNotice(null), 4500);
+        }
+      }
+    }
   };
 
   // Fetch lyrics from LRCLIB (https://lrclib.net) on mount or source change
@@ -228,28 +250,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       if (!isCancelled) {
         if (track) {
           setLyrics(track);
-          // Check for music video intro delay
-          if (playerStateRef.current.duration > 0 && manualOffsetRef.current === 0) {
-            const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
-            if (!saved) {
-              if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
-                const known = KNOWN_VIDEO_INTROS[source.sourceId];
-                if (known > 0) {
-                  handleOffsetChange(known);
-                  setIntroNotice(`Music video intro aligned (+${known}s) · Synchronized`);
-                  setTimeout(() => setIntroNotice(null), 4000);
-                }
-              } else {
-                const audioDur = track.duration || (track.lines.length > 0 ? track.lines[track.lines.length - 1].timestamp + 8 : 0);
-                const diff = Number((playerStateRef.current.duration - audioDur).toFixed(1));
-                if (diff >= 1.5 && diff <= 120) {
-                  handleOffsetChange(diff);
-                  setIntroNotice(`Music video intro detected (+${diff}s) · Lyrics aligned to vocal start`);
-                  setTimeout(() => setIntroNotice(null), 4500);
-                }
-              }
-            }
-          }
+          alignIntroOffset(playerStateRef.current.duration, track);
         }
         setIsLoadingLyrics(false);
       }
@@ -272,31 +273,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     },
     onDurationChange: (duration) => {
       setPlayerState((prev) => ({ ...prev, duration }));
-      // Check for automatic music video intro delay
-      const curLyrics = lyricsRef.current;
-      if (duration > 0 && curLyrics && manualOffsetRef.current === 0) {
-        const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
-        if (!saved) {
-          if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
-            const known = KNOWN_VIDEO_INTROS[source.sourceId];
-            if (known > 0) {
-              handleOffsetChange(known);
-              setIntroNotice(`Music video intro aligned (+${known}s) · Synchronized`);
-              setTimeout(() => setIntroNotice(null), 4000);
-            }
-          } else {
-            const audioDur = curLyrics.duration || (curLyrics.lines.length > 0 ? curLyrics.lines[curLyrics.lines.length - 1].timestamp + 8 : 0);
-            if (audioDur > 0) {
-              const diff = Number((duration - audioDur).toFixed(1));
-              if (diff >= 1.5 && diff <= 120) {
-                handleOffsetChange(diff);
-                setIntroNotice(`Music video intro detected (+${diff}s) · Lyrics aligned to vocal start`);
-                setTimeout(() => setIntroNotice(null), 4500);
-              }
-            }
-          }
-        }
-      }
+      alignIntroOffset(duration, lyricsRef.current);
     },
     onMetadata: (meta) => {
       if (!meta.title) return;
@@ -314,28 +291,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         }).then((track) => {
           if (track) {
             setLyrics(track);
-            // Check for music video intro delay
-            if (playerStateRef.current.duration > 0 && manualOffsetRef.current === 0) {
-              const saved = localStorage.getItem(`lyrixer_offset_${source.sourceId}`);
-              if (!saved) {
-                if (KNOWN_VIDEO_INTROS[source.sourceId] !== undefined) {
-                  const known = KNOWN_VIDEO_INTROS[source.sourceId];
-                  if (known > 0) {
-                    handleOffsetChange(known);
-                    setIntroNotice(`Music video intro aligned (+${known}s) · Synchronized`);
-                    setTimeout(() => setIntroNotice(null), 4000);
-                  }
-                } else {
-                  const audioDur = track.duration || (track.lines.length > 0 ? track.lines[track.lines.length - 1].timestamp + 8 : 0);
-                  const diff = Number((playerStateRef.current.duration - audioDur).toFixed(1));
-                  if (diff >= 1.5 && diff <= 120) {
-                    handleOffsetChange(diff);
-                    setIntroNotice(`Music video intro detected (+${diff}s) · Lyrics aligned to vocal start`);
-                    setTimeout(() => setIntroNotice(null), 4500);
-                  }
-                }
-              }
-            }
+            alignIntroOffset(playerStateRef.current.duration, track);
           }
           setIsLoadingLyrics(false);
         });
@@ -551,7 +507,6 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
           onAutoSync={handleAutoSync}
-          onAlignVocalsToNow={handleAlignVocalsToNow}
           isEnded={playerState.status === 'ended' || (playerState.duration > 5 && playerState.currentTime >= playerState.duration - 0.6)}
           trackTitle={trackInfo.title}
           trackArtist={effectiveArtist}
@@ -574,7 +529,6 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
           onAutoSync={handleAutoSync}
-          onAlignVocalsToNow={handleAlignVocalsToNow}
         />
       )}
 
@@ -595,8 +549,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onSeek={(sec) => adapter?.seekTo(sec)}
           onVolumeChange={(vol) => adapter?.setVolume(vol)}
           onToggleMute={() => adapter?.setMuted(!playerState.muted)}
-          onAutoSync={handleAutoSync}
-          onAlignVocalsToNow={handleAlignVocalsToNow}
+          onAutoSync={() => handleAutoSync(false)}
+          onAlignVocalsToNow={() => handleAutoSync(true)}
           onOffsetChange={handleOffsetChange}
           onResetSync={handleResetSync}
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}

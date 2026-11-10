@@ -188,69 +188,128 @@ const JUICE_WRLD_ROBBERY_LRC = `[ti:Robbery]
 const BILLIE_EILISH_CHIHIRO_LRC = `[ti:CHIHIRO]
 [ar:Billie Eilish]
 [al:HIT ME HARD AND SOFT]
-[00:00.00]♪ (Hallway Intro)
-[00:21.00]♪ (Music Begins)
-[00:23.12]To take my love away
-[00:26.73]When I come back around, will I know what to say?
-[00:31.68]Said you won't forget my name
-[00:34.93]Not today, not tomorrow
-[00:39.10]Kind of strange, feelin' sorrow
-[00:43.72]I got change (yup), you could borrow (borrow)
-[00:48.53]When I come back around, will I know what to say?
-[00:52.48]Not today, maybe tomorrow
-[00:57.17]Open up the door, can you open up the door?
-[01:01.05]I know you said before you can't cope with anymore
-[01:05.49]You told me it was war, said you'd show me what's in store
-[01:09.83]I hope it's not for sure, can you open up the door?
-[01:13.97]Did you
-[01:18.86]Take
-[01:22.65]My love
-[01:27.13]Away
-[01:31.45]From me?
-[01:38.55]Me
-[01:43.80]Me
-[01:49.66]Saw your seat at the counter when I look away
-[01:54.17]Saw you turn around, but it wasn't your face
-[01:57.71]Said I need to be alone now, I'm takin' a break
-[02:02.08]How come, when I returned, you were gone away?
-[02:06.75]I don't, I don't know why I called
-[02:13.21]I don't know you at all
-[02:17.53]I don't know you
-[02:22.21]Not at all
-[02:24.07]I don't know, I don't know why I called
-[02:30.59]I don't know you at all
-[02:35.09]I don't know you
-[02:46.09]Did you
-[02:49.92]Take my love
-[02:54.43]Away
-[02:58.68]From me?
-[03:05.75]Me
-[03:14.64]And that's when you found me
-[03:18.40]I was waitin' in the garden
-[03:22.59]Contemplatin', beg your pardon
-[03:26.72]But there's a part of me that recognizes you
-[03:31.08]Do you feel it too?
-[03:33.85]When you told me it was serious
-[03:38.22]Were you serious? Mm
-[03:42.11]They told me they were only curious
-[03:46.82]Now it's serious, hm
-[03:51.69]Open up the door, can you open up the door?
-[03:55.67]I know you said before you can't cope with anymore
-[04:00.05]You told me it was war, said you'd show me what's in store
-[04:04.44]I hope it's not for sure, can you open up the door?
-[04:26.41]Wringing my hands in my lap
-[04:30.45]And you tell me it's all been a trap
-[04:34.80]And you don't know if you'll make it back
-[04:39.18]I said, "No, don't say that"
-[04:44.46](Wringing my hands in my lap)
-[04:47.78](And you tell me it's all been a trap)
-[04:51.94](And you don't know if you'll make it back)
-[04:56.48](I said, "No, don't say that")
-[05:01.32](Wringing my hands in my lap)
-[05:05.75](And you tell me it's all been a trap)
-[05:09.96](And you don't know if you'll make it back)
-[05:13.51](No, don't say that)
-[05:19.86]Hm-hm
+[00:00.00]♪
+[00:02.12]To take my love away
+[00:05.74]When I come back around, will I know what to say?
+[00:10.64]Said you won't forget my name
+[00:13.91]Not today, not tomorrow
+[00:18.35]Kinda strange, feelin' sorrow
+[00:22.68]I got change (yup), you could borrow (borrow)
+[00:27.53]When I come back around, will I know what to say?
+[00:31.36]Not today, maybe tomorrow
+[00:36.05]Open up the door, can you open up the door?
+[00:40.19]I know you said before you can't cope with anymore
+[00:44.42]You told me it was war, said you'd show me what's in store
+[00:48.83]I hope it's not for sure, can you open up the door?
+[00:52.97]Did you
+[00:57.86]Take
+[01:01.65]My love
+[01:06.13]Away
+[01:10.45]From me?
+[01:17.55]Me
+[01:22.80]Me
+[01:28.66]Saw your seat at the counter when I look away
+[01:33.17]Saw you turn around, but it wasn't your face
+[01:36.71]Said I need to be alone now, I'm takin' a break
+[01:41.08]How come, when I returned, you were gone away?
+[01:45.75]I don't, I don't know why I called
+[01:52.21]I don't know you at all
+[01:56.53]I don't know you
+[02:01.21]Not at all
+[02:03.07]I don't know, I don't know why I called
+[02:09.59]I don't know you at all
+[02:14.09]I don't know you
+[02:25.09]Did you
+[02:28.92]Take my love
+[02:33.43]Away
+[02:37.68]From me?
+[02:44.75]Me
+[02:53.64]And that's when you found me
+[02:57.40]I was waitin' in the garden
+[03:01.59]Contemplatin', beg your pardon
+[03:05.72]But there's a part of me that recognizes you
+[03:10.08]Do you feel it too?
+[03:12.85]When you told me it was serious
+[03:17.22]Were you serious? Mm
+[03:21.11]They told me they were only curious
+[03:25.82]Now it's serious, hm
+[03:30.69]Open up the door, can you open up the door?
+[03:34.67]I know you said before you can't cope with anymore
+[03:39.05]You told me it was war, said you'd show me what's in store
+[03:43.44]I hope it's not for sure, can you open up the door?
+[04:05.41]Wringing my hands in my lap
+[04:09.45]And you tell me it's all been a trap
+[04:13.80]And you don't know if you'll make it back
+[04:18.18]I said, "No, don't say that"
+[04:23.46](Wringing my hands in my lap)
+[04:26.78](And you tell me it's all been a trap)
+[04:30.94](And you don't know if you'll make it back)
+[04:35.48](I said, "No, don't say that")
+[04:40.32](Wringing my hands in my lap)
+[04:44.75](And you tell me it's all been a trap)
+[04:48.96](And you don't know if you'll make it back)
+[04:52.51](No, don't say that)
+[04:58.86]Hm-hm
+`;
+
+const JUICE_WRLD_LEAN_WIT_ME_LRC = `[ti:Lean Wit Me]
+[ar:Juice WRLD]
+[al:Goodbye & Good Riddance]
+[00:11.43]Drugs got me sweatin', but the room gettin' colder
+[00:14.48]Lookin' at the devil and the angel on my shoulder
+[00:17.55]Will I die tonight? I don't know, is it over?
+[00:20.32]Lookin' for my next high, I'm lookin' for closure
+[00:23.21]Lean with me, pop with me
+[00:26.02]Get high with me if you rock with me
+[00:29.09]Smoke with me, drink with me
+[00:31.98]Fucked up liver with some bad kidneys
+[00:34.85]Lean with me, pop with me
+[00:37.84]Get high with me if you rock with me
+[00:40.72]Smoke with me, drink with me
+[00:43.66]Fucked up liver with some bad kidneys
+[00:46.61]Told her if I die, yeah, I'ma die young
+[00:49.69]Every day I've been getting fucked up
+[00:52.37]Finally know the difference between love and drugs
+[00:55.38]Shawty tell me I should really sober up
+[00:58.34]This shit ain't fiction, it's too real, too real
+[01:01.39]Fuck one dose, I need two pills, two pills
+[01:04.13]I'm looking for trouble so I know I'm gonna find it
+[01:07.06]Ring, ring, plug hit my phone, perfect timing
+[01:10.07]I know I'm not right
+[01:12.11]But I'm not wrong, no, I'm not wrong
+[01:15.36]Girl, you hate it when I'm too high
+[01:17.85]But that's where I belong, where I belong
+[01:21.84]Lean with me, pop with me
+[01:24.69]Get high with me if you rock with me
+[01:27.64]Smoke with me, drink with me
+[01:30.69]Fucked up liver with some bad kidneys
+[01:33.42]Lean with me, pop with me
+[01:36.24]Get high with me if you rock with me
+[01:39.28]Smoke with me, drink with me
+[01:42.25]Fucked up liver with some bad kidneys
+[01:45.03]Eyes red, no Visine
+[01:47.73]Crashed the Mustang, no Saleen
+[01:50.69]Yeah, I love beans, yeah, I love lean
+[01:53.65]I laugh when they ask if my piss clean
+[01:56.46]Huh, smoke with me, huh, pop with me, huh
+[01:59.78]Ayy, Gucci store, come and shop with me
+[02:02.42]If I overdose, bae, are you gon' drop with me?
+[02:05.21]I'on even wanna think about that right now
+[02:07.81]Let's get too high, reach a new height
+[02:11.04]Take the shrooms and the pills at the same time
+[02:14.17]Went to Hollywood thrills from the street life
+[02:16.92]Took too many drugs, now I don't feel right
+[02:20.33]Lean with me, pop with me
+[02:23.03]Get high with me if you rock with me
+[02:26.11]Smoke with me, drink with me
+[02:29.08]Fucked up liver with some bad kidneys
+[02:32.02]Lean with me, pop with me
+[02:34.83]Get high with me if you rock with me
+[02:37.83]Smoke with me, drink with me
+[02:40.78]Fucked up liver with some bad kidneys (bad kidneys)
+[02:46.35]Oh-oh
+[02:49.60]Oh-oh-oh
+[02:52.55]Oh-oh-oh
 `;
 
 export const CURATED_TRACKS: Record<string, LyricTrack> = {
@@ -261,11 +320,14 @@ export const CURATED_TRACKS: Record<string, LyricTrack> = {
   iI34LYmJ1Fs: parseLrc(JUICE_WRLD_ROBBERY_LRC, 'curated'),
   i9AHJkHqkpw: parseLrc(JUICE_WRLD_ROBBERY_LRC, 'curated'),
   BY_XwvKogC8: parseLrc(BILLIE_EILISH_CHIHIRO_LRC, 'curated'),
+  '5SejM_hBvMM': parseLrc(JUICE_WRLD_LEAN_WIT_ME_LRC, 'curated'),
   yellow: parseLrc(COLDPLAY_YELLOW_LRC, 'curated'),
   getlucky: parseLrc(DAFT_PUNK_GET_LUCKY_LRC, 'curated'),
   easyonme: parseLrc(ADELE_EASY_ON_ME_LRC, 'curated'),
   bohemianrhapsody: parseLrc(BOHEMIAN_RHAPSODY_LRC, 'curated'),
   robbery: parseLrc(JUICE_WRLD_ROBBERY_LRC, 'curated'),
   chihiro: parseLrc(BILLIE_EILISH_CHIHIRO_LRC, 'curated'),
+  leanwitme: parseLrc(JUICE_WRLD_LEAN_WIT_ME_LRC, 'curated'),
+  'juicewrld-lean-wit-me': parseLrc(JUICE_WRLD_LEAN_WIT_ME_LRC, 'curated'),
 };
 

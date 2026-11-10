@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, Music2, Play, FileVideo, Sparkles } from 'lucide-react';
+import { Clock, Music2, Play, FileVideo } from 'lucide-react';
 import { YoutubeIcon } from '../../components/ui/Icons';
 import SpotlightCard from '../../components/reactbits/SpotlightCard';
 import type { RecentSession, VideoSource } from '../../types/session';
@@ -12,53 +12,11 @@ interface RecentSessionsProps {
   onSelectSession?: (source: VideoSource) => void;
 }
 
-// Isolated mock sessions for testing & previewing the populated state
-const MOCK_RECENT_SESSIONS: RecentSession[] = [
-  {
-    id: 'mock-1',
-    title: 'Coldplay — Yellow',
-    artist: 'Coldplay',
-    thumbnailUrl: 'https://img.youtube.com/vi/yKNxeF4KMsY/hqdefault.jpg',
-    kind: 'youtube',
-    sourceId: 'yKNxeF4KMsY',
-    duration: 269,
-    playedAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
-  },
-  {
-    id: 'mock-2',
-    title: 'Queen — Bohemian Rhapsody (Remastered)',
-    artist: 'Queen',
-    thumbnailUrl: 'https://img.youtube.com/vi/fJ9rUzIMcZQ/hqdefault.jpg',
-    kind: 'youtube',
-    sourceId: 'fJ9rUzIMcZQ',
-    duration: 359,
-    playedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-  },
-  {
-    id: 'mock-3',
-    title: 'Daft Punk — Get Lucky (Official Audio)',
-    artist: 'Daft Punk ft. Pharrell Williams',
-    thumbnailUrl: 'https://img.youtube.com/vi/5NV6Rdv1a3I/hqdefault.jpg',
-    kind: 'youtube',
-    sourceId: '5NV6Rdv1a3I',
-    duration: 248,
-    playedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  },
-];
-
 export const RecentSessions: React.FC<RecentSessionsProps> = ({
-  sessions: initialSessions = [],
+  sessions = [],
   onSelectSession,
 }) => {
-  const [showMockHistory, setShowMockHistory] = useState(false);
-
-  const displaySessions = showMockHistory
-    ? MOCK_RECENT_SESSIONS
-    : initialSessions;
-
-  const handleToggleMock = () => {
-    setShowMockHistory((prev) => !prev);
-  };
+  const displaySessions = sessions;
 
   const handleCardClick = (session: RecentSession) => {
     if (onSelectSession) {
@@ -81,17 +39,6 @@ export const RecentSessions: React.FC<RecentSessionsProps> = ({
             <Clock size={15} className="recent-header-icon" />
             <h2 className="recent-heading">Recently Played</h2>
           </div>
-
-          {/* Toggle for reviewing populated state */}
-          <button
-            type="button"
-            className="mock-toggle-btn"
-            onClick={handleToggleMock}
-            title={showMockHistory ? 'Show clean empty state' : 'Preview sample sessions'}
-          >
-            <Sparkles size={12} />
-            <span>{showMockHistory ? 'Reset to Empty' : 'Preview Demo History'}</span>
-          </button>
         </div>
 
         {/* Content: Empty State vs Cards */}

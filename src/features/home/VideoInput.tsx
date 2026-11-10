@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Link2,
@@ -11,34 +11,23 @@ import {
   Shield,
   ArrowRight,
   Clipboard,
-  Sparkles,
+  Timer,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import SpotlightCard from '../../components/reactbits/SpotlightCard';
-import { validateYouTubeUrl, fetchYouTubeMetadata } from '../../utils/youtube';
-import { formatFileSize } from '../../utils/formatters';
+import {
+  validateYouTubeUrl,
+  fetchYouTubeMetadata,
+  detectVideoIntroOffset,
+  parseTimeStringToSeconds,
+} from '../../utils/youtube';
+import { formatFileSize, formatDuration } from '../../utils/formatters';
 import type { VideoSource } from '../../types/session';
 import './VideoInput.css';
 
 interface VideoInputProps {
   onStartSession: (source: VideoSource) => void;
 }
-
-// Sample curated music videos for instant demonstration
-const DEMO_TRACKS = [
-  {
-    title: 'Coldplay — Yellow',
-    url: 'https://www.youtube.com/watch?v=yKNxeF4KMsY',
-  },
-  {
-    title: 'Daft Punk — Get Lucky',
-    url: 'https://www.youtube.com/watch?v=5NV6Rdv1a3I',
-  },
-  {
-    title: 'Adele — Easy On Me',
-    url: 'https://www.youtube.com/watch?v=U3ASj1L6_sY',
-  },
-];
 
 export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
   const [url, setUrl] = useState('');
@@ -49,8 +38,34 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [sessionSuccessToast, setSessionSuccessToast] = useState<string | null>(null);
+  const [lyricsStartTime, setLyricsStartTime] = useState<string>('');
+  const [autoDetectedSec, setAutoDetectedSec] = useState<number>(0);
+  const [detectedVideoId, setDetectedVideoId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Automatically detect video ID and intro start timestamp whenever URL changes
+  useEffect(() => {
+    const trimmed = url.trim();
+    if (!trimmed) {
+      setDetectedVideoId(null);
+      setAutoDetectedSec(0);
+      setLyricsStartTime('');
+      return;
+    }
+
+    const validation = validateYouTubeUrl(trimmed);
+    if (validation.isValid && validation.videoId) {
+      setDetectedVideoId(validation.videoId);
+      const intro = validation.startTime ?? detectVideoIntroOffset(validation.videoId, trimmed);
+      setAutoDetectedSec(intro);
+      setLyricsStartTime(formatDuration(intro));
+    } else {
+      setDetectedVideoId(null);
+      setAutoDetectedSec(0);
+      setLyricsStartTime('');
+    }
+  }, [url]);
 
   // Handle URL changes with automatic clearing of errors on typing
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +99,14 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
       return;
     }
 
+    // Determine the final lyrics start offset
+    const userOffset = lyricsStartTime.trim() ? parseTimeStringToSeconds(lyricsStartTime) : 0;
+    // Preserve full decimal precision of auto-detected offset unless user manually typed a custom time
+    const finalOffset =
+      userOffset > 0 && Math.abs(userOffset - autoDetectedSec) > 1
+        ? userOffset
+        : (autoDetectedSec > 0 ? autoDetectedSec : userOffset);
+
     setErrorMessage(null);
     setIsLoading(true);
     setLoadingStep('Fetching track details from YouTube...');
@@ -100,6 +123,7 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
           title: meta.cleanTitle || meta.title,
           artist: meta.cleanArtist || meta.author,
           thumbnailUrl: `https://img.youtube.com/vi/${validation.videoId}/hqdefault.jpg`,
+          startOffset: finalOffset,
         };
         onStartSession(source);
         setSessionSuccessToast(`Loaded track: ${source.title}`);
@@ -112,6 +136,7 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
         sourceId: validation.videoId,
         title: `YouTube Video (${validation.videoId})`,
         thumbnailUrl: `https://img.youtube.com/vi/${validation.videoId}/hqdefault.jpg`,
+        startOffset: finalOffset,
       };
       onStartSession(source);
     }
@@ -314,6 +339,32 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
               )}
             </div>
 
+            {/* Added timestamp for the pasted YouTube video where lyrics begin */}
+            {detectedVideoId && (
+              <div className="pasted-timestamp-row">
+                <div className="pasted-timestamp-label">
+                  <Timer size={13} className="timestamp-icon" />
+                  <span>Lyrics Start:</span>
+                </div>
+                <div className="pasted-timestamp-input-wrap">
+                  <input
+                    type="text"
+                    value={lyricsStartTime}
+                    onChange={(e) => setLyricsStartTime(e.target.value)}
+                    placeholder="0:00"
+                    className="pasted-timestamp-input"
+                    title="Timestamp where the lyrics/vocals begin in the video (e.g. 0:21 or 21)"
+                    aria-label="Lyrics start timestamp"
+                  />
+                  {autoDetectedSec > 0 && (
+                    <span className="auto-intro-badge">
+                      Auto-detected intro ({formatDuration(autoDetectedSec)})
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="form-submit-wrapper">
               <Button
                 type="submit"
@@ -374,29 +425,6 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
             <Upload size={14} className="choose-video-icon" />
             <span>Choose a Video</span>
           </button>
-        </div>
-      )}
-
-      {/* Quick Demo Links */}
-      {!selectedFile && (
-        <div className="demo-suggestions">
-          <span className="demo-label">Try a demo:</span>
-          <div className="demo-chips">
-            {DEMO_TRACKS.map((demo) => (
-              <button
-                key={demo.title}
-                type="button"
-                className="demo-chip"
-                onClick={() => {
-                  setUrl(demo.url);
-                  setErrorMessage(null);
-                }}
-              >
-                <Sparkles size={11} className="demo-chip-icon" />
-                <span>{demo.title}</span>
-              </button>
-            ))}
-          </div>
         </div>
       )}
 

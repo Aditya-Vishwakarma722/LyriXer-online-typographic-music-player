@@ -11,8 +11,9 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(7, 7, 9, 0.75);
-  backdrop-filter: blur(12px);
+  background: rgba(5, 5, 8, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 1;
 }
 
@@ -26,35 +27,39 @@
 
 .modal-panel {
   width: 100%;
-  background: rgba(20, 20, 24, 0.92);
-  border: 1px solid var(--border-default);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 32px rgba(167, 139, 250, 0.1);
+  background: rgba(14, 14, 18, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85),
+              0 0 1px 1px rgba(255, 255, 255, 0.05),
+              0 0 40px rgba(167, 139, 250, 0.08);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
 }
 
 .modal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 24px 28px 16px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   gap: 16px;
 }
 
 .modal-title {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.025em;
 }
 
 .modal-description {
   margin-top: 4px;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: 0.84rem;
+  color: var(--text-secondary, #94909D);
+  line-height: 1.45;
 }
 
 .modal-close-btn {
@@ -63,17 +68,19 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
 
 .modal-close-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  color: #FFFFFF;
+  border-color: rgba(167, 139, 250, 0.4);
+  transform: scale(1.05);
 }
 
 .modal-body {

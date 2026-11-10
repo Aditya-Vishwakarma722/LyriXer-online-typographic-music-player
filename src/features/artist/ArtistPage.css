@@ -10,13 +10,11 @@
   z-index: 100;
 }
 
-/* 1. Full-Screen Cinematic Photograph (Dominant on Right) */
+/* 1. Extended Full-Screen Backdrop: Upscaled Clear Quality Artist Image covering entire screen (100vw x 100vh) */
 .artist-bg-viewport {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 68vw;
+  inset: 0;
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
   pointer-events: none;
@@ -28,21 +26,24 @@
   height: 100%;
   object-fit: cover;
   object-position: center 25%;
-  filter: contrast(1.06) brightness(0.9);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  filter: contrast(1.05) brightness(0.88) saturate(1.08);
 }
 
-/* Subtle Dark Left Gradient for Text Readability */
+/* Atmospheric Gradients for text legibility without requiring element box backgrounds */
 .artist-gradient-left {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     90deg,
-    #08080B 0%,
-    rgba(8, 8, 11, 0.96) 24%,
-    rgba(8, 8, 11, 0.68) 50%,
-    rgba(8, 8, 11, 0.2) 78%,
+    rgba(8, 8, 11, 0.9) 0%,
+    rgba(8, 8, 11, 0.78) 32%,
+    rgba(8, 8, 11, 0.45) 58%,
+    rgba(8, 8, 11, 0.12) 82%,
     transparent 100%
   );
+  pointer-events: none;
 }
 
 .artist-gradient-bottom {
@@ -50,37 +51,36 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 140px;
-  background: linear-gradient(180deg, transparent 0%, #08080B 100%);
+  height: 160px;
+  background: linear-gradient(180deg, transparent 0%, rgba(8, 8, 11, 0.95) 100%);
+  pointer-events: none;
 }
 
 .artist-vignette-overlay {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse at 75% 30%,
-    transparent 45%,
-    rgba(8, 8, 11, 0.5) 100%
+    ellipse at 70% 35%,
+    transparent 35%,
+    rgba(8, 8, 11, 0.45) 80%,
+    rgba(8, 8, 11, 0.85) 100%
   );
+  pointer-events: none;
 }
 
-/* 2. Left-Side Editorial Content Area */
+/* 2. Previous Editorial Design in Transparent Overlay Mode (No Element Box Backgrounds) */
 .artist-stage-left {
   position: relative;
   z-index: 10;
-  width: 46vw;
+  width: 48vw;
   min-width: 480px;
-  max-width: 680px;
+  max-width: 720px;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 32px 40px 24px;
-  background: linear-gradient(
-    90deg,
-    #08080B 75%,
-    rgba(8, 8, 11, 0.94) 100%
-  );
-  backdrop-filter: blur(14px);
+  padding: 32px 48px 24px;
+  background: transparent;
+  backdrop-filter: none;
 }
 
 /* Top Minimal Navigation Bar */
@@ -108,27 +108,29 @@
   color: #A5A1AD;
   padding: 6px 14px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transition: all var(--transition-fast);
   cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .artist-return-btn:hover {
   color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .artist-return-btn.primary {
   color: #EDE9FE;
-  background: rgba(167, 139, 250, 0.14);
-  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.16);
+  border-color: rgba(167, 139, 250, 0.38);
 }
 
 .artist-return-btn.primary:hover {
-  background: rgba(167, 139, 250, 0.22);
-  border-color: rgba(167, 139, 250, 0.5);
+  background: rgba(167, 139, 250, 0.26);
+  border-color: rgba(167, 139, 250, 0.55);
   color: #FFFFFF;
 }
 
@@ -139,11 +141,13 @@
   font-size: 0.72rem;
   font-weight: 500;
   color: #C4B5FD;
-  background: rgba(167, 139, 250, 0.08);
-  border: 1px solid rgba(167, 139, 250, 0.2);
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.25);
   padding: 4px 10px;
   border-radius: var(--radius-full);
   letter-spacing: 0.02em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Artist Information (Upper Left) */
@@ -168,43 +172,47 @@
   font-size: 0.6875rem;
   font-weight: 600;
   color: #C4B5FD;
-  background: rgba(167, 139, 250, 0.12);
+  background: rgba(167, 139, 250, 0.14);
   padding: 2px 8px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(167, 139, 250, 0.28);
+  border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
 .artist-genre-label {
   font-size: 0.75rem;
   color: #A5A1AD;
   letter-spacing: 0.02em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .artist-headline-name {
   font-family: var(--font-display);
-  font-size: 2.85rem;
+  font-size: 3rem;
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.05;
   color: #FFFFFF;
   margin: 2px 0;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 .artist-listeners-tag {
   font-size: 0.75rem;
-  color: #A5A1AD;
+  color: #C4B5FD;
   font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .artist-description-text {
   font-size: 0.8125rem;
   line-height: 1.5;
-  color: #A5A1AD;
-  max-width: 520px;
+  color: #D1CFD7;
+  max-width: 540px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 }
 
 .artist-channel-link {
@@ -212,22 +220,23 @@
   align-items: center;
   gap: 5px;
   font-size: 0.75rem;
-  color: #71717A;
+  color: #C4B5FD;
   margin-top: 2px;
   transition: color var(--transition-fast);
 }
 
 .artist-channel-link:hover {
-  color: #C4B5FD;
+  color: #EDE9FE;
+  text-decoration: underline;
 }
 
-/* Understated Catalogue Category Tabs */
+/* Catalogue Category Tabs */
 .catalogue-category-tabs {
   display: flex;
   align-items: center;
   gap: 18px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 10px;
   flex-shrink: 0;
 }
@@ -235,7 +244,7 @@
 .cat-tab {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #71717A;
+  color: #8E8A96;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -310,12 +319,12 @@
 }
 
 .artist-tracklist-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-full);
 }
 
 .artist-tracklist-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.4);
 }
 
 .artist-footer-meta {
@@ -323,7 +332,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.6875rem;
-  color: #63636E;
+  color: #8E8A96;
   padding-top: 10px;
   flex-shrink: 0;
 }
@@ -340,6 +349,7 @@
   padding: 10px 18px;
   background: rgba(20, 19, 25, 0.9);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(167, 139, 250, 0.35);
   border-radius: var(--radius-full);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(167, 139, 250, 0.15);
@@ -398,35 +408,13 @@
   background: var(--accent-violet);
 }
 
-.rotate-180 {
-  transform: rotate(180deg);
-}
-
 /* Responsive Behavior */
 @media (max-width: 960px) {
-  .artist-cinematic-page {
-    flex-direction: column;
-    overflow-y: auto;
-  }
-
-  .artist-bg-viewport {
-    position: relative;
-    width: 100%;
-    height: 320px;
-    flex-shrink: 0;
-  }
-
-  .artist-gradient-left {
-    display: none;
-  }
-
   .artist-stage-left {
     width: 100%;
     min-width: 100%;
     max-width: 100%;
-    height: auto;
     padding: 24px 20px;
-    background: #08080B;
   }
 
   .artist-headline-name {

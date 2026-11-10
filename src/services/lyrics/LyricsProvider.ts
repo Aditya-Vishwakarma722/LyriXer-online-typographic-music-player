@@ -136,6 +136,9 @@ export class LyricsProvider {
     if (lowerTitle === 'robbery' && (lowerArtist.includes('juice') || lowerArtist === '' || !artistName)) {
       return CURATED_TRACKS['iI34LYmJ1Fs'] || CURATED_TRACKS['robbery'];
     }
+    if ((lowerTitle.includes('lean with me') || lowerTitle.includes('lean wit me')) && (lowerArtist.includes('juice') || lowerArtist === '' || !artistName)) {
+      return CURATED_TRACKS['5SejM_hBvMM'] || CURATED_TRACKS['leanwitme'];
+    }
     if (lowerTitle === 'chihiro' && (lowerArtist.includes('billie') || lowerArtist === '' || !artistName)) {
       return CURATED_TRACKS['BY_XwvKogC8'] || CURATED_TRACKS['chihiro'];
     }
