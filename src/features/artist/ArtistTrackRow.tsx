@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, ShieldCheck } from 'lucide-react';
+import { Play, ShieldCheck, Users, Disc3 } from 'lucide-react';
 import type { ArtistTrack } from '../../types/artist';
 import './ArtistTrackRow.css';
 
@@ -68,12 +68,22 @@ export const ArtistTrackRow: React.FC<ArtistTrackRowProps> = ({
           {track.featuredArtist && (
             <span className="track-featured">ft. {track.featuredArtist}</span>
           )}
-          {track.isOfficial && (
+          {track.trackType === 'collab' || (track.featuredArtist && !track.trackType) ? (
+            <span className="track-collab-tag" title="Collaboration / Feature">
+              <Users size={11} />
+              <span>Collab</span>
+            </span>
+          ) : track.trackType === 'audio' ? (
+            <span className="track-audio-tag" title="Official Audio / Album Track">
+              <Disc3 size={11} />
+              <span>Official Audio</span>
+            </span>
+          ) : track.isOfficial ? (
             <span className="track-official-tag" title="Official Music Video">
               <ShieldCheck size={11} />
               <span>Official Video</span>
             </span>
-          )}
+          ) : null}
         </div>
 
         {track.album && (

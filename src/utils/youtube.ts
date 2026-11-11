@@ -60,15 +60,22 @@ export function extractYouTubeStartTime(url: string): number | null {
 export function extractYouTubeId(url: string): string | null {
   if (!url || typeof url !== 'string') return null;
 
-  const trimmed = url.trim();
+  const trimmed = url.trim().replace(/^[<"']+|[>"']+$/g, '');
+
+  // Direct 11-character YouTube video ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+    return trimmed;
+  }
 
   // Pattern matches:
   // - youtube.com/watch?v=VIDEO_ID
   // - youtu.be/VIDEO_ID
   // - youtube.com/embed/VIDEO_ID
   // - youtube.com/shorts/VIDEO_ID
+  // - youtube.com/live/VIDEO_ID
   // - youtube.com/v/VIDEO_ID
-  const regExp = /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  // - music.youtube.com, m.youtube.com, etc.
+  const regExp = /(?:https?:\/\/)?(?:[a-zA-Z0-9_-]+\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = trimmed.match(regExp);
 
   return match ? match[1] : null;
@@ -78,13 +85,22 @@ export function extractYouTubeId(url: string): string | null {
  * Validates whether an input string is a valid, supported YouTube video URL.
  */
 export function validateYouTubeUrl(url: string): YouTubeValidationResult {
-  const trimmed = url.trim();
+  const trimmed = url.trim().replace(/^[<"']+|[>"']+$/g, '');
 
   if (!trimmed) {
     return {
       isValid: false,
       videoId: null,
       errorMessage: 'Please enter a YouTube video URL.',
+    };
+  }
+
+  // Direct 11-character YouTube video ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+    return {
+      isValid: true,
+      videoId: trimmed,
+      startTime: null,
     };
   }
 
@@ -218,7 +234,9 @@ export function cleanTrackTitle(rawTitle: string, authorName?: string): { artist
  */
 export async function fetchYouTubeMetadata(videoId: string): Promise<YouTubeMetadata> {
   try {
-    const resp = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
+    const resp = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`, {
+      signal: AbortSignal.timeout(3000),
+    });
     if (resp.ok) {
       const data = await resp.json();
       if (!data.error && data.title) {

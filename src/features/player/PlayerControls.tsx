@@ -11,13 +11,13 @@ import {
   Type,
   Sliders,
   Sparkles,
-  Search,
   Eye,
   EyeOff,
   UserRound,
   Timer,
   RotateCcw,
   X,
+  Search,
 } from 'lucide-react';
 import type { VideoPlayerState } from '../../services/video/types';
 import type { TypographyPreset, UserPreferences } from '../../types/session';
@@ -33,7 +33,6 @@ interface PlayerControlsProps {
   preferences: UserPreferences;
   isFullScreen: boolean;
   lyricsVisible: boolean;
-  detectedIntroGap?: number | null;
   onPlay: () => void;
   onPause: () => void;
   onSeek: (seconds: number) => void;
@@ -61,7 +60,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   preferences,
   isFullScreen,
   lyricsVisible,
-  detectedIntroGap,
   onPlay,
   onPause,
   onSeek,
@@ -258,7 +256,9 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                     <span className={`sync-status-value ${manualOffset !== 0 ? 'offset-applied' : ''}`}>
                       {manualOffset === 0
                         ? '0.0s (Direct / In Sync)'
-                        : `${manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`} (Intro delay)`}
+                        : manualOffset > 0
+                        ? `+${manualOffset.toFixed(1)}s (Delayed · Lyrics later)`
+                        : `${manualOffset.toFixed(1)}s (Rushed · Lyrics earlier)`}
                     </span>
                   </div>
 
@@ -271,106 +271,79 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                         if (onAlignVocalsToNow) onAlignVocalsToNow();
                         else if (onAutoSync) onAutoSync();
                       }}
-                      title="Align opening line to current video playback position"
+                      title="Align opening line to current video playback position (Press 'S')"
                     >
                       <Sparkles size={16} />
                       <div className="sync-btn-text">
                         <strong>Sync to Vocal Start</strong>
-                        <span>Sets opening line to {formatDuration(currentTime)}</span>
+                        <span>Sets opening line to {formatDuration(currentTime)} (Press 'S')</span>
                       </div>
                     </button>
                   </div>
-
-                  {/* Snap Lyrics to Video */}
-                  {onAutoSync && (
-                    <div className="sync-section">
-                      <button
-                        type="button"
-                        className="sync-catch-hero-btn secondary"
-                        onClick={() => onAutoSync()}
-                        title="Fine-align active line to current audio position"
-                      >
-                        <Timer size={15} />
-                        <div className="sync-btn-text">
-                          <strong>Snap Lyrics to Video</strong>
-                          <span>Fine-aligns active line to audio</span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Auto-detected Intro Gap */}
-                  {detectedIntroGap && detectedIntroGap > 0 && onOffsetChange && (
-                    <div className="sync-detected-intro">
-                      <div className="intro-info">
-                        <span className="intro-label">Intro scene detected:</span>
-                        <span className="intro-time">+{detectedIntroGap}s</span>
-                      </div>
-                      <button
-                        type="button"
-                        className="apply-intro-btn"
-                        onClick={() => onOffsetChange(detectedIntroGap)}
-                      >
-                        Apply Offset
-                      </button>
-                    </div>
-                  )}
 
                   {/* Fine Adjust Steppers (Nudge Delay / Forward) */}
                   {onOffsetChange && (
                     <div className="sync-section">
                       <div className="sync-section-title">
                         <span>Fine Adjust (Delay / Rush)</span>
-                        <span className="current-offset-tag">
-                          {manualOffset > 0 ? `+${manualOffset.toFixed(1)}s` : `${manualOffset.toFixed(1)}s`}
+                        <span className={`current-offset-tag ${manualOffset !== 0 ? 'active' : ''}`}>
+                          {manualOffset > 0
+                            ? `+${manualOffset.toFixed(1)}s Delay`
+                            : manualOffset < 0
+                            ? `${manualOffset.toFixed(1)}s Rush`
+                            : '0.0s In Sync'}
                         </span>
+                      </div>
+                      <div className="sync-direction-row">
+                        <span className="sync-dir-label rush">◀ Rush (Earlier)</span>
+                        <span className="sync-dir-label delay">Delay (Later) ▶</span>
                       </div>
                       <div className="sync-stepper-row">
                         <button
                           type="button"
-                          className="stepper-btn"
+                          className="stepper-btn rush-btn"
                           onClick={() => onOffsetChange(Number((manualOffset - 1.0).toFixed(1)))}
-                          title="Advance lyrics earlier by 1.0s"
+                          title="Rush lyrics 1.0s earlier"
                         >
                           -1s
                         </button>
                         <button
                           type="button"
-                          className="stepper-btn"
+                          className="stepper-btn rush-btn"
                           onClick={() => onOffsetChange(Number((manualOffset - 0.5).toFixed(1)))}
-                          title="Advance lyrics earlier by 0.5s"
+                          title="Rush lyrics 0.5s earlier"
                         >
                           -0.5s
                         </button>
                         <button
                           type="button"
-                          className="stepper-btn"
+                          className="stepper-btn rush-btn"
                           onClick={() => onOffsetChange(Number((manualOffset - 0.1).toFixed(1)))}
-                          title="Advance lyrics earlier by 0.1s"
+                          title="Rush lyrics 0.1s earlier"
                         >
                           -0.1s
                         </button>
                         <button
                           type="button"
-                          className="stepper-btn"
+                          className="stepper-btn delay-btn"
                           onClick={() => onOffsetChange(Number((manualOffset + 0.1).toFixed(1)))}
-                          title="Delay lyrics later by 0.1s"
+                          title="Delay lyrics 0.1s later"
                         >
                           +0.1s
                         </button>
                         <button
                           type="button"
-                          className="stepper-btn"
+                          className="stepper-btn delay-btn"
                           onClick={() => onOffsetChange(Number((manualOffset + 0.5).toFixed(1)))}
-                          title="Delay lyrics later by 0.5s"
+                          title="Delay lyrics 0.5s later"
                         >
                           +0.5s
                         </button>
                         <button
                           type="button"
-                          className="stepper-btn"
+                          className="stepper-btn delay-btn"
                           onClick={() => onOffsetChange(Number((manualOffset + 1.0).toFixed(1)))}
-                          title="Delay lyrics later by 1.0s"
+                          title="Delay lyrics 1.0s later"
                         >
                           +1s
                         </button>
@@ -393,7 +366,10 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
 
                   {/* Keyboard Shortcuts Hint */}
                   <div className="sync-tip-hint">
-                    <span>Tip: Press <strong>'S'</strong> to sync vocals &middot; <strong>'['</strong> / <strong>']'</strong> to nudge &plusmn;0.2s</span>
+                    <span>
+                      Tip: Press <kbd className="hint-kbd">S</kbd> when lyrics start &middot;{' '}
+                      <kbd className="hint-kbd">[</kbd> / <kbd className="hint-kbd">]</kbd> to adjust sync (&plusmn;0.1s)
+                    </span>
                   </div>
                 </div>
               )}
@@ -413,14 +389,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             </button>
           )}
 
-          {/* Search LRCLIB Button */}
+          {/* Search LRCLIB */}
           {onSearchLrclibClick && (
             <button
               type="button"
               className="ctrl-btn"
               onClick={onSearchLrclibClick}
-              title="Search lyrics on lrclib.net"
-              aria-label="Search lyrics on LRCLIB"
+              title="Search LRCLIB (https://lrclib.net)"
+              aria-label="Search LRCLIB"
             >
               <Search size={17} />
             </button>
@@ -513,29 +489,88 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
 
             {showEffectsMenu && (
               <div className="player-popover effects-popover">
-                <span className="popover-title">Background Atmosphere</span>
-                <div className="popover-slider-row">
-                  <label>Blur ({preferences.blurLevel}px)</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="24"
-                    value={preferences.blurLevel}
-                    onChange={(e) =>
-                      onUpdatePreferences({ blurLevel: Number(e.target.value) })
-                    }
-                  />
+                <div className="popover-header-row">
+                  <span className="popover-title">Blur & Dim</span>
+                  {((preferences.blurLevel ?? 0) > 0 || (preferences.overlayOpacity ?? 0) > 0) && (
+                    <button
+                      type="button"
+                      className="popover-reset-btn"
+                      onClick={() =>
+                        onUpdatePreferences({ blurLevel: 0, overlayOpacity: 0 })
+                      }
+                      title="Reset to Original Video (0% Dim, 0px Blur)"
+                    >
+                      Reset
+                    </button>
+                  )}
                 </div>
+
+                {/* Quick Presets */}
+                <div className="effects-presets-row">
+                  <button
+                    type="button"
+                    className={`effects-preset-chip ${(preferences.blurLevel ?? 0) === 0 && (preferences.overlayOpacity ?? 0) === 0 ? 'active' : ''}`}
+                    onClick={() =>
+                      onUpdatePreferences({ blurLevel: 0, overlayOpacity: 0 })
+                    }
+                  >
+                    Original
+                  </button>
+                  <button
+                    type="button"
+                    className={`effects-preset-chip ${(preferences.blurLevel ?? 0) === 4 && Math.round((preferences.overlayOpacity ?? 0) * 100) === 20 ? 'active' : ''}`}
+                    onClick={() =>
+                      onUpdatePreferences({ blurLevel: 4, overlayOpacity: 0.2 })
+                    }
+                  >
+                    Subtle
+                  </button>
+                  <button
+                    type="button"
+                    className={`effects-preset-chip ${(preferences.blurLevel ?? 0) === 8 && Math.round((preferences.overlayOpacity ?? 0) * 100) === 40 ? 'active' : ''}`}
+                    onClick={() =>
+                      onUpdatePreferences({ blurLevel: 8, overlayOpacity: 0.4 })
+                    }
+                  >
+                    Atmosphere
+                  </button>
+                </div>
+
                 <div className="popover-slider-row">
-                  <label>Dim Overlay ({Math.round(preferences.overlayOpacity * 100)}%)</label>
+                  <div className="popover-slider-label-row">
+                    <label>Dim Video</label>
+                    <span className="slider-val-tag">
+                      {Math.round((preferences.overlayOpacity ?? 0) * 100)}%
+                      {(preferences.overlayOpacity ?? 0) === 0 ? ' (No Dim)' : ''}
+                    </span>
+                  </div>
                   <input
                     type="range"
                     min="0"
                     max="1"
                     step="0.02"
-                    value={preferences.overlayOpacity}
+                    value={preferences.overlayOpacity ?? 0}
                     onChange={(e) =>
                       onUpdatePreferences({ overlayOpacity: Number(e.target.value) })
+                    }
+                  />
+                </div>
+
+                <div className="popover-slider-row">
+                  <div className="popover-slider-label-row">
+                    <label>Blur Video</label>
+                    <span className="slider-val-tag">
+                      {preferences.blurLevel ?? 0}px
+                      {(preferences.blurLevel ?? 0) === 0 ? ' (Original Sharp)' : ''}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    value={preferences.blurLevel ?? 0}
+                    onChange={(e) =>
+                      onUpdatePreferences({ blurLevel: Number(e.target.value) })
                     }
                   />
                 </div>

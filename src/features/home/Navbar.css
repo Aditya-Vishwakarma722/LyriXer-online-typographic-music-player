@@ -96,6 +96,18 @@
   border-color: var(--border-subtle);
 }
 
+.navbar-link.active {
+  color: #FFFFFF;
+  background: rgba(167, 139, 250, 0.16);
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.22);
+}
+
+.navbar-link.active .navbar-link-icon {
+  opacity: 1;
+  color: var(--accent-violet-light);
+}
+
 .navbar-link-icon {
   opacity: 0.7;
 }

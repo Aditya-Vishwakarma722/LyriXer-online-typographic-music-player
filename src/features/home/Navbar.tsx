@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Info, Mic2 } from 'lucide-react';
+import { SlidersHorizontal, Info, Mic2, Home } from 'lucide-react';
 import './Navbar.css';
 
 interface NavbarProps {
   onOpenAbout: () => void;
   onOpenSettings: () => void;
   onOpenArtists?: () => void;
+  onOpenHome?: () => void;
+  activeView?: 'home' | 'artists';
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenAbout,
   onOpenSettings,
   onOpenArtists,
+  onOpenHome,
+  activeView = 'home',
 }) => {
   const [scrolled, setScrolled] = useState(false);
 
@@ -27,7 +31,17 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-content">
         {/* Brand Wordmark */}
-        <a href="/" className="navbar-brand" aria-label="LyriXer Home">
+        <a
+          href="#home"
+          className="navbar-brand"
+          aria-label="LyriXer Home"
+          onClick={(e) => {
+            if (onOpenHome) {
+              e.preventDefault();
+              onOpenHome();
+            }
+          }}
+        >
           <div className="navbar-logo-glyph">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="rgba(167, 139, 250, 0.4)" strokeWidth="1.2" />
@@ -46,10 +60,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Minimal Navigation */}
         <nav className="navbar-nav" aria-label="Main Navigation">
-          {onOpenArtists && (
+          {onOpenHome && activeView === 'artists' && (
             <button
               type="button"
               className="navbar-link"
+              onClick={onOpenHome}
+              aria-label="Home"
+            >
+              <Home size={15} className="navbar-link-icon" />
+              <span>Home</span>
+            </button>
+          )}
+
+          {onOpenArtists && (
+            <button
+              type="button"
+              className={`navbar-link ${activeView === 'artists' ? 'active' : ''}`}
               onClick={onOpenArtists}
               aria-label="Artists Catalogue"
             >

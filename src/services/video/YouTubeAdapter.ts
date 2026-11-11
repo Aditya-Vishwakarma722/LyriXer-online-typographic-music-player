@@ -98,6 +98,8 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
           cc_load_policy: 0, // Disable YouTube's own auto captions to prevent collision with LyriXer
           cc_lang_pref: 'none',
           iv_load_policy: 3, // Disable video annotations
+          fs: 0, // Disable native fullscreen button inside iframe
+          autohide: 1,
         },
         events: {
           onReady: (event) => {

@@ -22,7 +22,14 @@
   justify-content: center;
   z-index: 1;
   pointer-events: none;
-  transition: filter var(--transition-normal);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Suppress video opacity and apply heavy ambient blur when entering end-screen zone */
+.yt-fullscreen-video-viewport.suppress-recommendations {
+  opacity: 0.12;
+  filter: blur(28px) !important;
 }
 
 .yt-fullscreen-host {
@@ -43,20 +50,45 @@
   pointer-events: none;
 }
 
-/* 2. Atmospheric Translucent Contrast Overlay */
+/* 2. Atmospheric Dim Contrast Overlay (Controlled cleanly via overlayOpacity) */
 .yt-fullscreen-contrast-overlay {
   position: absolute;
   inset: 0;
   z-index: 5;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    rgba(11, 11, 13, 0.42) 0%,
-    rgba(11, 11, 13, 0.72) 65%,
-    rgba(11, 11, 13, 0.94) 100%
-  );
-  box-shadow: inset 0 -110px 100px rgba(11, 11, 13, 0.98);
-  transition: background-color var(--transition-normal);
+  background-color: #000000;
+  transition: opacity 0.15s ease-out;
+}
+
+/* 2b. End-Screen Anti-Recommendation Shield
+   Aggressively covers and dissolves YouTube recommended video cards / suggested video overlays
+   in the last 20 seconds while the song is still playing. */
+.yt-end-recommendations-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background:
+    /* Deep quadrant blackouts targeting YouTube end-card layout zones */
+    radial-gradient(circle at 18% 22%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
+    radial-gradient(circle at 82% 22%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
+    radial-gradient(circle at 18% 78%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
+    radial-gradient(circle at 82% 78%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
+    /* Overall atmospheric dark gradient */
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(11, 11, 13, 0.90) 0%,
+      rgba(8, 8, 11, 0.98) 70%,
+      #08080B 100%
+    );
+  backdrop-filter: blur(36px);
+  -webkit-backdrop-filter: blur(36px);
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yt-end-recommendations-shield.active {
+  opacity: 1;
 }
 
 /* 3. Centered Lyrics Overlay (Floating on top of playing video) */

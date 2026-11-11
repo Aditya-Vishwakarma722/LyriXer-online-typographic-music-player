@@ -9,6 +9,7 @@ import { AboutModal } from './features/home/AboutModal';
 import { SettingsModal } from './features/home/SettingsModal';
 import { PlayerShell } from './features/player/PlayerShell';
 import { ArtistPage } from './features/artist/ArtistPage';
+import { ArtistsHub } from './features/artist/ArtistsHub';
 import type { UserPreferences, VideoSource, RecentSession } from './types/session';
 import type { ArtistTrack } from './types/artist';
 import { ArrowRight } from 'lucide-react';
@@ -21,20 +22,20 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   backgroundStyle: 'combined',
   enableParticles: true,
   theme: 'midnight',
-  blurLevel: 8,
-  overlayOpacity: 0.5,
+  blurLevel: 0,
+  overlayOpacity: 0,
 };
 
 const STORAGE_KEY_PREFS = 'lyrixer_preferences';
 const STORAGE_KEY_RECENT = 'lyrixer_recent_sessions';
 
-type AppView = 'home' | 'artist' | 'player';
+type AppView = 'home' | 'artists-hub' | 'artist' | 'player';
 
 export const App: React.FC = () => {
   // Navigation View State
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [selectedArtistName, setSelectedArtistName] = useState<string>('Juice WRLD');
-  const [previousView, setPreviousView] = useState<'home' | 'artist' | 'player'>('home');
+  const [previousView, setPreviousView] = useState<AppView>('home');
 
   // User Preferences with LocalStorage Persistence & automatic purge of legacy grey styles
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
@@ -48,6 +49,17 @@ export const App: React.FC = () => {
           !parsed.backgroundStyle
         ) {
           parsed.backgroundStyle = 'combined';
+          localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(parsed));
+        }
+        // If legacy default (8px blur, 0.5 dim) exists without explicit customization,
+        // modernize to clean original video view (0px blur, 0 dim)
+        if (
+          parsed.blurLevel === 8 &&
+          parsed.overlayOpacity === 0.5 &&
+          !parsed.hasCustomVisualSettings
+        ) {
+          parsed.blurLevel = 0;
+          parsed.overlayOpacity = 0;
           localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(parsed));
         }
         return { ...DEFAULT_PREFERENCES, ...parsed };
@@ -79,7 +91,13 @@ export const App: React.FC = () => {
   // Synchronize preferences to localStorage and DOM theme
   const handleUpdatePreferences = (updates: Partial<UserPreferences>) => {
     setPreferences((prev) => {
-      const updated = { ...prev, ...updates };
+      const updated = {
+        ...prev,
+        ...updates,
+        ...(updates.blurLevel !== undefined || updates.overlayOpacity !== undefined
+          ? { hasCustomVisualSettings: true }
+          : {}),
+      };
       try {
         localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(updated));
       } catch {
@@ -99,7 +117,7 @@ export const App: React.FC = () => {
     } else {
       root.style.setProperty('--bg-base', '#0B0B0D');
     }
-    root.style.setProperty('--bg-blur', `${preferences.blurLevel ?? 8}px`);
+    root.style.setProperty('--bg-blur', `${preferences.blurLevel ?? 0}px`);
   }, [preferences.theme, preferences.blurLevel]);
 
   const handleStartSession = (source: VideoSource) => {
@@ -173,11 +191,38 @@ export const App: React.FC = () => {
           activeSession={activeSession}
           onSelectTrack={handleSelectArtistTrack}
           onBackToHome={() => setCurrentView('home')}
+          onBackToArtists={previousView === 'artists-hub' ? () => setCurrentView('artists-hub') : undefined}
           onBackToPlayer={previousView === 'player' ? () => setCurrentView('player') : undefined}
           onOpenPlayer={() => setCurrentView('player')}
         />
+      ) : currentView === 'artists-hub' ? (
+        /* View 3: Dedicated Immersive Artists Discovery Hub */
+        <>
+          <AtmosphericBackground
+            style={preferences.backgroundStyle}
+            enableParticles={preferences.enableParticles}
+            enablePulse={preferences.haloMotion}
+          />
+
+          <Navbar
+            onOpenAbout={() => setIsAboutOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenHome={() => setCurrentView('home')}
+            onOpenArtists={() => setCurrentView('artists-hub')}
+            activeView="artists"
+          />
+
+          <ArtistsHub
+            onSelectArtist={(artistName) => {
+              handleOpenArtist(artistName);
+            }}
+            onBackToHome={() => setCurrentView('home')}
+            activeSession={activeSession}
+            onResumePlayer={() => setCurrentView('player')}
+          />
+        </>
       ) : (
-        /* View 3: Clean Atmospheric Homepage UI */
+        /* View 4: Clean Atmospheric Homepage UI */
         <>
           {/* Authentic Classy Atmospheric Background (Concentric Halo + React Bits Waves & Particles) */}
           <AtmosphericBackground
@@ -191,8 +236,11 @@ export const App: React.FC = () => {
             onOpenAbout={() => setIsAboutOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onOpenArtists={() => {
-              handleOpenArtist('Juice WRLD');
+              setPreviousView('home');
+              setCurrentView('artists-hub');
             }}
+            onOpenHome={() => setCurrentView('home')}
+            activeView="home"
           />
 
           {/* Main Page Layout */}

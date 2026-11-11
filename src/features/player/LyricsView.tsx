@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { LyricTrack, LyricLine } from '../../services/lyrics/lrcParser';
 import type { TypographyPreset } from '../../types/session';
-import { Loader2, Music, Upload, Search, Sparkles } from 'lucide-react';
+import { Loader2, Music, Upload, Search } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import './LyricsView.css';
 
@@ -28,13 +28,9 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   onSeekTo,
   onUploadLrcClick,
   onSearchLrclibClick,
-  onAutoSync,
-  onAlignVocalsToNow,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeLineRef = useRef<HTMLDivElement>(null);
-
-  const handleSyncTrigger = onAutoSync || onAlignVocalsToNow;
 
   // Auto-scroll for list/stack presets
   useEffect(() => {
@@ -50,7 +46,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     return (
       <div className="lyrics-loading-state">
         <Loader2 size={28} className="animate-spin text-accent" />
-        <p className="loading-text">Fetching matching lyrics from LRCLIB...</p>
+        <p className="loading-text">Fetching synchronized lyrics from LRCLIB...</p>
       </div>
     );
   }
@@ -63,7 +59,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         </div>
         <h3 className="empty-title">No Synchronized Lyrics Found</h3>
         <p className="empty-desc">
-          We could not automatically match timestamped lyrics for this track on LRCLIB. You can search manually by title/artist or load a local .LRC file.
+          We couldn't automatically find lyrics on LRCLIB for this video. You can search LRCLIB or load a custom .lrc file.
         </p>
         <div className="empty-actions-row">
           {onSearchLrclibClick && (
@@ -114,40 +110,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
                 >
                   <h1 className="kinetic-hero-text">{activeLine.text || '♪'}</h1>
                 </motion.div>
-              ) : (
-                <motion.div
-                  key="kinetic-intro"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.04 }}
-                  transition={{ duration: 0.4 }}
-                  className="kinetic-intro-box"
-                >
-                  <div className="kinetic-bars-eq">
-                    <span className="kb-bar kb-1" />
-                    <span className="kb-bar kb-2" />
-                    <span className="kb-bar kb-3" />
-                    <span className="kb-bar kb-4" />
-                  </div>
-                  <span className="kinetic-intro-label">Music Video Intro Scene</span>
-                  {lyrics.lines[0]?.text && (
-                    <span className="kinetic-next-line-preview">
-                      Opening line: "{lyrics.lines[0].text}"
-                    </span>
-                  )}
-                  {handleSyncTrigger && (
-                    <button
-                      type="button"
-                      className="kinetic-sync-now-pill"
-                      onClick={handleSyncTrigger}
-                      title="Click the exact second the vocals start singing to lock in lyrics sync"
-                    >
-                      <Sparkles size={15} />
-                      <span>Vocals Start Here — Tap to Sync (or Press 'S')</span>
-                    </button>
-                  )}
-                </motion.div>
-              )}
+              ) : null}
             </AnimatePresence>
           </div>
         </div>
@@ -163,36 +126,6 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
       style={{ '--lyric-font-scale': fontSizeScale } as React.CSSProperties}
     >
       <div className="lyrics-content-wrapper">
-        {activeIndex === -1 && lyrics.synced && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="lyric-intro-banner"
-          >
-            <div className="lyric-instrumental-pill">
-              <span className="instrumental-dot" />
-              <span>Music Video Intro</span>
-              <span className="instrumental-dot" />
-            </div>
-            {lyrics.lines[0]?.text && (
-              <span className="lyric-intro-first-line">
-                Opening line: "{lyrics.lines[0].text}"
-              </span>
-            )}
-            {handleSyncTrigger && (
-              <button
-                type="button"
-                className="list-sync-now-btn"
-                onClick={handleSyncTrigger}
-                title="Click when vocals start"
-              >
-                <Sparkles size={13} />
-                <span>Vocals Start Here — Tap to Sync (Press 'S')</span>
-              </button>
-            )}
-          </motion.div>
-        )}
-
         {lyrics.lines.map((line: LyricLine, index: number) => {
           const isActive = index === activeIndex;
           const isPast = activeIndex !== -1 && index < activeIndex;

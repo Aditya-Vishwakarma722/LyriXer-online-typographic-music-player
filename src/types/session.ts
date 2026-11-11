@@ -41,7 +41,8 @@ export interface UserPreferences {
   backgroundStyle: BackgroundStyle;
   enableParticles: boolean;
   theme: 'midnight' | 'abyss' | 'obsidian';
-  blurLevel: number; // 0 to 20 px
-  overlayOpacity: number; // 0.2 to 0.8
+  blurLevel: number; // 0 to 24 px (0 = original sharpness, no blur)
+  overlayOpacity: number; // 0 to 1 (0 = original video, no dim)
+  hasCustomVisualSettings?: boolean;
 }
 

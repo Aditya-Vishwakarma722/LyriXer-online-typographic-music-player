@@ -7,6 +7,7 @@ export interface ArtistTrack {
   durationFormatted: string; // e.g. "4:29"
   videoId: string; // YouTube Video ID
   isOfficial: boolean; // Verified official upload / Vevo
+  trackType?: 'video' | 'collab' | 'audio';
   album?: string;
   year?: string;
   views?: string;

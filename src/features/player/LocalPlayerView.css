@@ -17,18 +17,14 @@
   transition: filter var(--transition-normal);
 }
 
+/* 2. Atmospheric Dim Contrast Overlay (Controlled cleanly via overlayOpacity) */
 .local-dark-overlay {
   position: absolute;
   inset: 0;
   z-index: 5;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    rgba(11, 11, 13, 0.42) 0%,
-    rgba(11, 11, 13, 0.72) 65%,
-    rgba(11, 11, 13, 0.94) 100%
-  );
-  transition: background-color var(--transition-normal);
+  background-color: #000000;
+  transition: opacity 0.15s ease-out;
 }
 
 .local-lyrics-container {

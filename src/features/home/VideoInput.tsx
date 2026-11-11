@@ -84,7 +84,7 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
         setErrorMessage(null);
       }
     } catch {
-      // Clipboard permission denied or unsupported
+      setErrorMessage('Please press Ctrl+V to paste your YouTube link.');
     }
   };
 
@@ -113,22 +113,18 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
 
     try {
       const meta = await fetchYouTubeMetadata(validation.videoId);
-      setLoadingStep('Connecting to LRCLIB (https://lrclib.net)...');
-
-      setTimeout(() => {
-        setIsLoading(false);
-        const source: VideoSource = {
-          kind: 'youtube',
-          sourceId: validation.videoId!,
-          title: meta.cleanTitle || meta.title,
-          artist: meta.cleanArtist || meta.author,
-          thumbnailUrl: `https://img.youtube.com/vi/${validation.videoId}/hqdefault.jpg`,
-          startOffset: finalOffset,
-        };
-        onStartSession(source);
-        setSessionSuccessToast(`Loaded track: ${source.title}`);
-        setTimeout(() => setSessionSuccessToast(null), 4000);
-      }, 500);
+      setIsLoading(false);
+      const source: VideoSource = {
+        kind: 'youtube',
+        sourceId: validation.videoId,
+        title: meta.cleanTitle || meta.title,
+        artist: meta.cleanArtist || meta.author,
+        thumbnailUrl: `https://img.youtube.com/vi/${validation.videoId}/hqdefault.jpg`,
+        startOffset: finalOffset,
+      };
+      onStartSession(source);
+      setSessionSuccessToast(`Loaded track: ${source.title}`);
+      setTimeout(() => setSessionSuccessToast(null), 4000);
     } catch {
       setIsLoading(false);
       const source: VideoSource = {
@@ -294,88 +290,99 @@ export const VideoInput: React.FC<VideoInputProps> = ({ onStartSession }) => {
         ) : (
           /* State: URL Input Form */
           <form onSubmit={handleSubmitUrl} className="url-form">
-            <div className="input-field-wrapper">
-              <Link2 size={18} className="input-link-icon" />
+            <div className="url-input-main-row">
+              <div className="input-field-wrapper">
+                <Link2 size={18} className="input-link-icon" />
 
-              <input
-                type="text"
-                value={url}
-                onChange={handleUrlChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="Paste a YouTube music video link..."
-                className="url-text-input"
-                disabled={isLoading}
-                aria-label="YouTube music video URL"
-                spellCheck={false}
-                autoComplete="off"
-              />
+                <input
+                  type="text"
+                  value={url}
+                  onChange={handleUrlChange}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  placeholder="Paste a YouTube music video link..."
+                  className="url-text-input"
+                  disabled={isLoading}
+                  aria-label="YouTube music video URL"
+                  spellCheck={false}
+                  autoComplete="off"
+                />
 
-              {url && (
-                <button
-                  type="button"
-                  className="input-clear-btn"
-                  onClick={() => {
-                    setUrl('');
-                    setErrorMessage(null);
-                  }}
-                  aria-label="Clear input"
+                {url && (
+                  <button
+                    type="button"
+                    className="input-clear-btn"
+                    onClick={() => {
+                      setUrl('');
+                      setErrorMessage(null);
+                    }}
+                    aria-label="Clear input"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+
+                {!url && (
+                  <button
+                    type="button"
+                    className="input-paste-btn"
+                    onClick={handlePasteClipboard}
+                    title="Paste from clipboard"
+                    aria-label="Paste URL from clipboard"
+                  >
+                    <Clipboard size={14} />
+                    <span>Paste</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="form-submit-wrapper">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="md"
+                  isLoading={isLoading}
+                  rightIcon={<ArrowRight size={16} />}
                 >
-                  <X size={14} />
-                </button>
-              )}
-
-              {!url && (
-                <button
-                  type="button"
-                  className="input-paste-btn"
-                  onClick={handlePasteClipboard}
-                  title="Paste from clipboard"
-                  aria-label="Paste URL from clipboard"
-                >
-                  <Clipboard size={14} />
-                  <span>Paste</span>
-                </button>
-              )}
+                  {isLoading ? loadingStep : 'Start Listening'}
+                </Button>
+              </div>
             </div>
 
             {/* Added timestamp for the pasted YouTube video where lyrics begin */}
-            {detectedVideoId && (
-              <div className="pasted-timestamp-row">
-                <div className="pasted-timestamp-label">
-                  <Timer size={13} className="timestamp-icon" />
-                  <span>Lyrics Start:</span>
-                </div>
-                <div className="pasted-timestamp-input-wrap">
-                  <input
-                    type="text"
-                    value={lyricsStartTime}
-                    onChange={(e) => setLyricsStartTime(e.target.value)}
-                    placeholder="0:00"
-                    className="pasted-timestamp-input"
-                    title="Timestamp where the lyrics/vocals begin in the video (e.g. 0:21 or 21)"
-                    aria-label="Lyrics start timestamp"
-                  />
-                  {autoDetectedSec > 0 && (
-                    <span className="auto-intro-badge">
-                      Auto-detected intro ({formatDuration(autoDetectedSec)})
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className="form-submit-wrapper">
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                isLoading={isLoading}
-                rightIcon={<ArrowRight size={16} />}
-              >
-                {isLoading ? loadingStep : 'Start Listening'}
-              </Button>
-            </div>
+            <AnimatePresence>
+              {detectedVideoId && (
+                <motion.div
+                  key="pasted-timestamp"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="pasted-timestamp-row"
+                >
+                  <div className="pasted-timestamp-label">
+                    <Timer size={13} className="timestamp-icon" />
+                    <span>Lyrics Start:</span>
+                  </div>
+                  <div className="pasted-timestamp-input-wrap">
+                    <input
+                      type="text"
+                      value={lyricsStartTime}
+                      onChange={(e) => setLyricsStartTime(e.target.value)}
+                      placeholder="0:00"
+                      className="pasted-timestamp-input"
+                      title="Timestamp where the lyrics/vocals begin in the video (e.g. 0:21 or 21)"
+                      aria-label="Lyrics start timestamp"
+                    />
+                    {autoDetectedSec > 0 && (
+                      <span className="auto-intro-badge">
+                        Auto-detected intro ({formatDuration(autoDetectedSec)})
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
         )}
       </SpotlightCard>

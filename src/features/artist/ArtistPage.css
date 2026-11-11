@@ -25,10 +25,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 25%;
+  object-position: center 20%;
   image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  filter: contrast(1.05) brightness(0.88) saturate(1.08);
+  image-rendering: high-quality;
+  filter: contrast(1.04) brightness(0.9) saturate(1.05);
+  transform: translateZ(0);
 }
 
 /* Atmospheric Gradients for text legibility without requiring element box backgrounds */
@@ -428,3 +429,385 @@
     justify-content: space-between;
   }
 }
+
+/* -------------------------------------------------------------
+   Full-Screen Authentic Loading Buffer Screen
+   ------------------------------------------------------------- */
+.artist-loading-screen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 200;
+  background-color: #08080B;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #F5F4F7;
+  overflow: hidden;
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* Ambient Radial Glows */
+.artist-loading-glow-core {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 540px;
+  height: 540px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.22) 0%,
+    rgba(126, 34, 206, 0.08) 45%,
+    transparent 70%
+  );
+  filter: blur(55px);
+  pointer-events: none;
+  animation: loadingGlowPulse 4s ease-in-out infinite;
+}
+
+.artist-loading-glow-ambient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 20%,
+    rgba(8, 8, 11, 0.65) 60%,
+    rgba(8, 8, 11, 0.98) 100%
+  );
+  pointer-events: none;
+}
+
+/* Navigation / Cancel Top Bar */
+.artist-loading-topbar {
+  position: absolute;
+  top: 32px;
+  left: 48px;
+  z-index: 210;
+}
+
+/* Central Content Container */
+.artist-loading-center {
+  position: relative;
+  z-index: 205;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 680px;
+  padding: 0 24px;
+}
+
+/* Concentric Rings & Sonic Stage */
+.artist-loading-disc-stage {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.artist-loading-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.artist-loading-ring.ring-1 {
+  width: 170px;
+  height: 170px;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  animation: loadingRingPulse 3.5s ease-in-out infinite;
+}
+
+.artist-loading-ring.ring-2 {
+  width: 220px;
+  height: 220px;
+  border: 1px dashed rgba(167, 139, 250, 0.16);
+  animation: loadingRotate 24s linear infinite;
+}
+
+.artist-loading-ring.ring-3 {
+  width: 260px;
+  height: 260px;
+  border: 1px solid rgba(167, 139, 250, 0.08);
+}
+
+/* Vinyl Disc & Grooves */
+.artist-loading-disc {
+  position: relative;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #232035 0%, #151322 45%, #0C0B12 80%);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  box-shadow:
+    0 0 45px rgba(124, 58, 237, 0.35),
+    0 16px 36px rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: loadingRotate 8s linear infinite;
+}
+
+.artist-loading-disc-grooves {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0,
+    transparent 4px,
+    rgba(255, 255, 255, 0.035) 5px,
+    transparent 6px
+  );
+  pointer-events: none;
+}
+
+.artist-loading-disc-center {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #0A0910;
+  border: 1.5px solid rgba(167, 139, 250, 0.5);
+  box-shadow:
+    0 0 18px rgba(167, 139, 250, 0.45),
+    inset 0 0 8px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Audio Equalizer Bars */
+.artist-loading-eq-bars {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+  height: 26px;
+}
+
+.artist-loading-eq-bars .eq-bar {
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #E9D5FF 0%, #A855F7 100%);
+  animation: eqBounce 0.9s ease-in-out infinite alternate;
+}
+
+.artist-loading-eq-bars .eq-bar.bar-1 {
+  animation-delay: 0.0s;
+  height: 6px;
+}
+
+.artist-loading-eq-bars .eq-bar.bar-2 {
+  animation-delay: 0.22s;
+  height: 16px;
+}
+
+.artist-loading-eq-bars .eq-bar.bar-3 {
+  animation-delay: 0.44s;
+  height: 22px;
+}
+
+.artist-loading-eq-bars .eq-bar.bar-4 {
+  animation-delay: 0.16s;
+  height: 14px;
+}
+
+.artist-loading-eq-bars .eq-bar.bar-5 {
+  animation-delay: 0.32s;
+  height: 8px;
+}
+
+/* Curation Engine Badge */
+.artist-loading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #DDD6FE;
+  margin-bottom: 14px;
+}
+
+/* Main Loading Typography */
+.artist-loading-title {
+  font-family: var(--font-display);
+  font-size: 2.15rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 45%, #C084FC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 24px rgba(168, 85, 247, 0.25);
+}
+
+.artist-loading-subtitle {
+  font-size: 0.95rem;
+  color: #94A3B8;
+  margin: 0 0 24px;
+  line-height: 1.55;
+}
+
+.artist-loading-highlight {
+  color: #F8FAFC;
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
+}
+
+/* Glowing Progress Shimmer Line */
+.artist-loading-bar-wrap {
+  width: 280px;
+  height: 2px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.artist-loading-bar-shimmer {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #A855F7 50%,
+    #E9D5FF 85%,
+    transparent 100%
+  );
+  border-radius: 9999px;
+  animation: loadingShimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Dynamic Phased Status Step */
+.artist-loading-status-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #CBD5E1;
+  letter-spacing: 0.02em;
+}
+
+.artist-loading-status-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #A855F7;
+  box-shadow: 0 0 8px #A855F7;
+  animation: loadingDotPulse 1.4s ease-in-out infinite;
+}
+
+/* Loading Animations */
+@keyframes loadingGlowPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+@keyframes loadingRingPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes loadingRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes eqBounce {
+  0% {
+    height: 4px;
+    opacity: 0.5;
+  }
+  100% {
+    height: 22px;
+    opacity: 1;
+  }
+}
+
+@keyframes loadingShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes loadingDotPulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 0 12px #C084FC;
+  }
+}
+
+/* Responsive adjustments for mobile loading */
+@media (max-width: 640px) {
+  .artist-loading-topbar {
+    top: 20px;
+    left: 20px;
+  }
+
+  .artist-loading-title {
+    font-size: 1.6rem;
+  }
+
+  .artist-loading-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .artist-loading-disc-stage {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
+  }
+
+  .artist-loading-ring.ring-2 {
+    width: 170px;
+    height: 170px;
+  }
+
+  .artist-loading-ring.ring-3 {
+    width: 200px;
+    height: 200px;
+  }
+}
+

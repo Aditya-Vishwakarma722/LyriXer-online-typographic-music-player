@@ -20,7 +20,7 @@ interface LocalPlayerViewProps {
   listener: VideoPlayerListener;
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
-  onSearchLrclibClick: () => void;
+  onSearchLrclibClick?: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
 }
@@ -77,7 +77,7 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
         ref={videoRef}
         className="local-bg-video"
         style={{
-          filter: blurLevel > 0 ? `blur(${blurLevel}px) saturate(1.2)` : 'saturate(1.2)',
+          filter: blurLevel > 0 ? `blur(${blurLevel}px)` : 'none',
         }}
         muted={false}
         playsInline
@@ -87,7 +87,8 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
       <div
         className="local-dark-overlay"
         style={{
-          backgroundColor: `rgba(11, 11, 13, ${overlayOpacity})`,
+          opacity: overlayOpacity,
+          display: overlayOpacity <= 0 ? 'none' : 'block',
         }}
       />
 

@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "npx tsx src/tests/test_timeline_matcher.ts && npx tsx src/tests/test_end_screen_suppression.ts && npx tsx src/tests/test_fine_adjust_and_intro.ts"
   },
   "dependencies": {
     "lucide-react": "^1.70.0",

@@ -21,10 +21,12 @@ interface YouTubePlayerViewProps {
   listener: VideoPlayerListener;
   onSeekTo: (seconds: number) => void;
   onUploadLrcClick: () => void;
-  onSearchLrclibClick: () => void;
+  onSearchLrclibClick?: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
   isEnded?: boolean;
+  currentTime?: number;
+  duration?: number;
   trackTitle?: string;
   trackArtist?: string;
   onOpenArtist?: () => void;
@@ -48,6 +50,8 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   onAutoSync,
   onAlignVocalsToNow,
   isEnded,
+  currentTime = 0,
+  duration = 0,
   trackTitle,
   trackArtist,
   onOpenArtist,
@@ -56,6 +60,15 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   const adapterRef = useRef<YouTubeAdapter | null>(null);
   const listenerRef = useRef(listener);
   const onAdapterReadyRef = useRef(onAdapterReady);
+
+  // YouTube displays end-screen recommendation cards in the last 20 seconds of playback.
+  // Suppress and hide all recommendations while the current song is still playing.
+  const isNearEnd = Boolean(
+    duration &&
+    duration >= 20 &&
+    currentTime >= Math.max(0, duration - 20) &&
+    !isEnded
+  );
 
   useEffect(() => {
     listenerRef.current = listener;
@@ -90,7 +103,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
     <div className="yt-fullscreen-player-root">
       {/* 1. Full-Viewport YouTube Video Backdrop */}
       <div
-        className="yt-fullscreen-video-viewport"
+        className={`yt-fullscreen-video-viewport ${isNearEnd ? 'suppress-recommendations' : ''}`}
         style={{
           filter: blurLevel > 0 ? `blur(${blurLevel}px)` : 'none',
         }}
@@ -98,15 +111,22 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
         <div ref={containerRef} className="yt-fullscreen-host" />
       </div>
 
-      {/* 2. Atmospheric Translucent Contrast Overlay */}
+      {/* 2. Atmospheric Dim Contrast Overlay */}
       <div
         className="yt-fullscreen-contrast-overlay"
         style={{
-          backgroundColor: `rgba(11, 11, 13, ${overlayOpacity})`,
+          opacity: overlayOpacity,
+          display: overlayOpacity <= 0 ? 'none' : 'block',
         }}
       />
 
-      {/* 3. Centered Lyrics Overlay (Floating directly above the playing video) */}
+      {/* 3. Anti-Recommendation End Shield: Hides YouTube suggested videos and end cards while the song is playing */}
+      <div
+        className={`yt-end-recommendations-shield ${isNearEnd ? 'active' : ''}`}
+        aria-hidden="true"
+      />
+
+      {/* 4. Centered Lyrics Overlay (Floating directly above the playing video) */}
       <div
         className={`yt-fullscreen-lyrics-overlay ${
           lyricsVisible && !isEnded ? 'lyrics-visible' : 'lyrics-hidden'

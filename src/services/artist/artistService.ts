@@ -38,8 +38,8 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     monthlyListeners: '35,800,000 monthly listeners',
     verified: true,
     bio: 'Jarad Anthony Higgins (1998–2019), known professionally as Juice WRLD, was a celebrated American rapper, singer, and songwriter. Known for his raw emotional vulnerability, iconic freestyles, and genre-defining emo rap anthems, his music continues to resonate worldwide.',
-    heroImageUrl: 'https://cdn-images.dzcdn.net/images/artist/2ecf2968fbbc8eb042b241b8e60e5d7e/1920x1920-000000-100-0-0.jpg',
-    imageAttribution: 'Official upscale studio photography via Deezer Master',
+    heroImageUrl: '/artists/juicewrld.jpg',
+    imageAttribution: 'Official studio master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UC0BletW9ph34lYD9zW61rqQ',
     tracks: [
       {
@@ -236,8 +236,8 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     monthlyListeners: '82,410,290 monthly listeners',
     verified: true,
     bio: 'Formed in London in 1997, Coldplay became one of the most celebrated rock bands in the world, known for emotive anthems and cinematic visuals.',
-    heroImageUrl: 'https://cdn-images.dzcdn.net/images/artist/3087954bca22f306324912e5ac8375c3/1920x1920-000000-100-0-0.jpg',
-    imageAttribution: 'Official upscale studio photography via Deezer Master',
+    heroImageUrl: '/artists/coldplay.jpg',
+    imageAttribution: 'Official studio master band portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCStandardzVpD4PwtG_UaUuY5Xg',
     tracks: [
       {
@@ -341,8 +341,8 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     monthlyListeners: '31,500,000 monthly listeners',
     verified: true,
     bio: 'Legendary Parisian electronic duo Thomas Bangalter and Guy-Manuel de Homem-Christo, renowned for revolutionary synth aesthetics and robot personas.',
-    heroImageUrl: 'https://cdn-images.dzcdn.net/images/artist/638e69b9caaf9f9f3f8826febea7b543/1920x1920-000000-100-0-0.jpg',
-    imageAttribution: 'Official upscale studio photography via Deezer Master',
+    heroImageUrl: '/artists/daftpunk.jpg',
+    imageAttribution: 'Official studio portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UC_kRDKYrUlrbtrSiyu5Tflg',
     tracks: [
       {
@@ -436,8 +436,8 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     monthlyListeners: '54,230,000 monthly listeners',
     verified: true,
     bio: 'English singer-songwriter recognized globally for her powerful mezzo-soprano voice and universally resonant soul ballads.',
-    heroImageUrl: 'https://cdn-images.dzcdn.net/images/artist/36375832e640b98193b6df6519f7e13f/1920x1920-000000-100-0-0.jpg',
-    imageAttribution: 'Official upscale studio photography via Deezer Master',
+    heroImageUrl: '/artists/adele.jpg',
+    imageAttribution: 'Live vocal performance portrait (2016)',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCsRM0YB_dabtEPGPTKo-gcw',
     tracks: [
       {
@@ -515,8 +515,8 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     monthlyListeners: '106,800,000 monthly listeners',
     verified: true,
     bio: 'Abel Tesfaye, known as The Weeknd, is a Canadian singer-songwriter acclaimed for sonic reinvention, dark atmospheric narratives, and record-shattering chart toppers.',
-    heroImageUrl: 'https://cdn-images.dzcdn.net/images/artist/581693b4724a7fcfa754455101e13a44/1920x1920-000000-100-0-0.jpg',
-    imageAttribution: 'Official upscale studio photography via Deezer Master',
+    heroImageUrl: '/artists/theweeknd.jpg',
+    imageAttribution: 'Official studio master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UC0WP5P-ufpRfjbNrmOWwLBQ',
     tracks: [
       {
@@ -582,8 +582,8 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     monthlyListeners: '48,900,000 monthly listeners',
     verified: true,
     bio: 'Iconic British rock band formed in London in 1970, fronted by the extraordinary Freddie Mercury, renowned for theatrical grandeur and enduring anthems.',
-    heroImageUrl: 'https://cdn-images.dzcdn.net/images/artist/eb41ddbc505b7c7e68d5d81a4be8c7f7/1920x1920-000000-100-0-0.jpg',
-    imageAttribution: 'Official upscale studio photography via Deezer Master',
+    heroImageUrl: '/artists/queen.jpg',
+    imageAttribution: 'Elektra Records 1975 publicity master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCiMhD4jzUqG-IgPzUmmytRQ',
     tracks: [
       {
@@ -651,6 +651,110 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
         year: '1984',
         views: '420M views',
         thumbnailUrl: 'https://i.ytimg.com/vi/azdwsXLmrHE/hqdefault.jpg',
+      },
+    ],
+  },
+  billieeilish: {
+    id: 'billieeilish',
+    name: 'Billie Eilish',
+    genre: 'Dark Pop / Electropop / Alternative',
+    monthlyListeners: '98,400,000 monthly listeners',
+    verified: true,
+    bio: 'Billie Eilish Pirate Baird O\'Connell is an American singer-songwriter. She first gained public attention in 2015 with her debut single "Ocean Eyes" and has since become one of the most successful pop artists of the 21st century.',
+    heroImageUrl: '/artists/billieeilish.jpg',
+    imageAttribution: 'Hit Me Hard and Soft studio master (2024)',
+    youtubeChannelUrl: 'https://www.youtube.com/channel/UCiGm_E4DwYPRCh48pgeV0PQ',
+    tracks: [
+      {
+        id: 'billie-chihiro',
+        title: 'CHIHIRO',
+        artist: 'Billie Eilish',
+        duration: 304,
+        durationFormatted: '5:04',
+        videoId: 'BY_XwvKogC8',
+        isOfficial: true,
+        album: 'HIT ME HARD AND SOFT',
+        year: '2024',
+        views: '110M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/BY_XwvKogC8/hqdefault.jpg',
+      },
+      {
+        id: 'billie-bad-guy',
+        title: 'bad guy',
+        artist: 'Billie Eilish',
+        duration: 206,
+        durationFormatted: '3:26',
+        videoId: 'DyDFGw5426A',
+        isOfficial: true,
+        album: 'WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?',
+        year: '2019',
+        views: '1.3B views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/DyDFGw5426A/hqdefault.jpg',
+      },
+    ],
+  },
+  eminem: {
+    id: 'eminem',
+    name: 'Eminem',
+    genre: 'Hip-Hop / Rap',
+    monthlyListeners: '86,200,000 monthly listeners',
+    verified: true,
+    bio: 'Marshall Bruce Mathers III, known professionally as Eminem, is an American rapper credited with popularizing hip-hop in middle America and critically acclaimed as one of the greatest rappers of all time.',
+    heroImageUrl: '/artists/eminem.jpg',
+    imageAttribution: 'Studio master portrait',
+    youtubeChannelUrl: 'https://www.youtube.com/channel/UCfM3zsQsOnfWNUppiycmBuw',
+    tracks: [
+      {
+        id: 'eminem-without-me',
+        title: 'Without Me',
+        artist: 'Eminem',
+        duration: 297,
+        durationFormatted: '4:57',
+        videoId: 'YVkUvmDQ3HY',
+        isOfficial: true,
+        album: 'The Eminem Show',
+        year: '2002',
+        views: '1.9B views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/YVkUvmDQ3HY/hqdefault.jpg',
+      },
+      {
+        id: 'eminem-lose-yourself',
+        title: 'Lose Yourself',
+        artist: 'Eminem',
+        duration: 326,
+        durationFormatted: '5:26',
+        videoId: '_Yhyp-_hX2s',
+        isOfficial: true,
+        album: '8 Mile Soundtrack',
+        year: '2002',
+        views: '1.4B views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/_Yhyp-_hX2s/hqdefault.jpg',
+      },
+    ],
+  },
+  drake: {
+    id: 'drake',
+    name: 'Drake',
+    genre: 'Hip-Hop / R&B / Pop',
+    monthlyListeners: '84,100,000 monthly listeners',
+    verified: true,
+    bio: 'Aubrey Drake Graham is a Canadian rapper, singer, and songwriter. An influential figure in contemporary popular music, he is credited for popularizing R&B sensibilities in hip-hop artists.',
+    heroImageUrl: '/artists/drake.jpg',
+    imageAttribution: 'Official press portrait',
+    youtubeChannelUrl: 'https://www.youtube.com/channel/UCByOQJjav0CUDwxCk-jVNRQ',
+    tracks: [
+      {
+        id: 'drake-gods-plan',
+        title: "God's Plan",
+        artist: 'Drake',
+        duration: 356,
+        durationFormatted: '5:56',
+        videoId: 'xpVfcZ0ZcFM',
+        isOfficial: true,
+        album: 'Scorpion',
+        year: '2018',
+        views: '1.6B views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/xpVfcZ0ZcFM/hqdefault.jpg',
       },
     ],
   },
@@ -738,7 +842,7 @@ export class ArtistService {
       const infoRes = await fetch(`/api/artist-info?artist=${encodeURIComponent(trimmed)}`);
       if (infoRes.ok) {
         const infoData = await infoRes.json();
-        if (infoData.heroImageUrl) {
+        if (!baseProfile?.heroImageUrl && infoData.heroImageUrl) {
           webHeroImage = infoData.heroImageUrl;
           webAttribution = infoData.imageAttribution || webAttribution;
         }
@@ -763,7 +867,7 @@ export class ArtistService {
           if (wRes.ok) {
             const wData = await wRes.json();
             if (wData.type !== 'disambiguation') {
-              if (wData.originalimage?.source) {
+              if (!baseProfile?.heroImageUrl && wData.originalimage?.source) {
                 webHeroImage = wData.originalimage.source;
                 webAttribution = 'High-resolution photography via Wikimedia Commons';
               }
@@ -778,49 +882,73 @@ export class ArtistService {
       }
     }
 
-    // Step 2: Call /api/artist-videos for live official music videos
+    // Step 2: Call /api/artist-videos for complete discography (music videos, collabs, album audios)
     try {
       const vRes = await fetch(`/api/artist-videos?artist=${encodeURIComponent(trimmed)}`);
       if (vRes.ok) {
         const vData = await vRes.json();
         if (Array.isArray(vData.tracks) && vData.tracks.length > 0) {
-          tracks = vData.tracks;
+          const curatedList = baseProfile ? [...baseProfile.tracks] : [];
+          const seenIds = new Set(curatedList.map((t) => t.videoId));
+          const seenTitles = new Set(
+            curatedList.map((t) => t.title.toLowerCase().replace(/[^a-z0-9]/g, ''))
+          );
+
+          const combined = [...curatedList];
+          for (const dynTrack of vData.tracks) {
+            const titleKey = dynTrack.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (!seenIds.has(dynTrack.videoId) && (titleKey.length <= 2 || !seenTitles.has(titleKey))) {
+              seenIds.add(dynTrack.videoId);
+              if (titleKey.length > 2) seenTitles.add(titleKey);
+              combined.push(dynTrack);
+            }
+          }
+          tracks = combined;
         }
       }
     } catch {
-      // If live endpoint failed and we have no curated tracks, try iTunes Search API
-      if (tracks.length === 0) {
-        try {
-          const itunesRes = await fetch(
-            `https://itunes.apple.com/search?term=${encodeURIComponent(trimmed)}&entity=song&limit=15`
-          );
-          if (itunesRes.ok) {
-            const itunesData = await itunesRes.json();
-            if (Array.isArray(itunesData.results)) {
-              tracks = itunesData.results
-                .filter((r: any) => r.trackName)
-                .map((r: any) => ({
+      // ignore
+    }
+
+    // Step 3: Fallback to iTunes Search API if no tracks found
+    if (tracks.length === 0) {
+      try {
+        const itunesRes = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(trimmed)}&entity=song&limit=50`
+        );
+        if (itunesRes.ok) {
+          const itunesData = await itunesRes.json();
+          if (Array.isArray(itunesData.results)) {
+            tracks = itunesData.results
+              .filter((r: any) => r.trackName)
+              .map((r: any) => {
+                const duration = Math.round((r.trackTimeMillis || 210000) / 1000);
+                const isCollab =
+                  /feat|ft|with|&/i.test(r.trackName) || /feat|ft|with|&/i.test(r.artistName);
+                return {
                   id: `itunes-${r.trackId}`,
                   title: r.trackName,
                   artist: r.artistName || trimmed,
-                  duration: Math.round((r.trackTimeMillis || 200000) / 1000),
-                  durationFormatted: `${Math.floor((r.trackTimeMillis || 200000) / 60000)}:${Math.floor(((r.trackTimeMillis || 200000) % 60000) / 1000).toString().padStart(2, '0')}`,
+                  featuredArtist: isCollab ? r.artistName : undefined,
+                  duration,
+                  durationFormatted: `${Math.floor(duration / 60)}:${Math.floor(duration % 60).toString().padStart(2, '0')}`,
                   videoId: baseProfile?.tracks[0]?.videoId || 'iI34LYmJ1Fs',
                   isOfficial: true,
+                  trackType: isCollab ? ('collab' as const) : ('audio' as const),
                   album: r.collectionName,
                   thumbnailUrl: r.artworkUrl100?.replace('100x100bb', '600x600bb'),
-                }));
-            }
+                };
+              });
           }
-        } catch {
-          // ignore
         }
+      } catch {
+        // ignore
       }
     }
 
-    // Build the resolved artist profile with upscaled clear photography
-    const finalHeroUrl = upscaleArtistImage(
-      webHeroImage || baseProfile?.heroImageUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2560&q=95'
+    // Build the resolved artist profile with prioritized official studio photography
+    const finalHeroUrl = baseProfile?.heroImageUrl || upscaleArtistImage(
+      webHeroImage || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2560&q=95'
     );
 
     const finalProfile: ArtistProfile = {

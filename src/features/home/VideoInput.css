@@ -46,6 +46,12 @@
 /* Form Layout */
 .url-form {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.url-input-main-row {
+  display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
@@ -135,8 +141,11 @@
   gap: 10px;
   padding: 8px 16px 10px;
   width: 100%;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   animation: fadeIn 0.2s ease-out;
+  overflow: hidden;
 }
 
 .pasted-timestamp-label {
@@ -189,6 +198,15 @@
   padding: 2px 8px;
   border-radius: var(--radius-full);
   white-space: nowrap;
+}
+
+.auto-intro-badge.ai-cache-badge {
+  color: var(--accent-violet-light, #a78bfa);
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Local File View State */

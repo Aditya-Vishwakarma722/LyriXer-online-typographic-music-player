@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../../components/ui/Modal';
-import { Type, Moon, Sparkles } from 'lucide-react';
+import { Type, Moon, Sparkles, Sliders } from 'lucide-react';
 import type { UserPreferences, TypographyPreset } from '../../types/session';
 import './SettingsModal.css';
 
@@ -84,19 +84,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <div className="settings-section">
           <div className="settings-section-header">
             <Sparkles size={14} className="settings-section-icon" />
-            <span className="settings-section-title">Background Softening</span>
+            <span className="settings-section-title">Background Softening (Blur)</span>
           </div>
           <p className="settings-section-desc">
-            Balance visual backdrop fidelity against foreground lyric readability.
+            Balance visual backdrop fidelity against foreground lyric readability. Choose 0px for sharp original video.
           </p>
 
           <div className="settings-blur-row">
             {[
+              { level: 0, label: 'Original', desc: '0px' },
               { level: 4, label: 'Subtle', desc: '4px' },
               { level: 8, label: 'Balanced', desc: '8px' },
               { level: 14, label: 'Deep', desc: '14px' },
             ].map((opt) => {
-              const isSelected = (preferences.blurLevel || 8) === opt.level;
+              const isSelected = (preferences.blurLevel ?? 0) === opt.level;
               return (
                 <button
                   key={opt.level}
@@ -112,7 +113,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        {/* Section 3: Color Palette Atmosphere */}
+        {/* Section 3: Video Dim Contrast */}
+        <div className="settings-section">
+          <div className="settings-section-header">
+            <Sliders size={14} className="settings-section-icon" />
+            <span className="settings-section-title">Video Dim Overlay</span>
+          </div>
+          <p className="settings-section-desc">
+            Set video backdrop darkness. Choose 0% to see the original video with no dimming.
+          </p>
+
+          <div className="settings-blur-row">
+            {[
+              { opacity: 0, label: 'Original', desc: '0%' },
+              { opacity: 0.25, label: 'Subtle', desc: '25%' },
+              { opacity: 0.5, label: 'Medium', desc: '50%' },
+              { opacity: 0.75, label: 'Deep', desc: '75%' },
+            ].map((opt) => {
+              const isSelected =
+                Math.round((preferences.overlayOpacity ?? 0) * 100) === Math.round(opt.opacity * 100);
+              return (
+                <button
+                  key={opt.opacity}
+                  type="button"
+                  className={`blur-pill-btn ${isSelected ? 'active' : ''}`}
+                  onClick={() => onUpdatePreferences({ overlayOpacity: opt.opacity })}
+                >
+                  <span className="blur-pill-label">{opt.label}</span>
+                  <span className="blur-pill-desc">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Section 4: Color Palette Atmosphere */}
         <div className="settings-section">
           <div className="settings-section-header">
             <Moon size={14} className="settings-section-icon" />
