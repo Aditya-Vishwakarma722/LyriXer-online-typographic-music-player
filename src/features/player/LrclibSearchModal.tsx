@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { LyricsProvider, type LrclibSearchResult } from '../../services/lyrics/LyricsProvider';
 import type { LyricTrack } from '../../services/lyrics/lrcParser';
-import { TimelineMatcher } from '../../services/lyrics/timelineMatcher';
+import { TimelineMatcher, type ScoredLrclibResult } from '../../services/lyrics/timelineMatcher';
 import { formatDuration } from '../../utils/formatters';
 import './LrclibSearchModal.css';
 
@@ -29,6 +29,119 @@ interface LrclibSearchModalProps {
   videoArtist?: string;
 }
 
+// Memoized Subtitle Card for 60/120fps smooth scrolling & zero lag
+interface SubtitleCardProps {
+  scoredItem: ScoredLrclibResult;
+  onSelect: (item: LrclibSearchResult, suggestedOffset: number) => void;
+}
+
+const SubtitleCard = React.memo<SubtitleCardProps>(({ scoredItem, onSelect }) => {
+  const handleClick = useCallback(() => {
+    onSelect(scoredItem.item, scoredItem.introOffset);
+  }, [onSelect, scoredItem.item, scoredItem.introOffset]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [handleClick]
+  );
+
+  return (
+    <div
+      className={`lrclib-subtitle-card ${scoredItem.isBestMatch ? 'is-best-match' : ''}`}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
+      {/* Top Row: Track Title & Badges */}
+      <div className="subtitle-card-header">
+        <div className="subtitle-title-wrap">
+          <h5 className="subtitle-track-name" title={scoredItem.item.trackName}>
+            {scoredItem.item.trackName}
+          </h5>
+          <div className="subtitle-artist-row">
+            <span className="subtitle-artist-name">{scoredItem.item.artistName}</span>
+            {scoredItem.item.albumName && (
+              <span className="subtitle-album-name" title={scoredItem.item.albumName}>
+                &bull; {scoredItem.item.albumName}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="subtitle-badge-cluster">
+          {scoredItem.item.syncedLyrics ? (
+            <span className="badge-sync synced" title="Synchronized lyrics available">
+              <Sparkles size={10} />
+              Synced
+            </span>
+          ) : (
+            <span className="badge-sync plain" title="Plain text lyrics">
+              Plain
+            </span>
+          )}
+          {scoredItem.item.duration && (
+            <span className="badge-duration-tag">
+              <Clock size={10} />
+              {formatDuration(scoredItem.item.duration)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Timeline & Vocal Alignment Row */}
+      <div className="subtitle-card-timeline">
+        {scoredItem.hasIntroDelay ? (
+          <span className="tag-intro-delay" title="Calibrated offset for video vocal start">
+            <Zap size={11} />
+            +{scoredItem.formattedOffset} Vocal Start
+          </span>
+        ) : (
+          <span className="tag-direct-sync">
+            <Check size={11} />
+            Direct Timeline Match
+          </span>
+        )}
+
+        {scoredItem.isBestMatch && (
+          <span className="tag-recommended-mini">
+            <Sparkles size={10} />
+            Best Match
+          </span>
+        )}
+      </div>
+
+      {/* Match reason text if present */}
+      {scoredItem.matchReason && (
+        <p className="subtitle-reason-text">{scoredItem.matchReason}</p>
+      )}
+
+      {/* Bottom Action Footer */}
+      <div className="subtitle-card-footer">
+        <span className="subtitle-id-label">ID #{scoredItem.item.id}</span>
+        <button
+          type="button"
+          className="btn-apply-subtitle"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
+        >
+          <span>Apply</span>
+          <ArrowRight size={12} className="apply-icon" />
+        </button>
+      </div>
+    </div>
+  );
+});
+
+SubtitleCard.displayName = 'SubtitleCard';
+
 export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
   isOpen,
   onClose,
@@ -38,76 +151,101 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
   videoTitle = '',
   videoArtist = '',
 }) => {
+  // Input query for typing (decoupled from scoring to eliminate typing latency)
   const [query, setQuery] = useState(initialQuery);
+  // Active searched term that produces current results
+  const [activeSearchTerm, setActiveSearchTerm] = useState(initialQuery);
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<LrclibSearchResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const performSearch = useCallback(async (termToSearch: string) => {
     const q = termToSearch.trim();
     if (!q) return;
 
+    // Abort any pending network request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setActiveSearchTerm(q);
     setIsSearching(true);
     setHasSearched(true);
+
     try {
-      const searchResults = await LyricsProvider.searchLrclib(q);
-      setResults(searchResults);
+      const searchResults = await LyricsProvider.searchLrclib(q, controller.signal);
+      if (!controller.signal.aborted) {
+        setResults(searchResults);
+        setIsSearching(false);
+      }
     } catch {
-      setResults([]);
-    } finally {
-      setIsSearching(false);
+      if (!controller.signal.aborted) {
+        setResults([]);
+        setIsSearching(false);
+      }
     }
   }, []);
 
+  // Initial search on modal open
   useEffect(() => {
     if (isOpen) {
       const activeQuery = (initialQuery || '').trim();
       setQuery(activeQuery);
+      setActiveSearchTerm(activeQuery);
       if (activeQuery) {
-        let isMounted = true;
-        setIsSearching(true);
-        setHasSearched(true);
-        LyricsProvider.searchLrclib(activeQuery)
-          .then((res) => {
-            if (isMounted) {
-              setResults(res);
-              setIsSearching(false);
-            }
-          })
-          .catch(() => {
-            if (isMounted) {
-              setResults([]);
-              setIsSearching(false);
-            }
-          });
-        return () => {
-          isMounted = false;
-        };
+        performSearch(activeQuery);
+      }
+    } else {
+      // Abort when modal closes
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
     }
-  }, [isOpen, initialQuery]);
+  }, [isOpen, initialQuery, performSearch]);
 
-  const handleSearch = () => {
+  // Debounced auto-search when typing stops (400ms)
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed || trimmed === activeSearchTerm) return;
+
+    const timer = setTimeout(() => {
+      performSearch(trimmed);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [query, activeSearchTerm, performSearch]);
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     performSearch(query);
   };
 
-  // Timeline analysis: Match LRCLIB results against video timeline
+  // Timeline analysis: Match LRCLIB results against video timeline.
+  // CRITICAL OPTIMIZATION: Match against videoTitle or activeSearchTerm, NOT query on every keystroke!
+  const matchTitle = (videoTitle || activeSearchTerm || '').trim();
   const timelineSummary = useMemo(() => {
     return TimelineMatcher.matchResults(
       results,
       videoDuration,
-      videoTitle || query,
+      matchTitle,
       videoArtist
     );
-  }, [results, videoDuration, videoTitle, videoArtist, query]);
+  }, [results, videoDuration, matchTitle, videoArtist]);
 
-  const handleSelect = (item: LrclibSearchResult, suggestedOffset = 0) => {
-    const track = LyricsProvider.convertLrclibItemToTrack(item, videoTitle, videoArtist);
-    if (track) {
-      onSelectLyrics(track, suggestedOffset);
-      onClose();
-    }
-  };
+  const handleSelect = useCallback(
+    (item: LrclibSearchResult, suggestedOffset = 0) => {
+      const track = LyricsProvider.convertLrclibItemToTrack(item, videoTitle, videoArtist);
+      if (track) {
+        onSelectLyrics(track, suggestedOffset);
+        onClose();
+      }
+    },
+    [onSelectLyrics, onClose, videoTitle, videoArtist]
+  );
 
   return (
     <Modal
@@ -140,14 +278,8 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
           </div>
         )}
 
-        {/* Search Input Bar with Clear Action */}
-        <form
-          className="lrclib-search-bar"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
-        >
+        {/* Search Input Bar with Instant Clear */}
+        <form className="lrclib-search-bar" onSubmit={handleSearchSubmit}>
           <div className="lrclib-input-wrap">
             <Search size={16} className="lrclib-search-icon" />
             <input
@@ -162,7 +294,10 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
               <button
                 type="button"
                 className="lrclib-input-clear-btn"
-                onClick={() => setQuery('')}
+                onClick={() => {
+                  setQuery('');
+                  // Keep previous results or clear cleanly
+                }}
                 title="Clear query"
               >
                 <X size={14} />
@@ -190,7 +325,7 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
           </Button>
         </form>
 
-        {/* Results Container */}
+        {/* Results Container with GPU-accelerated scrolling */}
         <div className="lrclib-results-container">
           {isSearching && (
             <div className="lrclib-loading">
@@ -210,7 +345,7 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
             <div className="lrclib-no-results">
               <Music2 size={36} className="lrclib-no-results-icon" />
               <p className="no-results-main">
-                No matching tracks found on LRCLIB for "{query}".
+                No matching tracks found on LRCLIB for "{activeSearchTerm || query}".
               </p>
               <span className="no-results-hint">
                 Try searching with just the song title, an alternate spelling, or the artist name.
@@ -218,7 +353,7 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
             </div>
           )}
 
-          {/* Featured: Best Suitable Option Hero Card (Calculated from Video Duration vs Song Duration) */}
+          {/* Featured: Best Suitable Option Hero Card */}
           {!isSearching && timelineSummary.bestMatch && (
             <div className="lrclib-featured-hero">
               <div className="featured-hero-header">
@@ -294,7 +429,7 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
             </div>
           )}
 
-          {/* Subtitles Results Grid: 2 in a Row */}
+          {/* Subtitles Results Grid: 2 in a Row with Memoized Cards */}
           {!isSearching && results.length > 0 && (
             <div className="lrclib-results-section">
               <div className="results-section-header">
@@ -311,113 +446,11 @@ export const LrclibSearchModal: React.FC<LrclibSearchModalProps> = ({
 
               <div className="lrclib-results-grid">
                 {timelineSummary.scoredResults.map((scoredItem) => (
-                  <div
+                  <SubtitleCard
                     key={scoredItem.item.id}
-                    className={`lrclib-subtitle-card ${
-                      scoredItem.isBestMatch ? 'is-best-match' : ''
-                    }`}
-                    onClick={() => handleSelect(scoredItem.item, scoredItem.introOffset)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleSelect(scoredItem.item, scoredItem.introOffset);
-                      }
-                    }}
-                  >
-                    {/* Top Row: Track Title & Badges */}
-                    <div className="subtitle-card-header">
-                      <div className="subtitle-title-wrap">
-                        <h5
-                          className="subtitle-track-name"
-                          title={scoredItem.item.trackName}
-                        >
-                          {scoredItem.item.trackName}
-                        </h5>
-                        <div className="subtitle-artist-row">
-                          <span className="subtitle-artist-name">
-                            {scoredItem.item.artistName}
-                          </span>
-                          {scoredItem.item.albumName && (
-                            <span
-                              className="subtitle-album-name"
-                              title={scoredItem.item.albumName}
-                            >
-                              &bull; {scoredItem.item.albumName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="subtitle-badge-cluster">
-                        {scoredItem.item.syncedLyrics ? (
-                          <span className="badge-sync synced" title="Synchronized lyrics available">
-                            <Sparkles size={10} />
-                            Synced
-                          </span>
-                        ) : (
-                          <span className="badge-sync plain" title="Plain text lyrics">
-                            Plain
-                          </span>
-                        )}
-                        {scoredItem.item.duration && (
-                          <span className="badge-duration-tag">
-                            <Clock size={10} />
-                            {formatDuration(scoredItem.item.duration)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Timeline & Vocal Alignment Row */}
-                    <div className="subtitle-card-timeline">
-                      {scoredItem.hasIntroDelay ? (
-                        <span
-                          className="tag-intro-delay"
-                          title="Calibrated offset for video vocal start"
-                        >
-                          <Zap size={11} />
-                          +{scoredItem.formattedOffset} Vocal Start
-                        </span>
-                      ) : (
-                        <span className="tag-direct-sync">
-                          <Check size={11} />
-                          Direct Timeline Match
-                        </span>
-                      )}
-
-                      {scoredItem.isBestMatch && (
-                        <span className="tag-recommended-mini">
-                          <Sparkles size={10} />
-                          Best Match
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Match reason text if present */}
-                    {scoredItem.matchReason && (
-                      <p className="subtitle-reason-text">
-                        {scoredItem.matchReason}
-                      </p>
-                    )}
-
-                    {/* Bottom Action Footer */}
-                    <div className="subtitle-card-footer">
-                      <span className="subtitle-id-label">ID #{scoredItem.item.id}</span>
-                      <button
-                        type="button"
-                        className="btn-apply-subtitle"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelect(scoredItem.item, scoredItem.introOffset);
-                        }}
-                      >
-                        <span>Apply</span>
-                        <ArrowRight size={12} className="apply-icon" />
-                      </button>
-                    </div>
-                  </div>
+                    scoredItem={scoredItem}
+                    onSelect={handleSelect}
+                  />
                 ))}
               </div>
             </div>

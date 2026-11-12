@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 
 import './SpotlightCard.css';
 
@@ -105,7 +105,7 @@ const SpotlightCard = ({
   const palette = THEMES[theme] ?? THEMES.dark;
   const color = spotlightColor ?? palette.light;
   const form = SHAPES.includes(shape) ? shape : 'circle';
-  const settings: Settings = {
+  const settings = useMemo<Settings>(() => ({
     shape: form,
     fill: falloff(color, softness),
     edge: falloff(color, 1),
@@ -117,13 +117,13 @@ const SpotlightCard = ({
     ambient,
     flare,
     grain: clamp(grain, 0, 1)
-  };
+  }), [form, color, softness, spotlightSize, intensity, palette.fill, borderGlow, palette.edge, proximity, smoothing, ambient, flare, grain]);
   const settingsRef = useRef(settings);
 
   useEffect(() => {
     settingsRef.current = settings;
     wakeRef.current?.();
-  });
+  }, [settings]);
 
   useEffect(() => {
     const root = rootRef.current;

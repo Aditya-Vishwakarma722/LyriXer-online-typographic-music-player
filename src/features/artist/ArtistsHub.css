@@ -637,22 +637,20 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #C084FC;
-  background: rgba(10, 10, 14, 0.7);
+  background: rgba(10, 10, 14, 0.88);
   border: 1px solid rgba(167, 139, 250, 0.35);
   padding: 3px 8px;
   border-radius: var(--radius-xs, 2px);
-  backdrop-filter: blur(8px);
 }
 
 .card-listeners-badge {
   font-size: 0.68rem;
   font-weight: 600;
   color: #E2E8F0;
-  background: rgba(10, 10, 14, 0.7);
+  background: rgba(10, 10, 14, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 3px 8px;
   border-radius: var(--radius-xs, 2px);
-  backdrop-filter: blur(8px);
 }
 
 /* Card Bottom Content */

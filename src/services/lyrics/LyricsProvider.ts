@@ -5,6 +5,9 @@ import { cleanTrackTitle } from '../../utils/youtube';
 // In-memory cache for fetched lyrics
 const lyricsCache = new Map<string, LyricTrack>();
 
+// In-memory cache for LRCLIB search queries (fast instant repeat searches)
+const lrclibSearchCache = new Map<string, LrclibSearchResult[]>();
+
 export interface LyricsSearchParams {
   trackName: string;
   artistName?: string;
@@ -252,22 +255,39 @@ export class LyricsProvider {
 
   /**
    * Direct search on LRCLIB API (https://lrclib.net/api/search?q=...)
+   * Includes in-memory caching and optional abort signal for cancellation.
    */
-  static async searchLrclib(query: string): Promise<LrclibSearchResult[]> {
-    if (!query.trim()) return [];
+  static async searchLrclib(query: string, signal?: AbortSignal): Promise<LrclibSearchResult[]> {
+    const trimmed = query.trim();
+    if (!trimmed) return [];
+
+    const cacheKey = trimmed.toLowerCase();
+    if (lrclibSearchCache.has(cacheKey)) {
+      return lrclibSearchCache.get(cacheKey)!;
+    }
+
     try {
       const resp = await fetch(
-        `https://lrclib.net/api/search?${new URLSearchParams({ q: query.trim() }).toString()}`,
+        `https://lrclib.net/api/search?${new URLSearchParams({ q: trimmed }).toString()}`,
         {
           headers: { 'User-Agent': 'LyriXer/1.0.0 (https://github.com/LyriXer)' },
+          signal,
         }
       );
       if (resp.ok) {
         const json = await resp.json();
-        return Array.isArray(json) ? json : [];
+        const results = Array.isArray(json) ? json : [];
+        if (lrclibSearchCache.size > 120) {
+          const firstKey = lrclibSearchCache.keys().next().value;
+          if (firstKey) lrclibSearchCache.delete(firstKey);
+        }
+        lrclibSearchCache.set(cacheKey, results);
+        return results;
       }
-    } catch (err) {
-      console.warn('LRCLIB search request failed:', err);
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        console.warn('LRCLIB search request failed:', err);
+      }
     }
     return [];
   }

@@ -1,4 +1,4 @@
-/* LRCLIB Search Modal - Authentic Classy Glassmorphism Theme */
+/* LRCLIB Search Modal - Authentic Classy Glassmorphism Theme (High Performance) */
 
 .lrclib-modal-content {
   display: flex;
@@ -14,8 +14,8 @@
   justify-content: space-between;
   gap: 12px;
   padding: 8px 14px;
-  background: rgba(167, 139, 250, 0.06);
-  border: 1px solid rgba(167, 139, 250, 0.2);
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.22);
   border-radius: var(--radius-xs, 2px);
   font-size: 0.8125rem;
 }
@@ -58,7 +58,7 @@
   flex-shrink: 0;
 }
 
-.context-track-name {
+.context-title {
   color: var(--text-primary);
   font-weight: 600;
   white-space: nowrap;
@@ -88,7 +88,7 @@
   flex-shrink: 0;
 }
 
-/* 2. Glassmorphic Search Bar */
+/* 2. Glassmorphic Search Bar - Optimized without blur inside scroll */
 .lrclib-search-bar {
   display: flex;
   gap: 10px;
@@ -101,18 +101,17 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(18, 18, 24, 0.75);
+  background: rgba(20, 20, 28, 0.95);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm, 4px);
   padding: 0 14px;
-  backdrop-filter: blur(20px);
-  transition: all var(--transition-normal);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .lrclib-input-wrap:focus-within {
   border-color: var(--accent-violet);
-  background: rgba(22, 22, 30, 0.9);
+  background: rgba(24, 24, 34, 0.98);
   box-shadow: 0 0 16px var(--accent-violet-glow),
               inset 0 1px 2px rgba(0, 0, 0, 0.4);
 }
@@ -176,7 +175,7 @@
   letter-spacing: -0.01em;
 }
 
-/* 3. Results Container & Scroll Area */
+/* 3. Results Container & GPU Accelerated Scroll Area */
 .lrclib-results-container {
   max-height: 490px;
   overflow-y: auto;
@@ -184,6 +183,9 @@
   flex-direction: column;
   gap: 16px;
   padding-right: 4px;
+  contain: paint;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom Scrollbar */
@@ -212,7 +214,7 @@
   padding: 48px 24px;
   color: var(--text-secondary);
   text-align: center;
-  background: rgba(18, 18, 24, 0.4);
+  background: rgba(18, 18, 24, 0.6);
   border: 1px dashed rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-sm, 4px);
 }
@@ -260,16 +262,16 @@
   line-height: 1.45;
 }
 
-/* 5. Featured Hero Card: Best Suitable Match */
+/* 5. Featured Hero Card: Best Suitable Match (Optimized without blur) */
 .lrclib-featured-hero {
   position: relative;
   background: linear-gradient(
     135deg,
     rgba(167, 139, 250, 0.14) 0%,
     rgba(99, 102, 241, 0.08) 50%,
-    rgba(56, 189, 248, 0.06) 100%
+    rgba(22, 22, 30, 0.98) 100%
   );
-  border: 1px solid rgba(167, 139, 250, 0.4);
+  border: 1px solid rgba(167, 139, 250, 0.38);
   border-radius: var(--radius-sm, 4px);
   padding: 16px 20px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5),
@@ -277,7 +279,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  backdrop-filter: blur(24px);
+  contain: layout style paint;
 }
 
 .featured-hero-header {
@@ -391,7 +393,7 @@
   gap: 8px;
   font-weight: 600 !important;
   box-shadow: 0 4px 16px rgba(167, 139, 250, 0.35);
-  transition: all var(--transition-fast) !important;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast) !important;
 }
 
 .btn-apply-featured:hover {
@@ -458,25 +460,27 @@
   }
 }
 
-/* 8. Subtitle Card */
+/* 8. Subtitle Card - Extreme GPU Performance Optimization */
 .lrclib-subtitle-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 10px;
   padding: 14px 16px;
-  background: rgba(20, 20, 26, 0.7);
+  background: rgba(22, 22, 30, 0.88);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm, 4px);
   cursor: pointer;
-  transition: all var(--transition-normal);
-  backdrop-filter: blur(16px);
   position: relative;
   overflow: hidden;
+  contain: layout style paint;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .lrclib-subtitle-card:hover {
-  background: rgba(28, 28, 38, 0.85);
+  background: rgba(30, 30, 42, 0.95);
   border-color: rgba(167, 139, 250, 0.45);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
@@ -492,8 +496,8 @@
   border-color: rgba(167, 139, 250, 0.4);
   background: linear-gradient(
     135deg,
-    rgba(167, 139, 250, 0.1) 0%,
-    rgba(20, 20, 26, 0.8) 100%
+    rgba(167, 139, 250, 0.12) 0%,
+    rgba(22, 22, 30, 0.92) 100%
   );
 }
 
@@ -680,7 +684,7 @@
   color: var(--accent-violet-light);
   border: 1px solid rgba(167, 139, 250, 0.28);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .btn-apply-subtitle .apply-icon {
