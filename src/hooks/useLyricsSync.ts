@@ -42,8 +42,8 @@ export function computeLyricsSync(
 
   const effectiveTime = currentTime - offsetSeconds;
 
-  // Before the first lyric line begins (with 50ms tolerance for floating-point precision)
-  if (effectiveTime < lines[0].timestamp - 0.05) {
+  // Before the song begins or before the first lyric line begins (with 50ms tolerance for floating-point precision)
+  if (effectiveTime < 0 || effectiveTime < lines[0].timestamp - 0.05) {
     return {
       activeIndex: -1,
       activeLine: null,

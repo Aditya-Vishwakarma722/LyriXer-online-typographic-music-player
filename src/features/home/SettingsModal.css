@@ -57,7 +57,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs, 2px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -140,7 +140,7 @@
   font-weight: 600;
   color: var(--text-secondary, #A5A1AD);
   padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs, 2px);
   background: rgba(255, 255, 255, 0.03);
   letter-spacing: 0.02em;
   transition: all var(--transition-fast);
@@ -174,7 +174,7 @@
   justify-content: center;
   gap: 2px;
   padding: 10px 14px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs, 2px);
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
@@ -221,7 +221,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs, 2px);
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
@@ -242,7 +242,7 @@
 .theme-swatch-circle {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
+  border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
@@ -253,7 +253,7 @@
 .theme-swatch-pip {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 1px;
 }
 
 .theme-swatch-name {

@@ -16,7 +16,7 @@
   padding: 8px 14px;
   background: rgba(167, 139, 250, 0.06);
   border: 1px solid rgba(167, 139, 250, 0.2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs, 2px);
   font-size: 0.8125rem;
 }
 
@@ -84,7 +84,7 @@
   font-size: 0.75rem;
   background: rgba(255, 255, 255, 0.04);
   padding: 3px 8px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   flex-shrink: 0;
 }
 
@@ -103,7 +103,7 @@
   align-items: center;
   background: rgba(18, 18, 24, 0.75);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm, 4px);
   padding: 0 14px;
   backdrop-filter: blur(20px);
   transition: all var(--transition-normal);
@@ -149,7 +149,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.06);
   border: none;
@@ -171,7 +171,7 @@
   gap: 6px;
   padding: 0 20px !important;
   height: 44px;
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--radius-xs, 2px) !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em;
 }
@@ -195,7 +195,7 @@
 }
 .lrclib-results-container::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-full);
+  border-radius: 2px;
 }
 .lrclib-results-container::-webkit-scrollbar-thumb:hover {
   background: rgba(167, 139, 250, 0.35);
@@ -214,13 +214,13 @@
   text-align: center;
   background: rgba(18, 18, 24, 0.4);
   border: 1px dashed rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm, 4px);
 }
 
 .lrclib-loading-spinner-wrap {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -270,7 +270,7 @@
     rgba(56, 189, 248, 0.06) 100%
   );
   border: 1px solid rgba(167, 139, 250, 0.4);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm, 4px);
   padding: 16px 20px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5),
               0 0 24px rgba(167, 139, 250, 0.12);
@@ -294,10 +294,10 @@
   gap: 6px;
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 4px 10px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   background: linear-gradient(135deg, var(--accent-violet) 0%, #6366f1 100%);
   color: #0b0b0e;
   box-shadow: 0 2px 10px rgba(167, 139, 250, 0.35);
@@ -333,7 +333,7 @@
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.3);
   padding: 2px 8px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   font-weight: 600;
   font-size: 0.75rem;
 }
@@ -433,7 +433,7 @@
   font-size: 0.6875rem;
   font-weight: 600;
   padding: 2px 7px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-secondary);
@@ -467,7 +467,7 @@
   padding: 14px 16px;
   background: rgba(20, 20, 26, 0.7);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm, 4px);
   cursor: pointer;
   transition: all var(--transition-normal);
   backdrop-filter: blur(16px);
@@ -562,9 +562,10 @@
   gap: 4px;
   font-size: 0.6875rem;
   font-weight: 700;
+  text-transform: uppercase;
   padding: 2px 7px;
-  border-radius: var(--radius-full);
-  letter-spacing: 0.02em;
+  border-radius: var(--radius-xs, 2px);
+  letter-spacing: 0.08em;
 }
 
 .badge-sync.synced {
@@ -611,7 +612,7 @@
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.3);
   padding: 2px 7px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
 }
 
 .tag-direct-sync {
@@ -624,7 +625,7 @@
   background: rgba(52, 211, 153, 0.08);
   border: 1px solid rgba(52, 211, 153, 0.2);
   padding: 2px 7px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
 }
 
 .tag-recommended-mini {
@@ -637,7 +638,7 @@
   background: rgba(167, 139, 250, 0.2);
   border: 1px solid rgba(167, 139, 250, 0.4);
   padding: 2px 7px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
 }
 
 .subtitle-reason-text {
@@ -674,7 +675,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   padding: 5px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs, 2px);
   background: rgba(167, 139, 250, 0.12);
   color: var(--accent-violet-light);
   border: 1px solid rgba(167, 139, 250, 0.28);

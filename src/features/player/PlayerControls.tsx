@@ -40,6 +40,7 @@ interface PlayerControlsProps {
   onToggleMute: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
+  onNudgeOffset?: (delta: number) => void;
   onOffsetChange?: (offset: number) => void;
   onResetSync?: () => void;
   onUploadLrcClick: () => void;
@@ -67,6 +68,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   onToggleMute,
   onAutoSync,
   onAlignVocalsToNow,
+  onNudgeOffset,
   onOffsetChange,
   onResetSync,
   onUploadLrcClick,
@@ -281,52 +283,33 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                     </button>
                   </div>
 
-                  {/* Fine Adjust Steppers (Nudge Delay / Forward) */}
-                  {onOffsetChange && (
+                  {/* Fine Adjust Steppers (Left for Delay, Right for Rush) */}
+                  {(onNudgeOffset || onOffsetChange) && (
                     <div className="sync-section">
                       <div className="sync-section-title">
                         <span>Fine Adjust (Delay / Rush)</span>
-                        <span className={`current-offset-tag ${manualOffset !== 0 ? 'active' : ''}`}>
-                          {manualOffset > 0
+                        <span className={`current-offset-tag ${Math.abs(manualOffset) >= 0.05 ? 'active' : ''}`}>
+                          {manualOffset > 0.05
                             ? `+${manualOffset.toFixed(1)}s Delay`
-                            : manualOffset < 0
+                            : manualOffset < -0.05
                             ? `${manualOffset.toFixed(1)}s Rush`
                             : '0.0s In Sync'}
                         </span>
                       </div>
                       <div className="sync-direction-row">
-                        <span className="sync-dir-label rush">◀ Rush (Earlier)</span>
-                        <span className="sync-dir-label delay">Delay (Later) ▶</span>
+                        <span className="sync-dir-label delay">◀ Delay (Later)</span>
+                        <span className="sync-dir-label rush">Rush (Earlier) ▶</span>
                       </div>
                       <div className="sync-stepper-row">
-                        <button
-                          type="button"
-                          className="stepper-btn rush-btn"
-                          onClick={() => onOffsetChange(Number((manualOffset - 1.0).toFixed(1)))}
-                          title="Rush lyrics 1.0s earlier"
-                        >
-                          -1s
-                        </button>
-                        <button
-                          type="button"
-                          className="stepper-btn rush-btn"
-                          onClick={() => onOffsetChange(Number((manualOffset - 0.5).toFixed(1)))}
-                          title="Rush lyrics 0.5s earlier"
-                        >
-                          -0.5s
-                        </button>
-                        <button
-                          type="button"
-                          className="stepper-btn rush-btn"
-                          onClick={() => onOffsetChange(Number((manualOffset - 0.1).toFixed(1)))}
-                          title="Rush lyrics 0.1s earlier"
-                        >
-                          -0.1s
-                        </button>
+                        {/* Left: Delay Steppers (+0.1s, +0.5s, +1s) */}
                         <button
                           type="button"
                           className="stepper-btn delay-btn"
-                          onClick={() => onOffsetChange(Number((manualOffset + 0.1).toFixed(1)))}
+                          onClick={() =>
+                            onNudgeOffset
+                              ? onNudgeOffset(0.1)
+                              : onOffsetChange?.(Number((manualOffset + 0.1).toFixed(1)))
+                          }
                           title="Delay lyrics 0.1s later"
                         >
                           +0.1s
@@ -334,7 +317,11 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                         <button
                           type="button"
                           className="stepper-btn delay-btn"
-                          onClick={() => onOffsetChange(Number((manualOffset + 0.5).toFixed(1)))}
+                          onClick={() =>
+                            onNudgeOffset
+                              ? onNudgeOffset(0.5)
+                              : onOffsetChange?.(Number((manualOffset + 0.5).toFixed(1)))
+                          }
                           title="Delay lyrics 0.5s later"
                         >
                           +0.5s
@@ -342,17 +329,59 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                         <button
                           type="button"
                           className="stepper-btn delay-btn"
-                          onClick={() => onOffsetChange(Number((manualOffset + 1.0).toFixed(1)))}
+                          onClick={() =>
+                            onNudgeOffset
+                              ? onNudgeOffset(1.0)
+                              : onOffsetChange?.(Number((manualOffset + 1.0).toFixed(1)))
+                          }
                           title="Delay lyrics 1.0s later"
                         >
                           +1s
+                        </button>
+
+                        {/* Right: Rush Steppers (-0.1s, -0.5s, -1s) */}
+                        <button
+                          type="button"
+                          className="stepper-btn rush-btn"
+                          onClick={() =>
+                            onNudgeOffset
+                              ? onNudgeOffset(-0.1)
+                              : onOffsetChange?.(Number((manualOffset - 0.1).toFixed(1)))
+                          }
+                          title="Rush lyrics 0.1s earlier"
+                        >
+                          -0.1s
+                        </button>
+                        <button
+                          type="button"
+                          className="stepper-btn rush-btn"
+                          onClick={() =>
+                            onNudgeOffset
+                              ? onNudgeOffset(-0.5)
+                              : onOffsetChange?.(Number((manualOffset - 0.5).toFixed(1)))
+                          }
+                          title="Rush lyrics 0.5s earlier"
+                        >
+                          -0.5s
+                        </button>
+                        <button
+                          type="button"
+                          className="stepper-btn rush-btn"
+                          onClick={() =>
+                            onNudgeOffset
+                              ? onNudgeOffset(-1.0)
+                              : onOffsetChange?.(Number((manualOffset - 1.0).toFixed(1)))
+                          }
+                          title="Rush lyrics 1.0s earlier"
+                        >
+                          -1s
                         </button>
                       </div>
                     </div>
                   )}
 
                   {/* Reset Offset Button */}
-                  {onResetSync && manualOffset !== 0 && (
+                  {onResetSync && Math.abs(manualOffset) >= 0.05 && (
                     <button
                       type="button"
                       className="sync-reset-action-btn"
@@ -368,7 +397,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                   <div className="sync-tip-hint">
                     <span>
                       Tip: Press <kbd className="hint-kbd">S</kbd> when lyrics start &middot;{' '}
-                      <kbd className="hint-kbd">[</kbd> / <kbd className="hint-kbd">]</kbd> to adjust sync (&plusmn;0.1s)
+                      <kbd className="hint-kbd">[</kbd> Delay / <kbd className="hint-kbd">]</kbd> Rush (&plusmn;0.1s)
                     </span>
                   </div>
                 </div>

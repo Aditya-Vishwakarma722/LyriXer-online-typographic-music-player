@@ -134,7 +134,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 4px 12px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
 }
 
 .lyric-intro-first-line {
@@ -153,7 +153,7 @@
   background: rgba(167, 139, 250, 0.2);
   border: 1px solid rgba(167, 139, 250, 0.4);
   padding: 6px 14px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -173,7 +173,7 @@
   background: rgba(167, 139, 250, 0.22);
   border: 1px solid rgba(167, 139, 250, 0.45);
   padding: 8px 16px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   margin-top: 12px;
   cursor: pointer;
   pointer-events: auto;
@@ -208,7 +208,7 @@
 
 .lyrics-scroll-container::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
+  border-radius: 2px;
 }
 
 .lyrics-content-wrapper {
@@ -322,7 +322,7 @@
 .lyric-line-item {
   cursor: pointer;
   padding: 10px 18px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xs, 2px);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
@@ -405,7 +405,7 @@
 .empty-icon-wrap {
   width: 60px;
   height: 60px;
-  border-radius: 50%;
+  border-radius: var(--radius-xs, 2px);
   background: rgba(167, 139, 250, 0.15);
   border: 1px solid rgba(167, 139, 250, 0.35);
   display: flex;

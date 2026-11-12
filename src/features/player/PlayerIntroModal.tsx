@@ -108,9 +108,9 @@ export const PlayerIntroModal: React.FC<PlayerIntroModalProps> = ({
                 </div>
               </div>
               <p className="player-intro-pillar-text">
-                Need micro-timing adjustments? Use <kbd className="intro-kbd-inline">[</kbd> to <strong>Rush</strong> lyrics
-                earlier, or <kbd className="intro-kbd-inline">]</kbd> to <strong>Delay</strong> lyrics later.
-                You can also use the <strong>Fine Adjust (-1s to +1s)</strong> steppers in the bottom player bar.
+                Need micro-timing adjustments? Use <kbd className="intro-kbd-inline">[</kbd> to <strong>Delay</strong> lyrics
+                later (Left), or <kbd className="intro-kbd-inline">]</kbd> to <strong>Rush</strong> lyrics earlier (Right).
+                You can also use the <strong>Delay / Rush</strong> steppers in the bottom player bar.
               </p>
             </div>
           </div>

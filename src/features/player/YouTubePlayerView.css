@@ -164,8 +164,9 @@
   background: rgba(167, 139, 250, 0.12);
   border: 1px solid rgba(167, 139, 250, 0.28);
   padding: 4px 12px;
-  border-radius: var(--radius-full);
-  letter-spacing: 0.03em;
+  border-radius: var(--radius-xs, 2px);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .end-track-title {
@@ -198,7 +199,7 @@
   font-size: 0.84rem;
   font-weight: 600;
   padding: 10px 20px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs, 2px);
   transition: all var(--transition-fast);
   cursor: pointer;
   border: none;

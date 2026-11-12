@@ -112,39 +112,66 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
 
   /**
    * Applies manual timing offset adjustments (Fine Adjust Delay/Rush, Brackets [ ], etc.)
+   * Supports both absolute number or updater function to prevent dropped clicks during rapid tapping.
    * Displays immediate on-screen visual confirmation toast.
    */
-  const handleOffsetChange = (newOffset: number, isManualUserAction = true) => {
-    if (isManualUserAction) {
-      isUserOffsetCustomizedRef.current = true;
-    }
-
-    const cleanOffset = Number(newOffset.toFixed(1));
-    setManualOffset(cleanOffset);
-    manualOffsetRef.current = cleanOffset;
-
-    try {
-      localStorage.setItem(`lyrixer_offset_${source.sourceId}`, cleanOffset.toString());
-    } catch {
-      // ignore
-    }
-
-    if (isManualUserAction) {
-      const label =
-        cleanOffset > 0
-          ? `+${cleanOffset.toFixed(1)}s (Delayed · Lyrics later)`
-          : cleanOffset < 0
-          ? `${cleanOffset.toFixed(1)}s (Rushed · Lyrics earlier)`
-          : '0.0s (Direct Timeline · In Sync)';
-      setIntroNotice(`Sync Adjusted: ${label}`);
-      if (noticeTimerRef.current) {
-        window.clearTimeout(noticeTimerRef.current);
+  const handleOffsetChange = useCallback(
+    (
+      newOffsetOrUpdater: number | ((prev: number) => number),
+      isManualUserAction = true
+    ) => {
+      if (isManualUserAction) {
+        isUserOffsetCustomizedRef.current = true;
       }
-      noticeTimerRef.current = window.setTimeout(() => {
-        setIntroNotice(null);
-      }, 2500);
-    }
-  };
+
+      setManualOffset((prev) => {
+        const rawTarget =
+          typeof newOffsetOrUpdater === 'function'
+            ? newOffsetOrUpdater(prev)
+            : newOffsetOrUpdater;
+
+        const cleanOffset = Number(rawTarget.toFixed(1));
+        manualOffsetRef.current = cleanOffset;
+
+        try {
+          localStorage.setItem(`lyrixer_offset_${source.sourceId}`, cleanOffset.toString());
+        } catch {
+          // ignore
+        }
+
+        if (isManualUserAction) {
+          const label =
+            cleanOffset > 0.05
+              ? `+${cleanOffset.toFixed(1)}s (Delayed · Lyrics later)`
+              : cleanOffset < -0.05
+              ? `${cleanOffset.toFixed(1)}s (Rushed · Lyrics earlier)`
+              : '0.0s (Direct Timeline · In Sync)';
+          setIntroNotice(`Sync Adjusted: ${label}`);
+          if (noticeTimerRef.current) {
+            window.clearTimeout(noticeTimerRef.current);
+          }
+          noticeTimerRef.current = window.setTimeout(() => {
+            setIntroNotice(null);
+          }, 2500);
+        }
+
+        return cleanOffset;
+      });
+    },
+    [source.sourceId]
+  );
+
+  /**
+   * Nudges the lyrics timing offset by a relative delta (in seconds).
+   * Positive delta = DELAY (lyrics appear later in video).
+   * Negative delta = RUSH (lyrics appear earlier in video).
+   */
+  const handleNudgeOffset = useCallback(
+    (delta: number) => {
+      handleOffsetChange((prev) => prev + delta, true);
+    },
+    [handleOffsetChange]
+  );
 
   /**
    * The Sync button synchronizes lyrics directly to the video:
@@ -372,10 +399,10 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         handleAutoSync(true);
       } else if (e.code === 'BracketLeft') {
         e.preventDefault();
-        handleOffsetChange(Number((manualOffsetRef.current - 0.1).toFixed(1)), true);
+        handleNudgeOffset(0.1); // Left bracket '[' = DELAY (+0.1s later)
       } else if (e.code === 'BracketRight') {
         e.preventDefault();
-        handleOffsetChange(Number((manualOffsetRef.current + 0.1).toFixed(1)), true);
+        handleNudgeOffset(-0.1); // Right bracket ']' = RUSH (-0.1s earlier)
       } else if (e.code === 'Escape') {
         if (showIntroModalRef.current) {
           setShowIntroModal(false);
@@ -578,6 +605,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onToggleMute={() => adapter?.setMuted(!playerState.muted)}
           onAutoSync={() => handleAutoSync(false)}
           onAlignVocalsToNow={() => handleAutoSync(true)}
+          onNudgeOffset={handleNudgeOffset}
           onOffsetChange={handleOffsetChange}
           onResetSync={handleResetSync}
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
