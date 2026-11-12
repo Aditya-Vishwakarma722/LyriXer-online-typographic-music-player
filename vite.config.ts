@@ -13,6 +13,31 @@ function parseDurationToSeconds(dur: string): number {
   return 210;
 }
 
+function formatViewCount(raw?: string): string {
+  if (!raw) return '';
+  const clean = raw.trim();
+  if (/[0-9.]+[BMKbmk]\b/i.test(clean)) {
+    if (!clean.toLowerCase().includes('view')) {
+      return `${clean} views`;
+    }
+    return clean;
+  }
+  const digits = clean.replace(/[^0-9]/g, '');
+  if (!digits) return clean;
+  const num = parseInt(digits, 10);
+  if (isNaN(num)) return clean;
+  if (num >= 1_000_000_000) {
+    return `${(num / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}B views`;
+  }
+  if (num >= 1_000_000) {
+    return `${(num / 1_000_000).toFixed(1).replace(/\.0$/, '')}M views`;
+  }
+  if (num >= 1_000) {
+    return `${(num / 1_000).toFixed(1).replace(/\.0$/, '')}K views`;
+  }
+  return `${num} views`;
+}
+
 const artistVideosCache = new Map<string, any[]>();
 
 function extractFeaturedArtist(rawTitle: string): string | undefined {
@@ -129,7 +154,14 @@ function lyrixerApiPlugin(): Plugin {
             if (titleKey.length > 2) seenTitles.add(titleKey);
 
             const trackType = determineTrackType(rawTitle, featured);
-            const views = v.viewCountText?.simpleText || '';
+            const rawViews =
+              v.viewCountText?.simpleText ||
+              v.viewCountText?.runs?.map((r: any) => r.text).join('') ||
+              v.shortViewCountText?.simpleText ||
+              v.shortViewCountText?.runs?.map((r: any) => r.text).join('') ||
+              v.shortViewCountText?.accessibility?.accessibilityData?.label ||
+              '';
+            const views = formatViewCount(rawViews);
 
             allTracks.push({
               id: `${artist.toLowerCase().replace(/[^a-z0-9]/g, '')}-${v.videoId}`,
@@ -172,6 +204,7 @@ function lyrixerApiPlugin(): Plugin {
       }
 
       let heroImageUrl = '';
+      let heroImages: string[] = [];
       let bio = '';
       let genre = '';
       let monthlyListeners = '';
@@ -179,7 +212,7 @@ function lyrixerApiPlugin(): Plugin {
 
       // 1. Check curated high-fidelity verified master images
       const cleanArtistKey = artist.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const CURATED_IMAGES: Record<string, { image: string; attr: string }> = {
+      const CURATED_IMAGES: Record<string, { image: string; attr: string; images?: string[] }> = {
         juicewrld: { image: '/artists/juicewrld.jpg', attr: 'Official studio master portrait' },
         theweeknd: { image: '/artists/theweeknd.jpg', attr: 'Official studio master portrait' },
         coldplay: { image: '/artists/coldplay.jpg', attr: 'Official studio master band portrait' },
@@ -189,11 +222,28 @@ function lyrixerApiPlugin(): Plugin {
         billieeilish: { image: '/artists/billieeilish.jpg', attr: 'Hit Me Hard and Soft studio master (2024)' },
         eminem: { image: '/artists/eminem.jpg', attr: 'Studio master portrait' },
         drake: { image: '/artists/drake.jpg', attr: 'Official press portrait' },
+        xxxtentacion: {
+          image: '/artists/xxxtentacion.jpg',
+          attr: 'Official studio master portrait & discography visuals',
+          images: [
+            '/artists/xxxtentacion-lookatme.jpg',
+            '/artists/xxxtentacion.jpg',
+            '/artists/xxxtentacion-moonlight.jpg',
+            '/artists/xxxtentacion-sad.jpg'
+          ]
+        },
+        travisscott: { image: '/artists/travisscott.jpg', attr: 'Official studio master portrait' },
+        kendricklamar: { image: '/artists/kendricklamar.jpg', attr: 'Official studio master portrait' },
+        taylorswift: { image: '/artists/taylorswift.jpg', attr: 'Official studio master portrait' },
+        postmalone: { image: '/artists/postmalone.jpg', attr: 'Official studio master portrait' },
       };
 
       if (CURATED_IMAGES[cleanArtistKey]) {
         heroImageUrl = CURATED_IMAGES[cleanArtistKey].image;
         imageAttribution = CURATED_IMAGES[cleanArtistKey].attr;
+        if (CURATED_IMAGES[cleanArtistKey].images) {
+          heroImages = CURATED_IMAGES[cleanArtistKey].images!;
+        }
       }
 
       // 2. Query Wikipedia API for biographical extract, high-res originalimage and description
@@ -236,7 +286,6 @@ function lyrixerApiPlugin(): Plugin {
         );
         if (dzRes.ok) {
           const dzData: any = await dzRes.json();
-          // Find close matching artist (avoid wrong artist names e.g. "OLOLO QUEEN" for Queen)
           const exactMatch = dzData.data?.find((d: any) =>
             d.name.toLowerCase() === artist.toLowerCase().trim() ||
             d.name.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanArtistKey
@@ -259,12 +308,38 @@ function lyrixerApiPlugin(): Plugin {
         // ignore
       }
 
+      // 4. Collect multi-image normal photos for panoramic left-to-right alignment if needed
+      if (heroImages.length === 0) {
+        try {
+          const itunesArtRes = await fetch(
+            `https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=album&limit=4`
+          );
+          if (itunesArtRes.ok) {
+            const itunesArtData: any = await itunesArtRes.json();
+            const albumArts = itunesArtData.results
+              ?.map((r: any) => r.artworkUrl100?.replace('100x100bb', '1000x1000bb'))
+              .filter(Boolean);
+            if (albumArts && albumArts.length >= 2) {
+              const multi = [];
+              if (heroImageUrl) multi.push(heroImageUrl);
+              multi.push(...albumArts.slice(0, 3));
+              if (multi.length >= 2) {
+                heroImages = multi;
+              }
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.end(
         JSON.stringify({
           name: artist,
           heroImageUrl,
+          heroImages,
           bio,
           genre,
           monthlyListeners,

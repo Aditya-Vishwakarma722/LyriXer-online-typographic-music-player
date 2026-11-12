@@ -6,9 +6,11 @@ import {
   ExternalLink,
   Sparkles,
   Play,
+  Flame,
+  Headphones,
 } from 'lucide-react';
 import { ArtistTrackRow } from './ArtistTrackRow';
-import { ArtistService } from '../../services/artist/artistService';
+import { ArtistService, parseViewCount } from '../../services/artist/artistService';
 import type { ArtistProfile, ArtistTrack } from '../../types/artist';
 import type { VideoSource } from '../../types/session';
 import './ArtistPage.css';
@@ -106,8 +108,16 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
   // Filter songs by category
   const displayedTracks = (() => {
     switch (activeCategory) {
-      case 'popular':
-        return profile.tracks.slice(0, 8);
+      case 'popular': {
+        const sorted = [...profile.tracks].sort((a, b) => {
+          const vB = parseViewCount(b.views);
+          const vA = parseViewCount(a.views);
+          if (vB !== vA) return vB - vA;
+          if (b.isOfficial !== a.isOfficial) return b.isOfficial ? 1 : -1;
+          return 0;
+        });
+        return sorted.map((track, idx) => ({ ...track, rank: idx + 1 }));
+      }
       case 'videos': {
         const v = profile.tracks.filter(
           (t) => t.trackType === 'video' || (!t.trackType && t.isOfficial && !t.featuredArtist)
@@ -260,22 +270,39 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
 
       {/* 1. Extended Full-Screen Backdrop: Upscaled Clear Quality Artist Image covering entire screen (100vw x 100vh) */}
       <div className="artist-bg-viewport" aria-hidden="true">
-        <motion.img
-          key={profile.heroImageUrl}
-          src={profile.heroImageUrl}
-          alt={profile.name}
-          className="artist-bg-photo"
-          referrerPolicy="no-referrer"
-          onError={(e) => {
-            const target = e.currentTarget as HTMLImageElement;
-            if (!target.src.includes('unsplash.com')) {
-              target.src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2560&q=95';
-            }
-          }}
-          initial={{ opacity: 0, scale: 1.03 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        />
+        {profile.heroImages && profile.heroImages.length > 1 ? (
+          <div className="artist-bg-multi-row">
+            {profile.heroImages.map((imgUrl, idx) => (
+              <div key={idx} className="artist-bg-col-panel">
+                <img
+                  src={imgUrl}
+                  alt={`${profile.name} visual ${idx + 1}`}
+                  className="artist-bg-col-photo"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                />
+                <div className="artist-bg-col-gradient" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <motion.img
+            key={profile.heroImageUrl}
+            src={profile.heroImageUrl}
+            alt={profile.name}
+            className="artist-bg-photo"
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              if (!target.src.includes('unsplash.com')) {
+                target.src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2560&q=95';
+              }
+            }}
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          />
+        )}
         {/* Soft atmospheric gradients for text legibility without box backgrounds */}
         <div className="artist-gradient-left" />
         <div className="artist-gradient-bottom" />
@@ -331,23 +358,43 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
 
         {/* Artist Information (Upper Left) */}
         <section className="artist-info-header">
-          <div className="artist-badges-row">
-            {profile.verified && (
-              <span className="artist-verified-tag">
-                <CheckCircle2 size={12} className="text-accent" />
-                <span>Official Artist</span>
-              </span>
-            )}
-            <span className="artist-genre-label">{profile.genre}</span>
-          </div>
-
-          <h1 className="artist-headline-name">{profile.name}</h1>
-
-          {profile.monthlyListeners && (
-            <div className="artist-listeners-tag">
-              <span>{profile.monthlyListeners}</span>
+          <div className="artist-identity-row">
+            <div className="artist-avatar-crest">
+              <img
+                src={profile.heroImageUrl}
+                alt={profile.name}
+                className="artist-crest-photo"
+                referrerPolicy="no-referrer"
+              />
+              <div className="artist-crest-ring" />
+              {profile.verified && (
+                <div className="artist-crest-check" title="Official Verified Artist">
+                  <CheckCircle2 size={11} />
+                </div>
+              )}
             </div>
-          )}
+
+            <div className="artist-identity-meta">
+              <div className="artist-badges-row">
+                {profile.verified && (
+                  <span className="artist-verified-tag">
+                    <CheckCircle2 size={12} className="text-accent" />
+                    <span>Official Artist</span>
+                  </span>
+                )}
+                <span className="artist-genre-label">{profile.genre}</span>
+              </div>
+
+              <h1 className="artist-headline-name">{profile.name}</h1>
+
+              {profile.monthlyListeners && (
+                <div className="artist-listeners-tag">
+                  <Headphones size={11} />
+                  <span>{profile.monthlyListeners}</span>
+                </div>
+              )}
+            </div>
+          </div>
 
           {profile.bio && (
             <p className="artist-description-text">{profile.bio}</p>
@@ -380,7 +427,8 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
             className={`cat-tab ${activeCategory === 'popular' ? 'active' : ''}`}
             onClick={() => setActiveCategory('popular')}
           >
-            Top Hits
+            <Flame size={12} className="cat-flame-icon" />
+            <span>Top Hits</span>
           </button>
           <button
             type="button"
@@ -426,6 +474,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                     isSelected={isSelected}
                     isPlaying={isPlaying}
                     onSelectTrack={onSelectTrack}
+                    isTopHitsTab={activeCategory === 'popular'}
                   />
                 );
               })}

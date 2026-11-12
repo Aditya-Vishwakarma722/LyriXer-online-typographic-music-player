@@ -12,6 +12,7 @@ export interface ArtistTrack {
   year?: string;
   views?: string;
   thumbnailUrl?: string;
+  rank?: number;
 }
 
 export interface ArtistProfile {
@@ -22,8 +23,8 @@ export interface ArtistProfile {
   verified: boolean;
   bio?: string;
   heroImageUrl: string;
+  heroImages?: string[]; // Multiple normal images aligned left-to-right for panoramic display
   imageAttribution: string;
   youtubeChannelUrl?: string;
   tracks: ArtistTrack[];
 }
-

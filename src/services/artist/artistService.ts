@@ -1,6 +1,54 @@
 import type { ArtistProfile, ArtistTrack } from '../../types/artist';
 
 /**
+ * Parses a view count string into a numeric count for sorting.
+ * e.g. "1.5B views" -> 1500000000, "330M views" -> 330000000, "980K" -> 980000
+ */
+export function parseViewCount(viewsStr?: string): number {
+  if (!viewsStr) return 0;
+  const clean = viewsStr.toLowerCase().replace(/views?/g, '').trim();
+  if (clean.includes('b')) {
+    return parseFloat(clean.replace('b', '')) * 1_000_000_000;
+  }
+  if (clean.includes('m')) {
+    return parseFloat(clean.replace('m', '')) * 1_000_000;
+  }
+  if (clean.includes('k')) {
+    return parseFloat(clean.replace('k', '')) * 1_000;
+  }
+  const numeric = parseFloat(clean.replace(/,/g, ''));
+  return isNaN(numeric) ? 0 : numeric;
+}
+
+/**
+ * Formats a raw view string or number into a clean, human-readable display string.
+ */
+export function formatViewCount(raw?: string): string {
+  if (!raw) return '';
+  const clean = raw.trim();
+  if (/[0-9.]+[BMKbmk]\b/i.test(clean)) {
+    if (!clean.toLowerCase().includes('view')) {
+      return `${clean} views`;
+    }
+    return clean;
+  }
+  const digits = clean.replace(/[^0-9]/g, '');
+  if (!digits) return clean;
+  const num = parseInt(digits, 10);
+  if (isNaN(num)) return clean;
+  if (num >= 1_000_000_000) {
+    return `${(num / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}B views`;
+  }
+  if (num >= 1_000_000) {
+    return `${(num / 1_000_000).toFixed(1).replace(/\.0$/, '')}M views`;
+  }
+  if (num >= 1_000) {
+    return `${(num / 1_000).toFixed(1).replace(/\.0$/, '')}K views`;
+  }
+  return `${num} views`;
+}
+
+/**
  * In-memory cache for dynamically fetched artist profiles.
  */
 const artistProfileCache = new Map<string, ArtistProfile>();
@@ -758,6 +806,168 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
       },
     ],
   },
+
+  xxxtentacion: {
+    id: 'xxxtentacion',
+    name: 'XXXTENTACION',
+    genre: 'Hip-Hop / Emo Rap / Alternative',
+    monthlyListeners: '38,200,000 monthly listeners',
+    verified: true,
+    bio: 'Jahseh Dwayne Ricardo Onfroy (January 23, 1998 – June 18, 2018), known professionally as XXXTENTACION, was an influential American rapper and singer known for his raw emotion, boundary-pushing versatility, and genre-defining emo rap and rock sound.',
+    heroImageUrl: '/artists/xxxtentacion.jpg',
+    heroImages: [
+      '/artists/xxxtentacion-lookatme.jpg',
+      '/artists/xxxtentacion.jpg',
+      '/artists/xxxtentacion-moonlight.jpg',
+      '/artists/xxxtentacion-sad.jpg',
+    ],
+    imageAttribution: 'Official studio master portrait & discography visuals',
+    youtubeChannelUrl: 'https://www.youtube.com/channel/UCM9r1xn6YW34gRqecYFmmBA',
+    tracks: [
+      {
+        id: 'xxxtentacion-moonlight',
+        title: 'Moonlight',
+        artist: 'XXXTENTACION',
+        duration: 135,
+        durationFormatted: '2:15',
+        videoId: 'GX8Hg6kWQYI',
+        isOfficial: true,
+        trackType: 'video',
+        album: '?',
+        year: '2018',
+        views: '1.5B views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/GX8Hg6kWQYI/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-sad',
+        title: 'SAD!',
+        artist: 'XXXTENTACION',
+        duration: 171,
+        durationFormatted: '2:51',
+        videoId: 'DW3tI9HCslo',
+        isOfficial: true,
+        trackType: 'video',
+        album: '?',
+        year: '2018',
+        views: '1.3B views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/DW3tI9HCslo/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-jocelyn-flores',
+        title: 'Jocelyn Flores',
+        artist: 'XXXTENTACION',
+        duration: 119,
+        durationFormatted: '1:59',
+        videoId: 'FAucVNRx_mU',
+        isOfficial: true,
+        trackType: 'audio',
+        album: '17',
+        year: '2017',
+        views: '920M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/FAucVNRx_mU/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-look-at-me',
+        title: 'Look At Me!',
+        artist: 'XXXTENTACION',
+        duration: 126,
+        durationFormatted: '2:06',
+        videoId: 'WmjshxRqa9g',
+        isOfficial: true,
+        trackType: 'video',
+        album: 'Revenge',
+        year: '2015',
+        views: '810M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/WmjshxRqa9g/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-changes',
+        title: 'Changes',
+        artist: 'XXXTENTACION',
+        duration: 122,
+        durationFormatted: '2:02',
+        videoId: 'f0bbDFRYD_A',
+        isOfficial: true,
+        trackType: 'video',
+        album: '?',
+        year: '2018',
+        views: '760M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/f0bbDFRYD_A/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-hope',
+        title: 'Hope',
+        artist: 'XXXTENTACION',
+        duration: 110,
+        durationFormatted: '1:50',
+        videoId: '7JODq4qDk88',
+        isOfficial: true,
+        trackType: 'audio',
+        album: '?',
+        year: '2018',
+        views: '620M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/7JODq4qDk88/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-everybody-dies',
+        title: 'Everybody Dies in Their Nightmares',
+        artist: 'XXXTENTACION',
+        duration: 95,
+        durationFormatted: '1:35',
+        videoId: '4U_8tFw4cM8',
+        isOfficial: true,
+        trackType: 'audio',
+        album: '17',
+        year: '2017',
+        views: '540M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/4U_8tFw4cM8/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-falling-down',
+        title: 'Falling Down',
+        artist: 'XXXTENTACION',
+        featuredArtist: 'Lil Peep',
+        duration: 198,
+        durationFormatted: '3:18',
+        videoId: '-jRKsiAOAA8',
+        isOfficial: true,
+        trackType: 'collab',
+        album: "Come Over When You're Sober, Pt. 2",
+        year: '2018',
+        views: '460M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/-jRKsiAOAA8/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-arms-around-you',
+        title: 'Arms Around You',
+        artist: 'XXXTENTACION',
+        featuredArtist: 'Lil Pump, Maluma, Swae Lee',
+        duration: 200,
+        durationFormatted: '3:20',
+        videoId: 'tLNOce4Y4uc',
+        isOfficial: true,
+        trackType: 'collab',
+        album: 'Arms Around You',
+        year: '2018',
+        views: '410M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/tLNOce4Y4uc/hqdefault.jpg',
+      },
+      {
+        id: 'xxxtentacion-revenge',
+        title: 'Revenge',
+        artist: 'XXXTENTACION',
+        duration: 120,
+        durationFormatted: '2:00',
+        videoId: 'E_kI0a6w6H0',
+        isOfficial: true,
+        trackType: 'audio',
+        album: '17',
+        year: '2017',
+        views: '360M views',
+        thumbnailUrl: 'https://i.ytimg.com/vi/E_kI0a6w6H0/hqdefault.jpg',
+      },
+    ],
+  },
 };
 
 export class ArtistService {
@@ -831,6 +1041,7 @@ export class ArtistService {
     }
 
     let webHeroImage = baseProfile?.heroImageUrl || '';
+    let webHeroImages: string[] = baseProfile?.heroImages ? [...baseProfile.heroImages] : [];
     let webBio = baseProfile?.bio || '';
     let webGenre = baseProfile?.genre || 'Artist';
     let webListeners = baseProfile?.monthlyListeners || '';
@@ -845,6 +1056,9 @@ export class ArtistService {
         if (!baseProfile?.heroImageUrl && infoData.heroImageUrl) {
           webHeroImage = infoData.heroImageUrl;
           webAttribution = infoData.imageAttribution || webAttribution;
+        }
+        if (Array.isArray(infoData.heroImages) && infoData.heroImages.length > 0) {
+          webHeroImages = infoData.heroImages;
         }
         if (infoData.bio) webBio = infoData.bio;
         if (infoData.genre) webGenre = infoData.genre;
@@ -959,6 +1173,7 @@ export class ArtistService {
       verified: true,
       bio: webBio || baseProfile?.bio || `${trimmed} is an acclaimed musical artist.`,
       heroImageUrl: finalHeroUrl,
+      heroImages: webHeroImages.length > 0 ? webHeroImages : baseProfile?.heroImages,
       imageAttribution: webAttribution,
       youtubeChannelUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(trimmed + ' official music videos')}`,
       tracks: tracks.length > 0 ? tracks : (baseProfile?.tracks || []),
