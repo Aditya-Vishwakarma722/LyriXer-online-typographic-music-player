@@ -49,49 +49,50 @@ export const PlayerIntroModal: React.FC<PlayerIntroModalProps> = ({
       onClose={handleDismiss}
       title="How Lyric Sync Works"
       description="Essential guide to synchronizing lyrics with any music video."
-      maxWidth="620px"
+      maxWidth="880px"
+      className="player-intro-modal-panel"
     >
       <div className="player-intro-content">
         {/* Header Hero Narrative */}
         <div className="player-intro-manifesto">
-          <div className="player-intro-kicker">
-            <Sparkles size={13} className="player-intro-kicker-sparkle" />
-            <span>QUICK START GUIDE &middot; LYRICS SYNCHRONIZATION</span>
+          <div className="player-intro-kicker-row">
+            <div className="player-intro-kicker">
+              <Sparkles size={13} className="player-intro-kicker-sparkle" />
+              <span>QUICK START GUIDE &middot; LYRICS SYNCHRONIZATION</span>
+            </div>
+            {trackTitle && (
+              <div className="player-intro-current-track">
+                <span className="intro-track-label">Preparing track:</span>
+                <strong className="intro-track-name">{trackTitle}</strong>
+                {trackArtist && <span className="intro-track-by">&middot; {trackArtist}</span>}
+              </div>
+            )}
           </div>
           <h3 className="player-intro-lead-title">
-            Feel the music. <br />
-            <span>Master the lyrics sync.</span>
+            Feel the music. <span>Master the lyrics sync.</span>
           </h3>
-          {trackTitle && (
-            <div className="player-intro-current-track">
-              <span className="intro-track-label">Preparing track:</span>
-              <strong className="intro-track-name">{trackTitle}</strong>
-              {trackArtist && <span className="intro-track-by">&middot; {trackArtist}</span>}
-            </div>
-          )}
           <p className="player-intro-lead-body">
             Official music videos frequently include cinematic opening dialogue, skits, or instrumental
             preambles. Here is how to keep lyrics synchronized with frame-accurate precision:
           </p>
         </div>
 
-        {/* Editorial Guide Pillars — Seamless Authentic Aesthetic */}
+        {/* Editorial Guide Pillars — Seamless Authentic 2-Column Grid */}
         <div className="player-intro-pillars">
           {/* Step 1: Adjust for Video Intros */}
           <div className="player-intro-pillar">
             <span className="player-intro-pillar-num">01</span>
             <div className="player-intro-pillar-body">
               <div className="player-intro-pillar-header">
-                <h4 className="player-intro-pillar-title">How to Adjust Video Intros</h4>
+                <h4 className="player-intro-pillar-title">Adjust for Video Intros</h4>
                 <div className="intro-key-badge">
                   <kbd className="intro-kbd">S</kbd>
                   <span>key</span>
                 </div>
               </div>
               <p className="player-intro-pillar-text">
-                When the singer sings the very first word, press <kbd className="intro-kbd-inline">S</kbd> on
-                your keyboard or click <strong>"Sync to Vocal Start"</strong> in the bottom bar.
-                This instantly locks the entire lyrics timeline to the video.
+                When the singer sings the very first word, press <kbd className="intro-kbd-inline">S</kbd> or
+                click <strong>"Sync to Vocal Start"</strong> in the bottom bar to instantly lock the timeline.
               </p>
             </div>
           </div>
@@ -108,9 +109,9 @@ export const PlayerIntroModal: React.FC<PlayerIntroModalProps> = ({
                 </div>
               </div>
               <p className="player-intro-pillar-text">
-                Need micro-timing adjustments? Use <kbd className="intro-kbd-inline">[</kbd> to <strong>Delay</strong> lyrics
-                later (Left), or <kbd className="intro-kbd-inline">]</kbd> to <strong>Rush</strong> lyrics earlier (Right).
-                You can also use the <strong>Delay / Rush</strong> steppers in the bottom player bar.
+                Press <kbd className="intro-kbd-inline">[</kbd> to <strong>Delay</strong> (+0.1s later) or{' '}
+                <kbd className="intro-kbd-inline">]</kbd> to <strong>Rush</strong> (-0.1s earlier). Or click
+                the <strong>Delay / Rush</strong> steppers in the bottom bar.
               </p>
             </div>
           </div>
@@ -127,9 +128,8 @@ export const PlayerIntroModal: React.FC<PlayerIntroModalProps> = ({
                 </div>
               </div>
               <p className="player-intro-pillar-text">
-                If the song is a remix, live version, or the lyrics don't match, click the{' '}
-                <strong>"Search LRCLIB"</strong> option in the top bar to choose from thousands of community-synced
-                tracks or upload your own <strong>.lrc</strong> file.
+                If the song is a remix or live version, click <strong>"Search LRCLIB"</strong> in
+                the top bar to select another community sync or upload your own <strong>.lrc</strong> file.
               </p>
             </div>
           </div>
@@ -139,10 +139,10 @@ export const PlayerIntroModal: React.FC<PlayerIntroModalProps> = ({
             <span className="player-intro-pillar-num">04</span>
             <div className="player-intro-pillar-body">
               <div className="player-intro-pillar-header">
-                <h4 className="player-intro-pillar-title">Essential Player Shortcuts</h4>
+                <h4 className="player-intro-pillar-title">Essential Shortcuts</h4>
                 <div className="intro-key-badge">
                   <Keyboard size={12} />
-                  <span>Shortcuts</span>
+                  <span>Keys</span>
                 </div>
               </div>
               <p className="player-intro-pillar-text">

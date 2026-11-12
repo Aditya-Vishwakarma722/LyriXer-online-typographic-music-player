@@ -10,6 +10,7 @@ interface ModalProps {
   description?: string;
   children: React.ReactNode;
   maxWidth?: string;
+  className?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -19,6 +20,7 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   children,
   maxWidth = '540px',
+  className = '',
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -50,7 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
           />
           <div className="modal-wrapper">
             <motion.div
-              className="modal-panel"
+              className={`modal-panel ${className}`.trim()}
               style={{ maxWidth }}
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

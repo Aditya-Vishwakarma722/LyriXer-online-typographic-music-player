@@ -1,16 +1,32 @@
+/* Modal body customization for non-scrollable widescreen Guide */
+.player-intro-modal-panel .modal-body {
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+  padding: 20px 32px 24px;
+}
+
 .player-intro-content {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 16px;
 }
 
 /* 1. Manifesto / Lead Section */
 .player-intro-manifesto {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-bottom: 20px;
+  gap: 8px;
+  padding-bottom: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.player-intro-kicker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .player-intro-kicker {
@@ -30,7 +46,7 @@
 
 .player-intro-lead-title {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.03em;
@@ -45,7 +61,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 3px 10px;
   background: rgba(167, 139, 250, 0.1);
   border: 1px solid rgba(167, 139, 250, 0.25);
   border-radius: var(--radius-xs, 2px);
@@ -61,7 +77,7 @@
 .intro-track-name {
   color: #FFFFFF;
   font-weight: 600;
-  max-width: 260px;
+  max-width: 320px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -72,29 +88,28 @@
 }
 
 .player-intro-lead-body {
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 0.835rem;
+  line-height: 1.5;
   color: var(--text-secondary, #A5A1AD);
-  margin-top: 2px;
 }
 
-/* 2. Seamless Editorial Pillars (Box-free) */
+/* 2. Seamless Editorial Pillars — 2-Column Grid (Zero Boxiness) */
 .player-intro-pillars {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 32px;
 }
 
 .player-intro-pillar {
   display: flex;
   align-items: flex-start;
-  gap: 18px;
-  padding: 14px 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all var(--transition-fast);
+  gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.player-intro-pillar:last-child {
+/* Second row in 2-column grid does not need a bottom border */
+.player-intro-pillar:nth-child(n+3) {
   border-bottom: none;
 }
 
@@ -102,17 +117,17 @@
   font-family: var(--font-mono, monospace);
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgba(167, 139, 250, 0.75);
-  padding-top: 3px;
+  color: rgba(167, 139, 250, 0.85);
+  padding-top: 2px;
   letter-spacing: 0.05em;
   flex-shrink: 0;
-  min-width: 24px;
+  min-width: 22px;
 }
 
 .player-intro-pillar-body {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   flex: 1;
 }
 
@@ -120,19 +135,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .player-intro-pillar-title {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #FFFFFF;
   letter-spacing: -0.01em;
 }
 
 .player-intro-pillar-text {
-  font-size: 0.8125rem;
-  line-height: 1.55;
+  font-size: 0.8rem;
+  line-height: 1.5;
   color: var(--text-secondary, #A5A1AD);
 }
 
@@ -145,18 +160,19 @@
 .intro-key-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-size: 0.6875rem;
   color: var(--text-muted, #71717A);
+  flex-shrink: 0;
 }
 
 .intro-kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
   font-family: var(--font-mono, monospace);
   font-size: 0.75rem;
   font-weight: 700;
@@ -190,15 +206,16 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 8px;
+  padding: 2px 7px;
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--accent-violet-light, #C4B5FD);
   background: rgba(167, 139, 250, 0.12);
   border: 1px solid rgba(167, 139, 250, 0.3);
   border-radius: var(--radius-xs, 2px);
+  flex-shrink: 0;
 }
 
 /* 3. Footer Bar */
@@ -207,7 +224,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-top: 18px;
+  padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
@@ -237,7 +254,28 @@
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
 }
 
+@media (max-width: 768px) {
+  .player-intro-pillars {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .player-intro-pillar:nth-child(n+3) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .player-intro-pillar:last-child {
+    border-bottom: none;
+  }
+}
+
 @media (max-width: 640px) {
+  .player-intro-modal-panel .modal-body {
+    padding: 16px 20px;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+  }
+
   .player-intro-footer {
     flex-direction: column;
     align-items: stretch;
