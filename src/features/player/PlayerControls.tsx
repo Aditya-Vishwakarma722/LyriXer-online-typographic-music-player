@@ -475,11 +475,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                 {(
                   [
                     { id: 'kinetic', name: 'Kinetic Screen (Cinema Edit)' },
-                    { id: 'focus-stack', name: 'Focus Stack' },
-                    { id: 'inter', name: 'Modern Sans' },
-                    { id: 'geometric', name: 'Geometric' },
-                    { id: 'serif', name: 'Editorial Serif' },
-                    { id: 'mono', name: 'Monospace' },
+                    { id: 'focus-stack', name: 'Focus Stack (Spotify Style)' },
                   ] as { id: TypographyPreset; name: string }[]
                 ).map((t) => (
                   <button

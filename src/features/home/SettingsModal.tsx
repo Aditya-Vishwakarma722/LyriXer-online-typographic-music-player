@@ -13,11 +13,7 @@ interface SettingsModalProps {
 
 const TYPOGRAPHY_PRESETS: { id: TypographyPreset; label: string; desc: string; sample: string }[] = [
   { id: 'kinetic', label: 'Kinetic Screen', desc: 'Screen-filling kinetic typography (Anime / Cinema Edit)', sample: 'Aa' },
-  { id: 'focus-stack', label: 'Focus Stack', desc: 'Active line in focus with softened surrounding context', sample: 'Aa' },
-  { id: 'inter', label: 'Modern Sans', desc: 'Clean, legible neo-grotesque (Inter)', sample: 'Aa' },
-  { id: 'geometric', label: 'Geometric', desc: 'Modern high-impact display (Plus Jakarta Sans)', sample: 'Aa' },
-  { id: 'serif', label: 'Editorial Serif', desc: 'Literary & elegant display', sample: 'Aa' },
-  { id: 'mono', label: 'Monospace', desc: 'Technical & structured (JetBrains Mono)', sample: 'Aa' },
+  { id: 'focus-stack', label: 'Focus Stack', desc: 'Active line centered in the middle with Spotify-style scrolling', sample: 'Aa' },
 ];
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({

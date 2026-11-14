@@ -30,7 +30,7 @@ export interface RecentSession {
   playedAt: string;
 }
 
-export type TypographyPreset = 'kinetic' | 'focus-stack' | 'inter' | 'serif' | 'geometric' | 'mono';
+export type TypographyPreset = 'kinetic' | 'focus-stack';
 
 export type BackgroundStyle = 'combined' | 'waves' | 'halo';
 

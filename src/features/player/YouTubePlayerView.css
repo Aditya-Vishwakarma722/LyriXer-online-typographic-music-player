@@ -93,12 +93,14 @@
 
 /* 3. Centered Lyrics Overlay (Floating on top of playing video) */
 .yt-fullscreen-lyrics-overlay {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 20;
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
   pointer-events: none;
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);

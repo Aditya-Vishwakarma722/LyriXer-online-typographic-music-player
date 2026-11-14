@@ -154,10 +154,6 @@
 /* Typeface font specimen classes */
 .preset-font-kinetic { font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif); }
 .preset-font-focus-stack { font-family: var(--font-sans, 'Inter', sans-serif); }
-.preset-font-inter { font-family: var(--font-sans, 'Inter', sans-serif); }
-.preset-font-geometric { font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif); }
-.preset-font-serif { font-family: Georgia, serif; font-style: italic; }
-.preset-font-mono { font-family: var(--font-mono, 'JetBrains Mono', monospace); }
 
 /* 3. Background Softening Selector */
 .settings-blur-row {
