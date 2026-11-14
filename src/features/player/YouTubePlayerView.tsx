@@ -30,6 +30,7 @@ interface YouTubePlayerViewProps {
   trackTitle?: string;
   trackArtist?: string;
   onOpenArtist?: () => void;
+  progress?: number;
 }
 
 export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
@@ -55,6 +56,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
   trackTitle,
   trackArtist,
   onOpenArtist,
+  progress = 0,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const adapterRef = useRef<YouTubeAdapter | null>(null);
@@ -111,7 +113,11 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
         <div ref={containerRef} className="yt-fullscreen-host" />
       </div>
 
-      {/* 2. Atmospheric Dim Contrast Overlay */}
+      {/* 2. Top and bottom cinematic edge shields ensuring zero YouTube chrome leak */}
+      <div className="yt-fullscreen-edge-shield-top" aria-hidden="true" />
+      <div className="yt-fullscreen-edge-shield-bottom" aria-hidden="true" />
+
+      {/* 3. Atmospheric Dim Contrast Overlay */}
       <div
         className="yt-fullscreen-contrast-overlay"
         style={{
@@ -143,6 +149,10 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
           onSearchLrclibClick={onSearchLrclibClick}
           onAutoSync={onAutoSync}
           onAlignVocalsToNow={onAlignVocalsToNow}
+          currentTime={currentTime}
+          duration={duration}
+          isEnded={isEnded}
+          progress={progress}
         />
       </div>
 

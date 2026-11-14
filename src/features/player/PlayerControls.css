@@ -295,6 +295,31 @@
   font-weight: 600;
 }
 
+.typography-popover {
+  width: 284px;
+  min-width: 284px;
+}
+
+.typography-popover .popover-title {
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+
+.typography-popover .popover-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.typography-popover .popover-item-check {
+  color: var(--accent-violet-light, #c4b5fd);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
 .effects-popover {
   width: 236px;
 }

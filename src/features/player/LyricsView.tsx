@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { LyricTrack, LyricLine } from '../../services/lyrics/lrcParser';
+import { isVocalText, getTimedWords, calculateLineDuration } from '../../services/lyrics/vocalFilter';
 import type { TypographyPreset } from '../../types/session';
 import { Loader2, Music, Upload, Search, ChevronDown } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -17,6 +18,10 @@ interface LyricsViewProps {
   onSearchLrclibClick?: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
+  currentTime?: number;
+  duration?: number;
+  isEnded?: boolean;
+  progress?: number;
 }
 
 export const LyricsView: React.FC<LyricsViewProps> = ({
@@ -28,6 +33,9 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   onSeekTo,
   onUploadLrcClick,
   onSearchLrclibClick,
+  currentTime = 0,
+  isEnded = false,
+  progress = 0,
 }) => {
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -176,6 +184,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
 
   // Active line
   const activeLine: LyricLine | null = activeIndex >= 0 ? lyrics.lines[activeIndex] : null;
+  const hasActiveVocal = activeLine ? isVocalText(activeLine.text) : false;
 
   // 1. KINETIC SCREEN-FILLING ANIME/CINEMATIC EDIT MODE (Single Active Lyric Focus)
   if (typographyPreset === 'kinetic') {
@@ -185,10 +194,10 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         style={{ '--lyric-font-scale': fontSizeScale } as React.CSSProperties}
       >
         <div className="kinetic-stage-container">
-          {/* Screen-filling giant kinetic hero phrase - ONLY active line, no blurred clutter */}
+          {/* Screen-filling giant kinetic hero phrase - ONLY active vocal line, leaving screen open when only music is playing */}
           <div className="kinetic-active-viewport">
             <AnimatePresence mode="wait">
-              {activeLine ? (
+              {activeLine && hasActiveVocal && !isEnded ? (
                 <motion.div
                   key={`kline-${activeIndex}-${activeLine.timestamp}`}
                   initial={{ opacity: 0, scale: 0.94, y: 24, filter: 'blur(8px)' }}
@@ -197,7 +206,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                   className="kinetic-hero-phrase"
                 >
-                  <h1 className="kinetic-hero-text">{activeLine.text || '♪'}</h1>
+                  <h1 className="kinetic-hero-text">{activeLine.text}</h1>
                 </motion.div>
               ) : null}
             </AnimatePresence>
@@ -206,6 +215,23 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
       </div>
     );
   }
+
+  // Focus Stack pre-vocal state: When intro music is playing (activeIndex === -1)
+  // and user is not manually scrolling, leave the screen completely open and clear.
+  const isPreVocal = activeIndex === -1 && wheelOffset === 0;
+
+  // Focus Stack ending state: when song finishes, vanish lyrics with a smooth fade-out animation
+  const isVanishEnded = isEnded && wheelOffset === 0;
+
+  // Real-time line progress for the currently active vocal line
+  const activeLineProgress = (() => {
+    if (progress > 0) return progress;
+    if (!activeLine || currentTime <= 0) return 0;
+    const nextLine = activeIndex < lyrics.lines.length - 1 ? lyrics.lines[activeIndex + 1] : null;
+    const lineDuration = calculateLineDuration(activeLine, nextLine);
+    const elapsed = currentTime - activeLine.timestamp;
+    return Math.min(1, Math.max(0, elapsed / lineDuration));
+  })();
 
   // 2. FOCUS STACK: SPOTIFY-STYLE VERTICALLY CENTERED CONTINUOUS AUTO-SCROLL
   return (
@@ -220,7 +246,9 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     >
       <div
         ref={trackRef}
-        className={`lyrics-focus-stack-track ${isInitialLoad ? 'no-transition' : ''}`}
+        className={`lyrics-focus-stack-track ${isInitialLoad ? 'no-transition' : ''} ${
+          isPreVocal ? 'pre-vocal-hidden' : ''
+        } ${isVanishEnded ? 'song-ended-hidden' : ''}`}
         style={{
           transform: `translate3d(0, ${translateY + wheelOffset}px, 0)`,
         }}
@@ -229,12 +257,17 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
           const isActive = index === activeIndex;
           const isPast = activeIndex !== -1 && index < activeIndex;
           const distance = activeIndex === -1 ? 99 : Math.abs(index - activeIndex);
+          const hasVocal = isVocalText(line.text);
 
           let statusClass = 'lyric-upcoming';
           if (isActive) statusClass = 'lyric-active';
           else if (isPast) statusClass = 'lyric-past';
 
           const distClass = distance <= 4 ? `dist-${distance}` : 'dist-far';
+          const vocalClass = hasVocal ? 'is-vocal' : 'is-non-vocal';
+
+          // Word-by-word breakdown for authentic Spotify-style singing word fill
+          const timedWords = getTimedWords(line.text);
 
           return (
             <div
@@ -242,7 +275,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
               ref={(el) => {
                 lineRefs.current[index] = el;
               }}
-              className={`lyric-line-item ${statusClass} ${distClass}`}
+              className={`lyric-line-item ${statusClass} ${distClass} ${vocalClass}`}
               data-active={isActive}
               onClick={() => {
                 setWheelOffset(0);
@@ -257,9 +290,58 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
                   onSeekTo(line.timestamp);
                 }
               }}
-              title={`Jump to ${Math.floor(line.timestamp / 60)}:${(line.timestamp % 60).toFixed(0).padStart(2, '0')}`}
+              title={
+                hasVocal
+                  ? `Jump to ${Math.floor(line.timestamp / 60)}:${(line.timestamp % 60).toFixed(0).padStart(2, '0')}`
+                  : undefined
+              }
             >
-              <span className="lyric-text">{line.text || '♪'}</span>
+              {hasVocal ? (
+                <span className="lyric-text lyric-text-container">
+                  {timedWords.map((tw, wIdx) => {
+                    let wordProgress = 0;
+                    if (isActive) {
+                      if (activeLineProgress >= tw.end) {
+                        wordProgress = 1;
+                      } else if (activeLineProgress <= tw.start) {
+                        wordProgress = 0;
+                      } else {
+                        wordProgress = (activeLineProgress - tw.start) / (tw.end - tw.start);
+                      }
+                    }
+
+                    return (
+                      <React.Fragment key={`${line.id}-w-${wIdx}`}>
+                        <span className="lyric-word-wrap">
+                          {/* Base un-sung word: dimmer grey */}
+                          <span className="word-base" aria-hidden="true">
+                            {tw.word}
+                          </span>
+
+                          {/* Current singing words: sharp white fill, clipped by wordProgress */}
+                          {isActive && wordProgress > 0 && (
+                            <span
+                              className="word-fill"
+                              style={{
+                                clipPath:
+                                  wordProgress >= 1
+                                    ? 'none'
+                                    : `inset(-20% ${((1 - wordProgress) * 100).toFixed(1)}% -20% 0)`,
+                              }}
+                            >
+                              {tw.word}
+                            </span>
+                          )}
+                        </span>
+                        {/* Space between words */}
+                        {wIdx < timedWords.length - 1 ? ' ' : ''}
+                      </React.Fragment>
+                    );
+                  })}
+                </span>
+              ) : (
+                <span className="lyric-text lyric-text-spacer">&nbsp;</span>
+              )}
             </div>
           );
         })}

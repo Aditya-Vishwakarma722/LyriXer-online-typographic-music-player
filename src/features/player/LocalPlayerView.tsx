@@ -23,6 +23,10 @@ interface LocalPlayerViewProps {
   onSearchLrclibClick?: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
+  currentTime?: number;
+  duration?: number;
+  isEnded?: boolean;
+  progress?: number;
 }
 
 export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
@@ -42,6 +46,10 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
   onSearchLrclibClick,
   onAutoSync,
   onAlignVocalsToNow,
+  currentTime = 0,
+  duration = 0,
+  isEnded = false,
+  progress = 0,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const adapterRef = useRef<HTML5VideoAdapter | null>(null);
@@ -108,6 +116,10 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
           onUploadLrcClick={onUploadLrcClick}
           onSearchLrclibClick={onSearchLrclibClick}
           onAutoSync={onAutoSync || onAlignVocalsToNow}
+          currentTime={currentTime}
+          duration={duration}
+          isEnded={isEnded}
+          progress={progress}
         />
       </div>
     </div>

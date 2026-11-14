@@ -1,13 +1,15 @@
 import { useMemo } from 'react';
 import type { LyricTrack, LyricLine } from '../services/lyrics/lrcParser';
+import { calculateLineDuration } from '../services/lyrics/vocalFilter';
 
 export interface LyricsSyncState {
   activeIndex: number;
   activeLine: LyricLine | null;
   previousLine: LyricLine | null;
   nextLine: LyricLine | null;
-  progress: number; // 0 to 1 progress within the current line
+  progress: number; // 0 to 1 progress within the current line (Spotify-style loading fill)
   isIntro: boolean;
+  isSongEnded: boolean;
 }
 
 export function computeLyricsSync(
@@ -23,6 +25,7 @@ export function computeLyricsSync(
       nextLine: null,
       progress: 0,
       isIntro: false,
+      isSongEnded: false,
     };
   }
 
@@ -37,6 +40,7 @@ export function computeLyricsSync(
       nextLine: lines[0],
       progress: 0,
       isIntro: true,
+      isSongEnded: false,
     };
   }
 
@@ -51,6 +55,7 @@ export function computeLyricsSync(
       nextLine: lines[0],
       progress: 0,
       isIntro: true,
+      isSongEnded: false,
     };
   }
 
@@ -74,10 +79,14 @@ export function computeLyricsSync(
   const previousLine = activeIndex > 0 ? lines[activeIndex - 1] : null;
   const nextLine = activeIndex < lines.length - 1 ? lines[activeIndex + 1] : null;
 
+  // Check if all vocal lines in the song have finished singing (plus a 1.8s buffer)
+  const lastLine = lines[lines.length - 1];
+  const lastDuration = calculateLineDuration(lastLine);
+  const isSongEnded = effectiveTime > lastLine.timestamp + lastDuration + 1.8;
+
   let progress = 0;
   if (activeLine) {
-    const end = activeLine.endTime ?? activeLine.timestamp + 4;
-    const duration = Math.max(0.5, end - activeLine.timestamp);
+    const duration = calculateLineDuration(activeLine, nextLine);
     progress = Math.min(1, Math.max(0, (effectiveTime - activeLine.timestamp) / duration));
   }
 
@@ -88,6 +97,7 @@ export function computeLyricsSync(
     nextLine,
     progress,
     isIntro: false,
+    isSongEnded,
   };
 }
 

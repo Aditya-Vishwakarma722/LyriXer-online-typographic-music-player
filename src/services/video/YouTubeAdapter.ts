@@ -94,6 +94,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
           origin: window.location.origin,
           vq: 'hd1440', // Request 1440p high definition default
           controls: 0, // Disable YouTube's own player controls so LyriXer custom player handles everything
+          showinfo: 0,
           disablekb: 1,
           cc_load_policy: 0, // Disable YouTube's own auto captions to prevent collision with LyriXer
           cc_lang_pref: 'none',

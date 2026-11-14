@@ -18,6 +18,7 @@ import {
   RotateCcw,
   X,
   Search,
+  Check,
 } from 'lucide-react';
 import type { VideoPlayerState } from '../../services/video/types';
 import type { TypographyPreset, UserPreferences } from '../../types/session';
@@ -489,7 +490,10 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                       setShowTypographyMenu(false);
                     }}
                   >
-                    {t.name}
+                    <span>{t.name}</span>
+                    {preferences.typographyPreset === t.id && (
+                      <Check size={14} className="popover-item-check" />
+                    )}
                   </button>
                 ))}
               </div>

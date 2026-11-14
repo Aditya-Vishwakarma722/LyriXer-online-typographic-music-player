@@ -63,106 +63,6 @@
   transform: scale(1.02);
 }
 
-/* Instrumental State */
-.kinetic-intro-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.kinetic-bars-eq {
-  display: flex;
-  align-items: flex-end;
-  gap: 5px;
-  height: 28px;
-}
-
-.kinetic-bars-eq .kb-bar {
-  width: 4px;
-  background: var(--accent-violet);
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 12px var(--accent-violet);
-  animation: eqBounce 1.2s ease-in-out infinite alternate;
-}
-
-.kinetic-bars-eq .kb-1 { height: 26px; animation-delay: 0.1s; }
-.kinetic-bars-eq .kb-2 { height: 14px; animation-delay: 0.35s; }
-.kinetic-bars-eq .kb-3 { height: 28px; animation-delay: 0.2s; }
-.kinetic-bars-eq .kb-4 { height: 18px; animation-delay: 0.45s; }
-
-@keyframes eqBounce {
-  0% { height: 6px; }
-  100% { height: 28px; }
-}
-
-.kinetic-intro-label {
-  font-size: 0.9375rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--accent-violet-light);
-  font-weight: 600;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
-}
-
-.kinetic-next-line-preview {
-  font-size: 0.84rem;
-  color: #C4B5FD;
-  font-style: italic;
-  max-width: 520px;
-  text-align: center;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-  margin-top: 4px;
-}
-
-.lyric-intro-banner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.lyric-instrumental-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
-  color: #A5A1AD;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4px 12px;
-  border-radius: var(--radius-xs, 2px);
-}
-
-.lyric-intro-first-line {
-  font-size: 0.8125rem;
-  color: #A5A1AD;
-  font-style: italic;
-}
-
-.list-sync-now-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #FFFFFF;
-  background: rgba(167, 139, 250, 0.2);
-  border: 1px solid rgba(167, 139, 250, 0.4);
-  padding: 6px 14px;
-  border-radius: var(--radius-xs, 2px);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.list-sync-now-btn:hover {
-  background: var(--accent-violet);
-  box-shadow: 0 0 14px rgba(167, 139, 250, 0.4);
-}
-
 .kinetic-sync-now-pill {
   display: inline-flex;
   align-items: center;
@@ -223,58 +123,154 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 26px;
   text-align: center;
   padding: 0 28px;
   will-change: transform;
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.5s ease;
 }
 
 .lyrics-focus-stack-track.no-transition {
   transition: none !important;
 }
 
+/* Pre-vocal state: completely leave screen open & clean while intro music plays */
+.lyrics-focus-stack-track.pre-vocal-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Song ended state: vanish lyrics at the end of the song with smooth fade-out animation */
+.lyrics-focus-stack-track.song-ended-hidden {
+  opacity: 0 !important;
+  transform: translate3d(0, -36px, 0) !important;
+  pointer-events: none !important;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 .preset-focus-stack {
   font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .preset-focus-stack .lyric-line-item {
   width: 100%;
-  max-width: 900px;
+  max-width: 920px;
   cursor: pointer;
-  padding: 10px 20px;
+  padding: 8px 20px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform, opacity, color, filter;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+  will-change: transform, opacity, filter;
+  transform-origin: center center;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.45s cubic-bezier(0.16, 1, 0.3, 1),
               color 0.25s ease,
               background 0.2s ease;
 }
 
-/* Active line: centered in middle, crystal sharp in focus, no blur, high contrast bold */
-.preset-focus-stack .lyric-line-item.lyric-active {
-  color: #FFFFFF !important;
-  opacity: 1 !important;
-  filter: blur(0px) !important;
-  transform: scale(1.05) !important;
+/* Non-vocal instrumental lines (e.g. musical markers, guitar solos) remain totally transparent */
+.preset-focus-stack .lyric-line-item.is-non-vocal {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Core typography metrics for both active and inactive lyric lines.
+   Ensures words NEVER wrap, reflow, or drop down when a line comes into focus! */
+.preset-focus-stack .lyric-text,
+.preset-focus-stack .lyric-text-container {
+  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: calc(clamp(2.4rem, 3.6vw, 3.1rem) * var(--lyric-font-scale, 1));
   font-weight: 800;
+  line-height: 1.34;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  text-align: center;
+  display: inline-block;
+  min-height: 1.34em;
+  position: relative;
+  max-width: 100%;
+  text-shadow: none;
+  transition: color 0.3s ease;
+}
+
+/* Individual word wrapper */
+.preset-focus-stack .lyric-word-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+  white-space: pre;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+/* Base un-sung word: crisp, pure translucent grey-white with subtle clean contour shadow */
+.preset-focus-stack .word-base {
+  position: relative;
+  display: inline-block;
+  vertical-align: baseline;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: rgba(255, 255, 255, 0.40);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.40);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  transition: color 0.2s ease;
+}
+
+/* Base text on unfocused lines: soft legible light grey with subtle contour shadow */
+.preset-focus-stack .lyric-line-item:not(.lyric-active) .word-base {
+  color: #E2E2E8;
+  -webkit-text-fill-color: #E2E2E8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+/* Sung word fill (left side of active line): pure sharp white glyphs without shadows
+   on the clipping layer, guaranteeing zero clipped bounding-box or tint artifacts! */
+.preset-focus-stack .word-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  vertical-align: baseline;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  white-space: pre;
+  color: #FFFFFF;
+  -webkit-text-fill-color: #FFFFFF;
+  text-shadow: none;
+  pointer-events: none;
+  will-change: clip-path;
+  transition: clip-path 0.08s linear;
+}
+
+/* Active line: centered in middle, crystal sharp in focus, unified Deep Glow and shadow on the unclipped container */
+.preset-focus-stack .lyric-line-item.lyric-active {
+  opacity: 1 !important;
+  filter: blur(0px) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5)) !important;
+  transform: scale(1.04) !important;
   z-index: 10;
 }
 
-.preset-focus-stack .lyric-line-item.lyric-active .lyric-text {
-  font-size: calc(clamp(2.7rem, 4.2vw, 3.4rem) * var(--lyric-font-scale, 1));
-  font-weight: 800;
-  line-height: 1.22;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-  -webkit-text-fill-color: #FFFFFF;
-  text-shadow: 0 4px 26px rgba(0, 0, 0, 0.98),
-               0 0 35px rgba(255, 255, 255, 0.4),
-               0 0 55px rgba(167, 139, 250, 0.35);
+.preset-focus-stack .lyric-line-item.lyric-active .lyric-text-container {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5),
+               0 0 20px rgba(255, 255, 255, 0.5),
+               0 0 35px rgba(167, 139, 250, 0.45),
+               0 0 70px rgba(124, 58, 237, 0.25);
 }
 
 /* Non-focus lines (both upcoming lines and lines that got passed):
@@ -316,14 +312,17 @@
 /* Hover state on any non-active line: clears blur on hover for easy reading/seeking */
 .preset-focus-stack .lyric-line-item:hover {
   filter: blur(0px) !important;
-  opacity: 0.80 !important;
+  opacity: 0.85 !important;
   transform: scale(1.02) !important;
   color: #FFFFFF !important;
   background: rgba(255, 255, 255, 0.06);
 }
 
-.preset-focus-stack .lyric-line-item:hover .lyric-text {
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.35);
+.preset-focus-stack .lyric-line-item:hover .lyric-text,
+.preset-focus-stack .lyric-line-item:hover .word-base {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 /* Default lyric line text size */
@@ -374,24 +373,6 @@
 @keyframes pulseDown {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(2px); }
-}
-
-.lyric-instrumental {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9375rem;
-  color: var(--accent-violet-light);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.instrumental-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-violet);
-  box-shadow: 0 0 10px var(--accent-violet);
 }
 
 /* 3. Empty & Loading States */
@@ -480,14 +461,12 @@
   }
 
   .preset-focus-stack .lyric-line-item {
-    padding: 8px 12px;
+    padding: 6px 12px;
   }
 
-  .preset-focus-stack .lyric-line-item.lyric-active .lyric-text {
-    font-size: calc(clamp(1.9rem, 6.0vw, 2.5rem) * var(--lyric-font-scale, 1));
-  }
-
-  .lyric-text {
-    font-size: calc(clamp(1.4rem, 4.4vw, 1.85rem) * var(--lyric-font-scale, 1));
+  .preset-focus-stack .lyric-text,
+  .preset-focus-stack .lyric-text-container {
+    font-size: calc(clamp(1.75rem, 5.4vw, 2.3rem) * var(--lyric-font-scale, 1));
+    line-height: 1.32;
   }
 }

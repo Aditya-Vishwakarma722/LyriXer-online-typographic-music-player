@@ -108,7 +108,18 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
   });
 
   // Sync hook (manualOffset shifts effective lyric time to compensate for music video intros)
-  const { activeIndex } = useLyricsSync(lyrics, playerState.currentTime, manualOffset);
+  const { activeIndex, progress, isSongEnded } = useLyricsSync(
+    lyrics,
+    playerState.currentTime,
+    manualOffset
+  );
+
+  const effectiveTime = Math.max(0, Number((playerState.currentTime - manualOffset).toFixed(2)));
+
+  const isPlaybackEnded =
+    playerState.status === 'ended' ||
+    (playerState.duration > 5 && playerState.currentTime >= playerState.duration - 0.6) ||
+    isSongEnded;
 
   /**
    * Applies manual timing offset adjustments (Fine Adjust Delay/Rush, Brackets [ ], etc.)
@@ -557,12 +568,10 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
           onAutoSync={handleAutoSync}
-          currentTime={playerState.currentTime}
+          currentTime={effectiveTime}
           duration={playerState.duration || source.duration || 0}
-          isEnded={
-            playerState.status === 'ended' ||
-            (playerState.duration > 5 && playerState.currentTime >= playerState.duration - 0.6)
-          }
+          isEnded={isPlaybackEnded}
+          progress={progress}
           trackTitle={trackInfo.title}
           trackArtist={effectiveArtist}
           onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
@@ -584,6 +593,10 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onUploadLrcClick={() => lrcFileInputRef.current?.click()}
           onSearchLrclibClick={() => setIsSearchModalOpen(true)}
           onAutoSync={handleAutoSync}
+          currentTime={effectiveTime}
+          duration={playerState.duration || source.duration || 0}
+          isEnded={isPlaybackEnded}
+          progress={progress}
         />
       )}
 
