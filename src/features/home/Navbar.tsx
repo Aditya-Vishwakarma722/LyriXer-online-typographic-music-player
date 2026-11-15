@@ -10,7 +10,7 @@ interface NavbarProps {
   activeView?: 'home' | 'artists';
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
+export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
   onOpenAbout,
   onOpenSettings,
   onOpenArtists,
@@ -107,4 +107,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
     </header>
   );
-};
+});
+
+Navbar.displayName = 'Navbar';

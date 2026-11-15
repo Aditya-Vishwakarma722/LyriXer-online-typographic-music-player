@@ -22,12 +22,19 @@ export interface TimedWord {
   end: number;   // 0.0 to 1.0 fraction of line progress
 }
 
+// In-memory cache to prevent re-splitting and re-weighting lyric lines 28 times per second
+const timedWordsCache = new Map<string, TimedWord[]>();
+
 /**
  * Splits a lyric line into individual words and computes proportionate
  * progress intervals [start, end] within [0, 1] based on word character weight.
  * This powers Spotify-style word-by-word active vocal illumination.
  */
 export function getTimedWords(text: string): TimedWord[] {
+  if (!text) return [];
+  const cached = timedWordsCache.get(text);
+  if (cached) return cached;
+
   const rawWords = (text || '').trim().split(/\s+/).filter(Boolean);
   if (rawWords.length === 0) return [];
 
@@ -36,13 +43,20 @@ export function getTimedWords(text: string): TimedWord[] {
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
 
   let current = 0;
-  return rawWords.map((word, i) => {
+  const result = rawWords.map((word, i) => {
     const fraction = weights[i] / totalWeight;
     const start = current;
     const end = Math.min(1, current + fraction);
     current = end;
     return { word, start, end };
   });
+
+  if (timedWordsCache.size > 600) {
+    const firstKey = timedWordsCache.keys().next().value;
+    if (firstKey) timedWordsCache.delete(firstKey);
+  }
+  timedWordsCache.set(text, result);
+  return result;
 }
 
 /**

@@ -53,7 +53,7 @@ interface PlayerControlsProps {
   onUpdatePreferences: (updates: Partial<UserPreferences>) => void;
 }
 
-export const PlayerControls: React.FC<PlayerControlsProps> = ({
+export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerControlsProps>(({
   playerState,
   title,
   artistName,
@@ -621,4 +621,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
       </div>
     </footer>
   );
-};
+});
+
+PlayerControls.displayName = 'PlayerControls';

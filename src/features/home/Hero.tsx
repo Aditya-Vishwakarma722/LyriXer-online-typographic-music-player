@@ -9,7 +9,7 @@ interface HeroProps {
   children?: React.ReactNode;
 }
 
-export const Hero: React.FC<HeroProps> = ({ children }) => {
+export const Hero: React.FC<HeroProps> = React.memo<HeroProps>(({ children }) => {
   return (
     <section className="hero-section" aria-label="Hero Introduction">
       <div className="hero-content">
@@ -75,4 +75,6 @@ export const Hero: React.FC<HeroProps> = ({ children }) => {
       </div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';

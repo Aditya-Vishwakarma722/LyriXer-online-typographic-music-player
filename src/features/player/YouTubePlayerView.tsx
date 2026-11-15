@@ -33,7 +33,7 @@ interface YouTubePlayerViewProps {
   progress?: number;
 }
 
-export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
+export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<YouTubePlayerViewProps>(({
   videoId,
   lyrics,
   activeIndex,
@@ -195,4 +195,6 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = ({
       )}
     </div>
   );
-};
+});
+
+YouTubePlayerView.displayName = 'YouTubePlayerView';

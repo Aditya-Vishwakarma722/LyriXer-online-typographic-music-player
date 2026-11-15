@@ -24,7 +24,7 @@ interface LyricsViewProps {
   progress?: number;
 }
 
-export const LyricsView: React.FC<LyricsViewProps> = ({
+export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>(({
   lyrics,
   activeIndex,
   isLoadingLyrics,
@@ -266,8 +266,8 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
           const distClass = distance <= 4 ? `dist-${distance}` : 'dist-far';
           const vocalClass = hasVocal ? 'is-vocal' : 'is-non-vocal';
 
-          // Word-by-word breakdown for authentic Spotify-style singing word fill
-          const timedWords = getTimedWords(line.text);
+          // Only compute timed words for the currently active vocal line to maximize 60/120fps smoothness
+          const timedWords = isActive ? getTimedWords(line.text) : null;
 
           return (
             <div
@@ -298,9 +298,9 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
             >
               {hasVocal ? (
                 <span className="lyric-text lyric-text-container">
-                  {timedWords.map((tw, wIdx) => {
-                    let wordProgress = 0;
-                    if (isActive) {
+                  {isActive && timedWords ? (
+                    timedWords.map((tw, wIdx) => {
+                      let wordProgress = 0;
                       if (activeLineProgress >= tw.end) {
                         wordProgress = 1;
                       } else if (activeLineProgress <= tw.start) {
@@ -308,36 +308,40 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
                       } else {
                         wordProgress = (activeLineProgress - tw.start) / (tw.end - tw.start);
                       }
-                    }
 
-                    return (
-                      <React.Fragment key={`${line.id}-w-${wIdx}`}>
-                        <span className="lyric-word-wrap">
-                          {/* Base un-sung word: dimmer grey */}
-                          <span className="word-base" aria-hidden="true">
-                            {tw.word}
-                          </span>
-
-                          {/* Current singing words: sharp white fill, clipped by wordProgress */}
-                          {isActive && wordProgress > 0 && (
-                            <span
-                              className="word-fill"
-                              style={{
-                                clipPath:
-                                  wordProgress >= 1
-                                    ? 'none'
-                                    : `inset(-20% ${((1 - wordProgress) * 100).toFixed(1)}% -20% 0)`,
-                              }}
-                            >
+                      return (
+                        <React.Fragment key={`${line.id}-w-${wIdx}`}>
+                          <span className="lyric-word-wrap">
+                            {/* Base un-sung word: dimmer grey */}
+                            <span className="word-base" aria-hidden="true">
                               {tw.word}
                             </span>
-                          )}
-                        </span>
-                        {/* Space between words */}
-                        {wIdx < timedWords.length - 1 ? ' ' : ''}
-                      </React.Fragment>
-                    );
-                  })}
+
+                            {/* Current singing words: sharp white fill, clipped by wordProgress */}
+                            {wordProgress > 0 && (
+                              <span
+                                className="word-fill"
+                                style={{
+                                  clipPath:
+                                    wordProgress >= 1
+                                      ? 'none'
+                                      : `inset(-20% ${((1 - wordProgress) * 100).toFixed(1)}% -20% 0)`,
+                                }}
+                              >
+                                {tw.word}
+                              </span>
+                            )}
+                          </span>
+                          {/* Space between words */}
+                          {wIdx < timedWords.length - 1 ? ' ' : ''}
+                        </React.Fragment>
+                      );
+                    })
+                  ) : (
+                    <span className="lyric-word-wrap">
+                      <span className="word-base">{line.text}</span>
+                    </span>
+                  )}
                 </span>
               ) : (
                 <span className="lyric-text lyric-text-spacer">&nbsp;</span>
@@ -369,4 +373,6 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
       </AnimatePresence>
     </div>
   );
-};
+});
+
+LyricsView.displayName = 'LyricsView';

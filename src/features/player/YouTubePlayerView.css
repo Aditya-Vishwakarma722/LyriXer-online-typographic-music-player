@@ -48,10 +48,11 @@
 }
 
 .yt-fullscreen-host iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  pointer-events: none;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  pointer-events: none !important;
+  display: block !important;
 }
 
 /* Top & bottom edge shields to guarantee zero YouTube UI or boundary artifacts ever peek through */
@@ -60,8 +61,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 56px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+  height: 72px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
   pointer-events: none;
   z-index: 3;
 }
@@ -71,8 +72,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 56px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+  height: 72px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
   pointer-events: none;
   z-index: 3;
 }

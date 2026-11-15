@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 
 import './ShinyText.css';
@@ -117,29 +117,49 @@ const ShinyText = ({
   const syncRef = useRef<(() => void) | null>(null);
   const content = children ?? text;
 
-  const settings: Settings = {
-    color,
-    shineColor,
-    speed: Math.max(0.1, speed),
-    delay: Math.max(0, delay),
-    angle,
-    shineWidth: clamp(shineWidth, 2, 200),
-    softness: clamp(softness, 0, 1),
-    bands: clamp(Math.round(bands), 1, 3),
-    glow: clamp(glow, 0, 1),
-    sign: direction === 'right' ? 1 : -1,
-    ease: EASINGS[easing as Easing] ?? EASINGS.smooth,
-    trigger: TRIGGERS.includes(trigger as Trigger) ? (trigger as Trigger) : 'loop',
-    yoyo,
-    followPointer,
-    pauseOnHover,
-    disabled
-  };
+  const settings = useMemo<Settings>(
+    () => ({
+      color,
+      shineColor,
+      speed: Math.max(0.1, speed),
+      delay: Math.max(0, delay),
+      angle,
+      shineWidth: clamp(shineWidth, 2, 200),
+      softness: clamp(softness, 0, 1),
+      bands: clamp(Math.round(bands), 1, 3),
+      glow: clamp(glow, 0, 1),
+      sign: direction === 'right' ? 1 : -1,
+      ease: EASINGS[easing as Easing] ?? EASINGS.smooth,
+      trigger: TRIGGERS.includes(trigger as Trigger) ? (trigger as Trigger) : 'loop',
+      yoyo,
+      followPointer,
+      pauseOnHover,
+      disabled,
+    }),
+    [
+      color,
+      shineColor,
+      speed,
+      delay,
+      angle,
+      shineWidth,
+      softness,
+      bands,
+      glow,
+      direction,
+      easing,
+      trigger,
+      yoyo,
+      followPointer,
+      pauseOnHover,
+      disabled,
+    ]
+  );
 
   useEffect(() => {
     settingsRef.current = settings;
     syncRef.current?.();
-  });
+  }, [settings]);
 
   useEffect(() => {
     const root = rootRef.current;

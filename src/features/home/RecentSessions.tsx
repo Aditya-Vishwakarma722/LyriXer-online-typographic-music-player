@@ -12,7 +12,7 @@ interface RecentSessionsProps {
   onSelectSession?: (source: VideoSource) => void;
 }
 
-export const RecentSessions: React.FC<RecentSessionsProps> = ({
+export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSessionsProps>(({
   sessions = [],
   onSelectSession,
 }) => {
@@ -143,4 +143,6 @@ export const RecentSessions: React.FC<RecentSessionsProps> = ({
       </div>
     </section>
   );
-};
+});
+
+RecentSessions.displayName = 'RecentSessions';
