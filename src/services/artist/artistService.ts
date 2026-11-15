@@ -87,6 +87,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Jarad Anthony Higgins (1998–2019), known professionally as Juice WRLD, was a celebrated American rapper, singer, and songwriter. Known for his raw emotional vulnerability, iconic freestyles, and genre-defining emo rap anthems, his music continues to resonate worldwide.',
     heroImageUrl: '/artists/juicewrld.jpg',
+    portraitImageUrl: '/artists/juicewrld-portrait.jpg',
     imageAttribution: 'Official studio master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UC0BletW9ph34lYD9zW61rqQ',
     tracks: [
@@ -285,6 +286,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Formed in London in 1997, Coldplay became one of the most celebrated rock bands in the world, known for emotive anthems and cinematic visuals.',
     heroImageUrl: '/artists/coldplay.jpg',
+    portraitImageUrl: '/artists/coldplay-portrait.jpg',
     imageAttribution: 'Official studio master band portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCStandardzVpD4PwtG_UaUuY5Xg',
     tracks: [
@@ -390,6 +392,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Legendary Parisian electronic duo Thomas Bangalter and Guy-Manuel de Homem-Christo, renowned for revolutionary synth aesthetics and robot personas.',
     heroImageUrl: '/artists/daftpunk.jpg',
+    portraitImageUrl: '/artists/daftpunk-portrait.jpg',
     imageAttribution: 'Official studio portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UC_kRDKYrUlrbtrSiyu5Tflg',
     tracks: [
@@ -485,6 +488,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'English singer-songwriter recognized globally for her powerful mezzo-soprano voice and universally resonant soul ballads.',
     heroImageUrl: '/artists/adele.jpg',
+    portraitImageUrl: '/artists/adele-portrait.jpg',
     imageAttribution: 'Live vocal performance portrait (2016)',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCsRM0YB_dabtEPGPTKo-gcw',
     tracks: [
@@ -564,6 +568,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Abel Tesfaye, known as The Weeknd, is a Canadian singer-songwriter acclaimed for sonic reinvention, dark atmospheric narratives, and record-shattering chart toppers.',
     heroImageUrl: '/artists/theweeknd.jpg',
+    portraitImageUrl: '/artists/theweeknd-portrait.jpg',
     imageAttribution: 'Official studio master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UC0WP5P-ufpRfjbNrmOWwLBQ',
     tracks: [
@@ -631,6 +636,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Iconic British rock band formed in London in 1970, fronted by the extraordinary Freddie Mercury, renowned for theatrical grandeur and enduring anthems.',
     heroImageUrl: '/artists/queen.jpg',
+    portraitImageUrl: '/artists/queen-portrait.jpg',
     imageAttribution: 'Elektra Records 1975 publicity master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCiMhD4jzUqG-IgPzUmmytRQ',
     tracks: [
@@ -710,6 +716,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Billie Eilish Pirate Baird O\'Connell is an American singer-songwriter. She first gained public attention in 2015 with her debut single "Ocean Eyes" and has since become one of the most successful pop artists of the 21st century.',
     heroImageUrl: '/artists/billieeilish.jpg',
+    portraitImageUrl: '/artists/billieeilish-portrait.jpg',
     imageAttribution: 'Hit Me Hard and Soft studio master (2024)',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCiGm_E4DwYPRCh48pgeV0PQ',
     tracks: [
@@ -749,6 +756,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Marshall Bruce Mathers III, known professionally as Eminem, is an American rapper credited with popularizing hip-hop in middle America and critically acclaimed as one of the greatest rappers of all time.',
     heroImageUrl: '/artists/eminem.jpg',
+    portraitImageUrl: '/artists/eminem-portrait.jpg',
     imageAttribution: 'Studio master portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCfM3zsQsOnfWNUppiycmBuw',
     tracks: [
@@ -788,6 +796,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Aubrey Drake Graham is a Canadian rapper, singer, and songwriter. An influential figure in contemporary popular music, he is credited for popularizing R&B sensibilities in hip-hop artists.',
     heroImageUrl: '/artists/drake.jpg',
+    portraitImageUrl: '/artists/drake-portrait.jpg',
     imageAttribution: 'Official press portrait',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCByOQJjav0CUDwxCk-jVNRQ',
     tracks: [
@@ -815,6 +824,7 @@ export const CURATED_ARTISTS: Record<string, ArtistProfile> = {
     verified: true,
     bio: 'Jahseh Dwayne Ricardo Onfroy (January 23, 1998 – June 18, 2018), known professionally as XXXTENTACION, was an influential American rapper and singer known for his raw emotion, boundary-pushing versatility, and genre-defining emo rap and rock sound.',
     heroImageUrl: '/artists/xxxtentacion.jpg',
+    portraitImageUrl: '/artists/xxxtentacion-portrait.jpg',
     heroImages: [
       '/artists/xxxtentacion-lookatme.jpg',
       '/artists/xxxtentacion.jpg',
@@ -1173,6 +1183,7 @@ export class ArtistService {
       verified: true,
       bio: webBio || baseProfile?.bio || `${trimmed} is an acclaimed musical artist.`,
       heroImageUrl: finalHeroUrl,
+      portraitImageUrl: baseProfile?.portraitImageUrl || finalHeroUrl,
       heroImages: webHeroImages.length > 0 ? webHeroImages : baseProfile?.heroImages,
       imageAttribution: webAttribution,
       youtubeChannelUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(trimmed + ' official music videos')}`,

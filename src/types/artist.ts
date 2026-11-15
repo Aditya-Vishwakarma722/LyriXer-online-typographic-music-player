@@ -23,6 +23,7 @@ export interface ArtistProfile {
   verified: boolean;
   bio?: string;
   heroImageUrl: string;
+  portraitImageUrl?: string; // Vertical 9:16 portrait image for Billboard-style artist panels
   heroImages?: string[]; // Multiple normal images aligned left-to-right for panoramic display
   imageAttribution: string;
   youtubeChannelUrl?: string;

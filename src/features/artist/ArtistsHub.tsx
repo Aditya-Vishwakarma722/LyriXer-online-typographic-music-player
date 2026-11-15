@@ -506,20 +506,19 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
                   }}
                   aria-label={`Explore ${artist.name}`}
                 >
-                  {/* High-Resolution Master Photography Backdrop */}
+                  {/* High-Resolution 9:16 Portrait Master Photography Backdrop */}
                   <div className="artist-card-backdrop">
                     <img
-                      src={artist.heroImageUrl}
+                      src={artist.portraitImageUrl || artist.heroImageUrl}
                       alt={artist.name}
                       className="artist-card-photo"
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
                     <div className="artist-card-gradient" />
-                    <div className="artist-card-vignette" />
                   </div>
 
-                  {/* Top Badges */}
+                  {/* Top Badge: Verified Official Artist (Listeners removed as requested) */}
                   <div className="artist-card-top">
                     {artist.verified && (
                       <span
@@ -530,52 +529,24 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
                         <span>Official Artist</span>
                       </span>
                     )}
-                    {artist.monthlyListeners && (
-                      <span className="card-listeners-badge">
-                        {artist.monthlyListeners
-                          .replace('monthly listeners', '')
-                          .trim()}
-                      </span>
-                    )}
                   </div>
 
-                  {/* Bottom Content Overlay with Authentic Artist Avatar Crest */}
+                  {/* Bottom Content Overlay - Billboard Style Editorial Overlay */}
                   <div className="artist-card-bottom">
-                    <div className="card-artist-identity">
-                      <div className="card-artist-avatar">
-                        <img
-                          src={artist.heroImageUrl}
-                          alt={artist.name}
-                          className="card-avatar-img"
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="card-avatar-ring" />
-                        {artist.verified && (
-                          <div
-                            className="card-avatar-check"
-                            title="Official Verified Artist"
-                          >
-                            <CheckCircle2 size={10} />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="card-artist-meta">
-                        <span className="card-genre">{artist.genre}</span>
-                        <h3 className="card-artist-name">{artist.name}</h3>
-                      </div>
+                    <div className="card-artist-meta">
+                      <span className="card-genre">{artist.genre}</span>
+                      <h3 className="card-artist-name">{artist.name}</h3>
                     </div>
 
                     <div className="card-footer-meta">
                       <span className="card-track-count">
-                        <Music size={12} />
-                        <span>{artist.tracks.length}+ Songs & Videos</span>
+                        <Music size={11} />
+                        <span>{artist.tracks.length}+ Songs</span>
                       </span>
 
                       <div className="card-action-btn">
                         <span>Explore</span>
-                        <Play size={11} fill="currentColor" />
+                        <Play size={10} fill="currentColor" />
                       </div>
                     </div>
                   </div>
