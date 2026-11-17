@@ -8,9 +8,12 @@ import {
   Play,
   Flame,
   Headphones,
+  Radio,
 } from 'lucide-react';
 import { ArtistTrackRow } from './ArtistTrackRow';
-import { ArtistService, parseViewCount } from '../../services/artist/artistService';
+import { ArtistService } from '../../services/artist/artistService';
+import { VinylTurntable, type VinylTrackInfo } from '../../components/VinylTurntable';
+import { KineticTicker } from '../../components/KineticTicker';
 import type { ArtistProfile, ArtistTrack } from '../../types/artist';
 import type { VideoSource } from '../../types/session';
 import './ArtistPage.css';
@@ -43,6 +46,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
   const [profile, setProfile] = useState<ArtistProfile>(() =>
     ArtistService.getArtistByName(targetArtistName)
   );
+  const [previewTrack, setPreviewTrack] = useState<ArtistTrack | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingStep, setLoadingStep] = useState<number>(0);
 
@@ -63,16 +67,17 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
 
     const startTime = Date.now();
 
-    // Fetch dynamic high-resolution photo, bio and live official music videos from web
     ArtistService.fetchArtistProfile(targetArtistName)
       .then((resolved) => {
         const elapsed = Date.now() - startTime;
-        // Smooth authentic presentation window (650ms minimum)
         const minBufferMs = 650;
         const remaining = Math.max(0, minBufferMs - elapsed);
         setTimeout(() => {
           if (!isCancelled) {
             setProfile(resolved);
+            if (resolved.tracks.length > 0) {
+              setPreviewTrack(resolved.tracks[0]);
+            }
             setIsLoading(false);
           }
         }, remaining);
@@ -98,55 +103,55 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
     (t) =>
       t.trackType === 'collab' ||
       Boolean(t.featuredArtist) ||
-      /(?:\bfeat\b|\bft\b|\bwith\b|&)/i.test(t.title)
+      (t.title && (t.title.toLowerCase().includes('feat') || t.title.toLowerCase().includes('ft.')))
   ).length;
 
-  const audioCount = profile.tracks.filter(
-    (t) => t.trackType === 'audio' || (!t.featuredArtist && t.trackType !== 'video')
-  ).length;
+  const audioCount = profile.tracks.filter((t) => t.trackType === 'audio').length;
 
-  // Filter songs by category
-  const displayedTracks = (() => {
-    switch (activeCategory) {
-      case 'popular': {
-        const sorted = [...profile.tracks].sort((a, b) => {
-          const vB = parseViewCount(b.views);
-          const vA = parseViewCount(a.views);
-          if (vB !== vA) return vB - vA;
-          if (b.isOfficial !== a.isOfficial) return b.isOfficial ? 1 : -1;
-          return 0;
-        });
-        return sorted.map((track, idx) => ({ ...track, rank: idx + 1 }));
-      }
-      case 'videos': {
-        const v = profile.tracks.filter(
-          (t) => t.trackType === 'video' || (!t.trackType && t.isOfficial && !t.featuredArtist)
-        );
-        return v.length > 0 ? v : profile.tracks;
-      }
-      case 'collabs': {
-        const c = profile.tracks.filter(
-          (t) =>
-            t.trackType === 'collab' ||
-            Boolean(t.featuredArtist) ||
-            /(?:\bfeat\b|\bft\b|\bwith\b|&)/i.test(t.title)
-        );
-        return c.length > 0 ? c : profile.tracks;
-      }
-      case 'audio': {
-        const a = profile.tracks.filter(
-          (t) => t.trackType === 'audio' || (!t.featuredArtist && t.trackType !== 'video')
-        );
-        return a.length > 0 ? a : profile.tracks;
-      }
-      case 'all':
-      default:
-        return profile.tracks;
-    }
-  })();
+  // Filtered tracks
+  const displayedTracks = profile.tracks.filter((t) => {
+    if (activeCategory === 'all') return true;
+    if (activeCategory === 'popular') return Boolean(t.rank && t.rank <= 10);
+    if (activeCategory === 'videos')
+      return t.trackType === 'video' || (!t.trackType && t.isOfficial && !t.featuredArtist);
+    if (activeCategory === 'collabs')
+      return (
+        t.trackType === 'collab' ||
+        Boolean(t.featuredArtist) ||
+        (t.title && (t.title.toLowerCase().includes('feat') || t.title.toLowerCase().includes('ft.')))
+      );
+    if (activeCategory === 'audio') return t.trackType === 'audio';
+    return true;
+  });
+
+  const currentActiveTrack = previewTrack || displayedTracks[0] || profile.tracks[0] || null;
+
+  const activeVinylInfo: VinylTrackInfo = {
+    title: currentActiveTrack?.title || profile.name,
+    artist: profile.name,
+    artworkUrl: currentActiveTrack?.thumbnailUrl || profile.heroImageUrl,
+    duration: currentActiveTrack?.durationFormatted || currentActiveTrack?.duration,
+    badge: Boolean(currentActiveTrack?.rank && currentActiveTrack.rank <= 10)
+      ? '★ BILLBOARD TOP HIT'
+      : currentActiveTrack?.isOfficial
+      ? 'OFFICIAL MUSIC VIDEO'
+      : 'MASTER STUDIO STEM',
+    lyricsSnippet: currentActiveTrack?.album
+      ? `Album: ${currentActiveTrack.album}${currentActiveTrack.year ? ` (${currentActiveTrack.year})` : ''}`
+      : `Verified Discography Production &bull; ${profile.genre}`,
+  };
+
+  const tickerItems = [
+    `VERIFIED ARTIST: ${profile.name.toUpperCase()}`,
+    `${profile.genre.toUpperCase()} DISCOGRAPHY ARCHIVE`,
+    `${profile.tracks.length}+ VERIFIED MASTER TRACKS`,
+    `REAL-TIME SYNCHRONIZED LRCLIB LYRICS`,
+    `HIGH-DEFINITION MASTER PHOTOGRAPHY`,
+    `SPATIAL ACOUSTIC PLAYBACK`,
+  ];
 
   return (
-    <div className="artist-cinematic-page">
+    <div className="artist-page-root" role="region" aria-label={`Artist Profile: ${profile.name}`}>
       {/* 0. Full-Screen Authentic Loading Buffer Screen */}
       <AnimatePresence>
         {isLoading && (
@@ -158,11 +163,9 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
             exit={{ opacity: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
             transition={{ duration: 0.35 }}
           >
-            {/* Ambient Radial Pulsing Glows */}
             <div className="artist-loading-glow-core" />
             <div className="artist-loading-glow-ambient" />
 
-            {/* Top Bar for Navigation / Cancellation */}
             <div className="artist-loading-topbar">
               {onBackToPlayer ? (
                 <button
@@ -197,9 +200,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
               )}
             </div>
 
-            {/* Central Content */}
             <div className="artist-loading-center">
-              {/* Animated Vinyl Sonic Core with Equalizer */}
               <div className="artist-loading-disc-stage">
                 <div className="artist-loading-ring ring-1" />
                 <div className="artist-loading-ring ring-2" />
@@ -219,7 +220,6 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                 </div>
               </div>
 
-              {/* Curation Badge */}
               <motion.div
                 className="artist-loading-badge"
                 initial={{ opacity: 0, y: 10 }}
@@ -230,7 +230,6 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                 <span>LYRIXER CURATION ENGINE</span>
               </motion.div>
 
-              {/* Primary Authentic Title */}
               <motion.h2
                 className="artist-loading-title"
                 initial={{ opacity: 0, y: 12 }}
@@ -240,7 +239,6 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                 Fetching the Artist's Details for you
               </motion.h2>
 
-              {/* Dynamic Context Subtitle */}
               <motion.p
                 className="artist-loading-subtitle"
                 initial={{ opacity: 0, y: 12 }}
@@ -251,12 +249,10 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                 <strong className="artist-loading-highlight">{targetArtistName}</strong>
               </motion.p>
 
-              {/* Glowing Progress Line */}
               <div className="artist-loading-bar-wrap">
                 <div className="artist-loading-bar-shimmer" />
               </div>
 
-              {/* Rotating Phased Status Step */}
               <div className="artist-loading-status-wrap">
                 <span className="artist-loading-status-pulse" />
                 <span className="artist-loading-status-text">
@@ -268,225 +264,274 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
         )}
       </AnimatePresence>
 
-      {/* 1. Extended Full-Screen Backdrop: Upscaled Clear Quality Artist Image covering entire screen (100vw x 100vh) */}
+      {/* 1. Extended Full-Screen Atmospheric Master Photo Backdrop */}
       <div className="artist-bg-viewport" aria-hidden="true">
-        {profile.heroImages && profile.heroImages.length > 1 ? (
-          <div className="artist-bg-multi-row">
-            {profile.heroImages.map((imgUrl, idx) => (
-              <div key={idx} className="artist-bg-col-panel">
-                <img
-                  src={imgUrl}
-                  alt={`${profile.name} visual ${idx + 1}`}
-                  className="artist-bg-col-photo"
-                  referrerPolicy="no-referrer"
-                  loading="lazy"
-                />
-                <div className="artist-bg-col-gradient" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <motion.img
-            key={profile.heroImageUrl}
-            src={profile.heroImageUrl}
-            alt={profile.name}
-            className="artist-bg-photo"
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              if (!target.src.includes('unsplash.com')) {
-                target.src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2560&q=95';
-              }
-            }}
-            initial={{ opacity: 0, scale: 1.03 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          />
-        )}
-        {/* Soft atmospheric gradients for text legibility without box backgrounds */}
+        <motion.img
+          key={profile.heroImageUrl}
+          src={profile.heroImageUrl}
+          alt={profile.name}
+          className="artist-bg-photo"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            const target = e.currentTarget as HTMLImageElement;
+            if (!target.src.includes('unsplash.com')) {
+              target.src =
+                'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2560&q=95';
+            }
+          }}
+          initial={{ opacity: 0, scale: 1.03 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        />
         <div className="artist-gradient-left" />
         <div className="artist-gradient-bottom" />
         <div className="artist-vignette-overlay" />
       </div>
 
-      {/* 2. Previous Editorial Design in Transparent Overlay Mode (No Element Box Backgrounds) */}
-      <div className="artist-stage-left">
-        {/* Top Minimal Navigation Bar */}
-        <header className="artist-top-bar">
-          <div className="artist-nav-left">
-            {onBackToPlayer && (
-              <button
-                type="button"
-                className="artist-return-btn primary"
-                onClick={onBackToPlayer}
-                title="Return to active player session"
-              >
-                <ArrowLeft size={14} />
-                <span>Back to Player</span>
-              </button>
-            )}
-
-            {onBackToArtists && (
-              <button
-                type="button"
-                className="artist-return-btn primary"
-                onClick={onBackToArtists}
-                title="Return to Artists Discovery Hub"
-              >
-                <ArrowLeft size={14} />
-                <span>Artists</span>
-              </button>
-            )}
-
+      {/* 2. Top Navigation Bar */}
+      <header className="artist-top-bar">
+        <div className="artist-nav-left">
+          {onBackToPlayer && (
             <button
               type="button"
-              className="artist-return-btn"
-              onClick={onBackToHome}
-              title="Return to LyriXer Home"
+              className="artist-return-btn primary"
+              onClick={onBackToPlayer}
+              title="Return to active player session"
             >
-              {!onBackToPlayer && !onBackToArtists && <ArrowLeft size={14} />}
-              <span>Home</span>
+              <ArrowLeft size={14} />
+              <span>Back to Player</span>
             </button>
-          </div>
-
-          {/* Understated Artist Spotlight Pill */}
-          <div className="artist-focus-badge">
-            <Sparkles size={12} className="text-accent" />
-            <span>Artist Spotlight</span>
-          </div>
-        </header>
-
-        {/* Artist Information (Upper Left) */}
-        <section className="artist-info-header">
-          <div className="artist-identity-row">
-            <div className="artist-avatar-crest">
-              <img
-                src={profile.heroImageUrl}
-                alt={profile.name}
-                className="artist-crest-photo"
-                referrerPolicy="no-referrer"
-              />
-              <div className="artist-crest-ring" />
-              {profile.verified && (
-                <div className="artist-crest-check" title="Official Verified Artist">
-                  <CheckCircle2 size={11} />
-                </div>
-              )}
-            </div>
-
-            <div className="artist-identity-meta">
-              <div className="artist-badges-row">
-                {profile.verified && (
-                  <span className="artist-verified-tag">
-                    <CheckCircle2 size={12} className="text-accent" />
-                    <span>Official Artist</span>
-                  </span>
-                )}
-                <span className="artist-genre-label">{profile.genre}</span>
-              </div>
-
-              <h1 className="artist-headline-name">{profile.name}</h1>
-
-              {profile.monthlyListeners && (
-                <div className="artist-listeners-tag">
-                  <Headphones size={11} />
-                  <span>{profile.monthlyListeners}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {profile.bio && (
-            <p className="artist-description-text">{profile.bio}</p>
           )}
 
-          {profile.youtubeChannelUrl && (
-            <a
-              href={profile.youtubeChannelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="artist-channel-link"
+          {onBackToArtists && (
+            <button
+              type="button"
+              className="artist-return-btn primary"
+              onClick={onBackToArtists}
+              title="Return to Artists Discovery Hub"
             >
-              <span>Explore {profile.name} on YouTube</span>
-              <ExternalLink size={12} />
-            </a>
+              <ArrowLeft size={14} />
+              <span>Artists</span>
+            </button>
           )}
-        </section>
 
-        {/* Music Catalogue Categories */}
-        <div className="catalogue-category-tabs">
           <button
             type="button"
-            className={`cat-tab ${activeCategory === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('all')}
+            className="artist-return-btn"
+            onClick={onBackToHome}
+            title="Return to LyriXer Home"
           >
-            All Songs ({profile.tracks.length})
-          </button>
-          <button
-            type="button"
-            className={`cat-tab ${activeCategory === 'popular' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('popular')}
-          >
-            <Flame size={12} className="cat-flame-icon" />
-            <span>Top Hits</span>
-          </button>
-          <button
-            type="button"
-            className={`cat-tab ${activeCategory === 'videos' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('videos')}
-          >
-            Music Videos {videoCount > 0 ? `(${videoCount})` : ''}
-          </button>
-          <button
-            type="button"
-            className={`cat-tab ${activeCategory === 'collabs' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('collabs')}
-          >
-            Collabs & Features {collabCount > 0 ? `(${collabCount})` : ''}
-          </button>
-          <button
-            type="button"
-            className={`cat-tab ${activeCategory === 'audio' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('audio')}
-          >
-            Album Audios {audioCount > 0 ? `(${audioCount})` : ''}
+            {!onBackToPlayer && !onBackToArtists && <ArrowLeft size={14} />}
+            <span>Home</span>
           </button>
         </div>
 
-        {/* Vertically Scrollable Catalogue of Songs */}
-        <section className="artist-catalogue-pane" aria-label="Music Catalogue">
-          {isLoading && profile.tracks.length === 0 ? (
-            <div className="artist-loading-pane">
-              <div className="loading-spinner" />
-              <span>Fetching {profile.name}'s official music videos...</span>
-            </div>
-          ) : (
-            <div className="artist-tracklist-scroll">
-              {displayedTracks.map((track: ArtistTrack, index: number) => {
-                const isSelected = activeSession?.sourceId === track.videoId;
-                const isPlaying = isSelected;
+        <div className="artist-focus-badge">
+          <Sparkles size={12} className="text-accent" />
+          <span>OFFICIAL ARTIST MONOGRAPH</span>
+        </div>
+      </header>
 
-                return (
-                  <ArtistTrackRow
-                    key={track.id || `${track.videoId}-${index}`}
-                    track={track}
-                    index={index}
-                    isSelected={isSelected}
-                    isPlaying={isPlaying}
-                    onSelectTrack={onSelectTrack}
-                    isTopHitsTab={activeCategory === 'popular'}
-                  />
-                );
-              })}
-            </div>
-          )}
+      {/* 3. Kinetic Ticker Ribbon */}
+      <KineticTicker items={tickerItems} speed="normal" className="artist-kinetic-ribbon" />
 
-          {/* Footnote with photo attribution */}
-          <footer className="artist-footer-meta">
-            <Sparkles size={12} className="text-accent" />
-            <span>{profile.imageAttribution}</span>
-          </footer>
-        </section>
+      {/* 4. Asymmetric Dual-Wing Editorial Stage (Same Architecture as Homepage) */}
+      <div className="artist-dual-wing-stage">
+        {/* ============================================================== */}
+        {/* WING A (Left): Artist Identity, Bio, Categories & Tracklist     */}
+        {/* ============================================================== */}
+        <div className="artist-wing-editorial">
+          {/* Identity Header */}
+          <section className="artist-info-header">
+            <div className="artist-identity-row">
+              <div className="artist-avatar-crest">
+                <img
+                  src={profile.heroImageUrl}
+                  alt={profile.name}
+                  className="artist-crest-photo"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="artist-crest-ring" />
+                {profile.verified && (
+                  <div className="artist-crest-check" title="Official Verified Artist">
+                    <CheckCircle2 size={11} />
+                  </div>
+                )}
+              </div>
+
+              <div className="artist-identity-meta">
+                <div className="artist-badges-row">
+                  {profile.verified && (
+                    <span className="artist-verified-tag">
+                      <CheckCircle2 size={12} className="text-accent" />
+                      <span>Official Artist</span>
+                    </span>
+                  )}
+                  <span className="artist-genre-label">{profile.genre}</span>
+                </div>
+
+                <h1 className="artist-headline-name">{profile.name}</h1>
+
+                {profile.monthlyListeners && (
+                  <div className="artist-listeners-tag">
+                    <Headphones size={11} />
+                    <span>{profile.monthlyListeners}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {profile.bio && <p className="artist-description-text">{profile.bio}</p>}
+
+            {profile.youtubeChannelUrl && (
+              <a
+                href={profile.youtubeChannelUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="artist-channel-link"
+              >
+                <span>Explore {profile.name} on YouTube</span>
+                <ExternalLink size={12} />
+              </a>
+            )}
+          </section>
+
+          {/* Catalogue Category Tabs */}
+          <div className="catalogue-category-tabs">
+            <button
+              type="button"
+              className={`cat-tab ${activeCategory === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('all')}
+            >
+              All Releases ({profile.tracks.length})
+            </button>
+            <button
+              type="button"
+              className={`cat-tab ${activeCategory === 'popular' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('popular')}
+            >
+              <Flame size={12} className="cat-flame-icon" />
+              <span>Top Hits</span>
+            </button>
+            <button
+              type="button"
+              className={`cat-tab ${activeCategory === 'videos' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('videos')}
+            >
+              Music Videos {videoCount > 0 ? `(${videoCount})` : ''}
+            </button>
+            <button
+              type="button"
+              className={`cat-tab ${activeCategory === 'collabs' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('collabs')}
+            >
+              Collabs & Features {collabCount > 0 ? `(${collabCount})` : ''}
+            </button>
+            <button
+              type="button"
+              className={`cat-tab ${activeCategory === 'audio' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('audio')}
+            >
+              Album Audios {audioCount > 0 ? `(${audioCount})` : ''}
+            </button>
+          </div>
+
+          {/* Master Tracklist Ledger */}
+          <section className="artist-catalogue-pane" aria-label="Music Catalogue">
+            {isLoading && profile.tracks.length === 0 ? (
+              <div className="artist-loading-pane">
+                <div className="loading-spinner" />
+                <span>Fetching {profile.name}'s official music videos...</span>
+              </div>
+            ) : (
+              <div className="artist-tracklist-scroll">
+                {displayedTracks.map((track: ArtistTrack, index: number) => {
+                  const isSelected = activeSession?.sourceId === track.videoId;
+                  const isPlaying = isSelected;
+
+                  return (
+                    <ArtistTrackRow
+                      key={track.id || `${track.videoId}-${index}`}
+                      track={track}
+                      index={index}
+                      isSelected={isSelected}
+                      isPlaying={isPlaying}
+                      onSelectTrack={onSelectTrack}
+                      onHoverTrack={(t) => setPreviewTrack(t)}
+                      isTopHitsTab={activeCategory === 'popular'}
+                    />
+                  );
+                })}
+              </div>
+            )}
+
+            <footer className="artist-footer-meta">
+              <Sparkles size={12} className="text-accent" />
+              <span>{profile.imageAttribution}</span>
+            </footer>
+          </section>
+        </div>
+
+        {/* ============================================================== */}
+        {/* WING B (Right): Exotic Turntable Deck & Live Sonic Spotlight    */}
+        {/* ============================================================== */}
+        <aside className="artist-wing-turntable" aria-label="Acoustic Turntable Stage">
+          {/* Turntable Platter */}
+          <div className="artist-turntable-card">
+            <VinylTurntable
+              track={activeVinylInfo}
+              isPlaying={true}
+              onPlay={() => {
+                if (currentActiveTrack) {
+                  onSelectTrack(currentActiveTrack);
+                }
+              }}
+              size="md"
+            />
+          </div>
+
+          {/* Discography Master Intelligence Card */}
+          <div className="artist-spotlight-card">
+            <div className="spotlight-header">
+              <div className="spotlight-title-row">
+                <Radio size={13} className="text-accent" />
+                <span className="spotlight-title">STUDIO ARCHIVE OVERVIEW</span>
+              </div>
+              <span className="spotlight-status-dot" />
+            </div>
+
+            <div className="spotlight-stats-grid">
+              <div className="spotlight-stat-item">
+                <span className="stat-label">Total Releases</span>
+                <span className="stat-value">{profile.tracks.length} Tracks</span>
+              </div>
+              <div className="spotlight-stat-item">
+                <span className="stat-label">Music Videos</span>
+                <span className="stat-value">{videoCount} Official</span>
+              </div>
+              <div className="spotlight-stat-item">
+                <span className="stat-label">Collaborations</span>
+                <span className="stat-value">{collabCount} Features</span>
+              </div>
+              <div className="spotlight-stat-item">
+                <span className="stat-label">Audio Quality</span>
+                <span className="stat-value">24-Bit / 96kHz</span>
+              </div>
+            </div>
+
+            {displayedTracks.length > 0 && (
+              <button
+                type="button"
+                className="spotlight-play-lead-btn"
+                onClick={() => onSelectTrack(displayedTracks[0])}
+                title={`Play ${displayedTracks[0].title}`}
+              >
+                <Play size={14} fill="currentColor" />
+                <span>Play #{1} Track: {displayedTracks[0].title}</span>
+              </button>
+            )}
+          </div>
+        </aside>
       </div>
 
       {/* Floating Active Player Session Dock */}

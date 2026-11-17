@@ -1,0 +1,494 @@
+.vinyl-turntable-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+/* Atmospheric Ambient Radial Glow */
+.turntable-ambient-glow {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.18) 0%, rgba(124, 58, 237, 0.05) 50%, transparent 75%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.turntable-radial-pulse {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  border: 1px dashed rgba(167, 139, 250, 0.22);
+  pointer-events: none;
+  animation: pulseRings 8s linear infinite;
+  z-index: 1;
+}
+
+@keyframes pulseRings {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.96);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) scale(1.04);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(0.96);
+    opacity: 0.3;
+  }
+}
+
+/* Platter Base */
+.turntable-platter-base {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #08080A 0%, #101015 85%, #050507 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8),
+              0 0 40px rgba(167, 139, 250, 0.12),
+              inset 0 0 24px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: transform var(--transition-normal);
+}
+
+.turntable-platter-base:hover {
+  border-color: rgba(167, 139, 250, 0.35);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.9),
+              0 0 50px rgba(167, 139, 250, 0.22);
+}
+
+/* Tonearm Assembly */
+.turntable-tonearm {
+  position: absolute;
+  top: -8px;
+  right: -24px;
+  width: 110px;
+  height: 180px;
+  pointer-events: none;
+  z-index: 10;
+  transform-origin: 85% 15%;
+  transform: rotate(-12deg);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.turntable-tonearm.tonearm-active {
+  transform: rotate(18deg);
+}
+
+.tonearm-pivot {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2D2D36 0%, #16161D 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pivot-screw {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C4B5FD;
+  box-shadow: 0 0 8px rgba(196, 181, 253, 0.6);
+}
+
+.tonearm-rod {
+  position: absolute;
+  top: 26px;
+  right: 22px;
+  width: 3px;
+  height: 130px;
+  background: linear-gradient(180deg, #A5A1AD 0%, #4E4B56 100%);
+  transform-origin: top center;
+  transform: rotate(12deg);
+  border-radius: 2px;
+}
+
+.tonearm-headshell {
+  position: absolute;
+  bottom: -4px;
+  left: -5px;
+  width: 14px;
+  height: 22px;
+  background: #1C1B24;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  border-radius: 2px;
+  transform: rotate(-25deg);
+}
+
+.stylus-cartridge {
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  width: 10px;
+  height: 5px;
+  background: #A78BFA;
+  border-radius: 1px;
+}
+
+.stylus-light {
+  position: absolute;
+  bottom: -3px;
+  left: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 8px #C4B5FD, 0 0 16px #A78BFA;
+}
+
+/* Vinyl Disc */
+.vinyl-disc {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: #0E0E12;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vinyl-disc.spinning {
+  animation: spinVinyl 6s linear infinite;
+}
+
+.vinyl-disc.paused {
+  animation: spinVinyl 6s linear infinite;
+  animation-play-state: paused;
+}
+
+@keyframes spinVinyl {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Microgrooves */
+.vinyl-grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 2px,
+    transparent 3px,
+    transparent 5px
+  );
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Sheen */
+.vinyl-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.vinyl-sheen.sheen-1 {
+  background: conic-gradient(
+    from 45deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.08) 40deg,
+    transparent 80deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.08) 220deg,
+    transparent 260deg,
+    transparent 360deg
+  );
+}
+
+.vinyl-sheen.sheen-2 {
+  background: conic-gradient(
+    from 135deg,
+    transparent 0deg,
+    rgba(167, 139, 250, 0.06) 30deg,
+    transparent 60deg,
+    transparent 180deg,
+    rgba(167, 139, 250, 0.06) 210deg,
+    transparent 240deg,
+    transparent 360deg
+  );
+}
+
+/* Center Label */
+.vinyl-center-label {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #23232C;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  background: #181820;
+}
+
+.label-artwork {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.label-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #1A1A24;
+}
+
+.fallback-icon {
+  color: var(--accent-violet-light);
+}
+
+.label-ring {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
+.spindle-hole {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #060608;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.9);
+}
+
+/* Hover / Play Trigger */
+.turntable-play-trigger {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(11, 11, 15, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  cursor: pointer;
+  z-index: 12;
+}
+
+.turntable-platter-base:hover .turntable-play-trigger {
+  opacity: 1;
+}
+
+.trigger-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--accent-violet-deep);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.4), 0 0 20px rgba(167, 139, 250, 0.3);
+  transform: translateY(4px);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.turntable-platter-base:hover .trigger-pill {
+  transform: translateY(0);
+}
+
+.trigger-pill:hover {
+  background: #8B5CF6;
+  transform: scale(1.05);
+}
+
+/* Meta Banner */
+.turntable-meta-banner {
+  margin-top: 24px;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 3;
+}
+
+.meta-badge-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.meta-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs, 2px);
+  text-transform: uppercase;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 8px #34D399;
+  animation: blinkLive 2s ease-in-out infinite;
+}
+
+@keyframes blinkLive {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.meta-eq-indicator {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.meta-eq-indicator .eq-bar {
+  width: 2px;
+  background: #A78BFA;
+  border-radius: 1px;
+  animation: eqBounce 1.2s ease-in-out infinite alternate;
+}
+
+.meta-eq-indicator .bar-1 { height: 40%; animation-delay: 0.1s; }
+.meta-eq-indicator .bar-2 { height: 80%; animation-delay: 0.3s; }
+.meta-eq-indicator .bar-3 { height: 100%; animation-delay: 0.15s; }
+.meta-eq-indicator .bar-4 { height: 60%; animation-delay: 0.4s; }
+
+@keyframes eqBounce {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+.meta-track-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 380px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta-track-artist {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.meta-lyric-snippet {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.16);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  max-width: 360px;
+}
+
+.snippet-sparkle {
+  color: #A78BFA;
+  flex-shrink: 0;
+}
+
+.snippet-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Size Variants */
+.vinyl-turntable-root.size-sm .turntable-platter-base {
+  width: 200px;
+  height: 200px;
+}
+.vinyl-turntable-root.size-sm .vinyl-disc {
+  width: 175px;
+  height: 175px;
+}
+.vinyl-turntable-root.size-sm .vinyl-center-label {
+  width: 70px;
+  height: 70px;
+}
+.vinyl-turntable-root.size-sm .turntable-tonearm {
+  transform: scale(0.75) rotate(-10deg);
+  right: -30px;
+}
+
+.vinyl-turntable-root.size-lg .turntable-platter-base {
+  width: 320px;
+  height: 320px;
+}
+.vinyl-turntable-root.size-lg .vinyl-disc {
+  width: 290px;
+  height: 290px;
+}
+.vinyl-turntable-root.size-lg .vinyl-center-label {
+  width: 110px;
+  height: 110px;
+}

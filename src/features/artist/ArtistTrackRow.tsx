@@ -9,6 +9,7 @@ interface ArtistTrackRowProps {
   isSelected: boolean;
   isPlaying: boolean;
   onSelectTrack: (track: ArtistTrack) => void;
+  onHoverTrack?: (track: ArtistTrack) => void;
   isTopHitsTab?: boolean;
 }
 
@@ -18,6 +19,7 @@ export const ArtistTrackRow: React.FC<ArtistTrackRowProps> = ({
   isSelected,
   isPlaying,
   onSelectTrack,
+  onHoverTrack,
   isTopHitsTab = false,
 }) => {
   const displayRank = track.rank || index + 1;
@@ -28,6 +30,7 @@ export const ArtistTrackRow: React.FC<ArtistTrackRowProps> = ({
         isTopHitsTab ? 'is-top-hit-row' : ''
       }`}
       onClick={() => onSelectTrack(track)}
+      onMouseEnter={() => onHoverTrack?.(track)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {

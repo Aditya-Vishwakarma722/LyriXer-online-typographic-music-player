@@ -1,18 +1,18 @@
-.artist-cinematic-page {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+.artist-page-root {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
   background-color: #08080B;
   color: #F5F4F7;
-  overflow: hidden;
+  overflow-x: hidden;
   display: flex;
+  flex-direction: column;
   z-index: 100;
 }
 
 /* 1. Extended Full-Screen Backdrop: Upscaled Clear Quality Artist Image covering entire screen (100vw x 100vh) */
 .artist-bg-viewport {
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
@@ -32,55 +32,16 @@
   transform: translateZ(0);
 }
 
-/* Multi-Image Panoramic Normal Images Aligned Left-to-Right */
-.artist-bg-multi-row {
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  inset: 0;
-}
-
-.artist-bg-col-panel {
-  flex: 1;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.artist-bg-col-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 25%;
-  filter: contrast(1.05) brightness(0.92) saturate(1.08);
-  transform: translateZ(0);
-}
-
-.artist-bg-col-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(8, 8, 11, 0.45) 0%,
-    rgba(8, 8, 11, 0.15) 40%,
-    rgba(8, 8, 11, 0.75) 100%
-  );
-  pointer-events: none;
-}
-
 /* Atmospheric Gradients for text legibility without requiring element box backgrounds */
 .artist-gradient-left {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(8, 8, 11, 0.9) 0%,
-    rgba(8, 8, 11, 0.78) 32%,
-    rgba(8, 8, 11, 0.45) 58%,
-    rgba(8, 8, 11, 0.12) 82%,
+    rgba(8, 8, 11, 0.94) 0%,
+    rgba(8, 8, 11, 0.82) 36%,
+    rgba(8, 8, 11, 0.5) 60%,
+    rgba(8, 8, 11, 0.15) 85%,
     transparent 100%
   );
   pointer-events: none;
@@ -91,8 +52,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 160px;
-  background: linear-gradient(180deg, transparent 0%, rgba(8, 8, 11, 0.95) 100%);
+  height: 180px;
+  background: linear-gradient(180deg, transparent 0%, rgba(8, 8, 11, 0.98) 100%);
   pointer-events: none;
 }
 
@@ -108,29 +69,19 @@
   pointer-events: none;
 }
 
-/* 2. Previous Editorial Design in Transparent Overlay Mode (No Element Box Backgrounds) */
-.artist-stage-left {
-  position: relative;
-  z-index: 10;
-  width: 48vw;
-  min-width: 480px;
-  max-width: 720px;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 32px 48px 24px;
-  background: transparent;
-  backdrop-filter: none;
-}
-
-/* Top Minimal Navigation Bar */
+/* 2. Top Navigation Bar */
 .artist-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-shrink: 0;
+  padding: 18px 48px;
+  background: rgba(8, 8, 11, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .artist-nav-left {
@@ -178,37 +129,65 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
   color: #C4B5FD;
   background: rgba(167, 139, 250, 0.1);
   border: 1px solid rgba(167, 139, 250, 0.25);
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: var(--radius-xs, 2px);
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* 3. Kinetic Ticker Ribbon */
+.artist-kinetic-ribbon {
+  border-top: none;
+  background: rgba(14, 14, 18, 0.5);
+}
+
+/* 4. Asymmetric Dual-Wing Editorial Stage (Matching Homepage Architecture) */
+.artist-dual-wing-stage {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 36px 48px 90px 48px;
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 56px;
+  align-items: start;
+}
+
+/* ============================================================== */
+/* WING A: Editorial Monograph & Catalogue Tracklist              */
+/* ============================================================== */
+.artist-wing-editorial {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 /* Artist Information (Upper Left) */
 .artist-info-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-shrink: 0;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .artist-identity-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .artist-avatar-crest {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 72px;
+  height: 72px;
   border-radius: var(--radius-xs, 2px);
   flex-shrink: 0;
 }
@@ -220,23 +199,23 @@
   object-fit: cover;
   object-position: center 25%;
   border: 1.5px solid rgba(167, 139, 250, 0.45);
-  box-shadow: 0 0 20px rgba(167, 139, 250, 0.35);
+  box-shadow: 0 0 24px rgba(167, 139, 250, 0.35);
 }
 
 .artist-crest-ring {
   position: absolute;
-  inset: -3px;
+  inset: -4px;
   border-radius: var(--radius-xs, 2px);
-  border: 1px dashed rgba(167, 139, 250, 0.3);
+  border: 1px dashed rgba(167, 139, 250, 0.35);
   pointer-events: none;
 }
 
 .artist-crest-check {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 16px;
-  height: 16px;
+  bottom: -3px;
+  right: -3px;
+  width: 18px;
+  height: 18px;
   border-radius: 2px;
   background: var(--accent-violet);
   color: #08080B;
@@ -249,13 +228,8 @@
 .artist-identity-meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
-}
-
-.cat-flame-icon {
-  color: #F59E0B;
-  flex-shrink: 0;
 }
 
 .artist-badges-row {
@@ -269,60 +243,65 @@
   align-items: center;
   gap: 5px;
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #C4B5FD;
   background: rgba(167, 139, 250, 0.14);
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: var(--radius-xs, 2px);
   border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
 .artist-genre-label {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   color: #A5A1AD;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .artist-headline-name {
   font-family: var(--font-display);
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: clamp(2.4rem, 4.2vw, 3.4rem);
+  font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.05;
   color: #FFFFFF;
-  margin: 2px 0;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.6);
+  margin: 0;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
 }
 
 .artist-listeners-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.75rem;
   color: #C4B5FD;
   font-weight: 500;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .artist-description-text {
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  line-height: 1.6;
   color: #D1CFD7;
-  max-width: 540px;
+  max-width: 620px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+  margin: 0;
 }
 
 .artist-channel-link {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.75rem;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
   color: #C4B5FD;
-  margin-top: 2px;
+  margin-top: 4px;
   transition: color var(--transition-fast);
 }
 
@@ -335,23 +314,28 @@
 .catalogue-category-tabs {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding-bottom: 8px;
+  gap: 20px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 10px;
+  margin-bottom: 16px;
   flex-shrink: 0;
+  overflow-x: auto;
 }
 
 .cat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.8125rem;
   font-weight: 500;
   color: #8E8A96;
   cursor: pointer;
   background: transparent;
   border: none;
-  padding: 4px 0;
+  padding: 6px 0;
   position: relative;
   transition: color var(--transition-fast);
+  white-space: nowrap;
 }
 
 .cat-tab:hover {
@@ -366,24 +350,26 @@
 .cat-tab.active::after {
   content: '';
   position: absolute;
-  bottom: -9px;
+  bottom: -13px;
   left: 0;
   right: 0;
   height: 2px;
   background: var(--accent-violet);
-  box-shadow: 0 0 8px var(--accent-violet);
+  box-shadow: 0 0 10px var(--accent-violet);
+}
+
+.cat-flame-icon {
+  color: #F59E0B;
 }
 
 /* Vertically Scrollable Catalogue of Songs */
 .artist-catalogue-pane {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 480px;
 }
 
 .artist-loading-pane {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -391,11 +377,12 @@
   gap: 12px;
   color: #A5A1AD;
   font-size: 0.84rem;
+  padding: 80px 0;
 }
 
 .loading-spinner {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border: 2px solid rgba(167, 139, 250, 0.2);
   border-top-color: var(--accent-violet);
   border-radius: 50%;
@@ -409,19 +396,22 @@
 }
 
 .artist-tracklist-scroll {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 640px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 6px;
+  padding-right: 8px;
 }
 
 .artist-tracklist-scroll::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .artist-tracklist-scroll::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .artist-tracklist-scroll::-webkit-scrollbar-thumb:hover {
@@ -432,27 +422,142 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.6875rem;
+  font-size: 0.72rem;
   color: #8E8A96;
-  padding-top: 10px;
-  flex-shrink: 0;
+  padding-top: 16px;
+}
+
+/* ============================================================== */
+/* WING B: Turntable Deck & Spotlight Intelligence                */
+/* ============================================================== */
+.artist-wing-turntable {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.artist-turntable-card {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Discography Intelligence Card */
+.artist-spotlight-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(18, 18, 22, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 6px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+}
+
+.spotlight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.spotlight-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spotlight-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-violet-light);
+  text-transform: uppercase;
+}
+
+.spotlight-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 8px #34D399;
+}
+
+.spotlight-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.spotlight-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm, 4px);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.spotlight-play-lead-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--accent-violet-deep);
+  color: #FFFFFF;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+}
+
+.spotlight-play-lead-btn:hover {
+  background: #8B5CF6;
+  transform: translateY(-1px);
 }
 
 /* Floating Active Session Continuity Dock */
 .artist-active-session-dock {
-  position: absolute;
+  position: fixed;
   bottom: 24px;
   right: 28px;
-  z-index: 50;
+  z-index: 90;
   display: flex;
   align-items: center;
   gap: 18px;
   padding: 10px 18px;
-  background: rgba(20, 19, 25, 0.9);
+  background: rgba(20, 19, 25, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(167, 139, 250, 0.35);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-full);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(167, 139, 250, 0.15);
 }
 
@@ -465,7 +570,7 @@
 .dock-live-dot {
   width: 8px;
   height: 8px;
-  border-radius: 2px;
+  border-radius: 50%;
   background: var(--accent-violet);
   box-shadow: 0 0 10px var(--accent-violet);
 }
@@ -499,7 +604,7 @@
   color: #FFFFFF;
   background: var(--accent-violet-deep);
   padding: 6px 14px;
-  border-radius: var(--radius-xs, 2px);
+  border-radius: var(--radius-full);
   transition: background var(--transition-fast);
   cursor: pointer;
   border: none;
@@ -509,30 +614,9 @@
   background: var(--accent-violet);
 }
 
-/* Responsive Behavior */
-@media (max-width: 960px) {
-  .artist-stage-left {
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    padding: 24px 20px;
-  }
-
-  .artist-headline-name {
-    font-size: 2.25rem;
-  }
-
-  .artist-active-session-dock {
-    bottom: 16px;
-    right: 16px;
-    left: 16px;
-    justify-content: space-between;
-  }
-}
-
-/* -------------------------------------------------------------
-   Full-Screen Authentic Loading Buffer Screen
-   ------------------------------------------------------------- */
+/* ============================================================== */
+/* Full-Screen Authentic Loading Buffer Screen                    */
+/* ============================================================== */
 .artist-loading-screen {
   position: fixed;
   inset: 0;
@@ -550,7 +634,6 @@
   user-select: none;
 }
 
-/* Ambient Radial Glows */
 .artist-loading-glow-core {
   position: absolute;
   top: 46%;
@@ -582,7 +665,6 @@
   pointer-events: none;
 }
 
-/* Navigation / Cancel Top Bar */
 .artist-loading-topbar {
   position: absolute;
   top: 32px;
@@ -590,7 +672,6 @@
   z-index: 210;
 }
 
-/* Central Content Container */
 .artist-loading-center {
   position: relative;
   z-index: 205;
@@ -602,7 +683,6 @@
   padding: 0 24px;
 }
 
-/* Concentric Rings & Sonic Stage */
 .artist-loading-disc-stage {
   position: relative;
   width: 260px;
@@ -639,7 +719,6 @@
   border: 1px solid rgba(167, 139, 250, 0.08);
 }
 
-/* Vinyl Disc & Grooves */
 .artist-loading-disc {
   position: relative;
   width: 116px;
@@ -685,7 +764,6 @@
   z-index: 2;
 }
 
-/* Audio Equalizer Bars */
 .artist-loading-eq-bars {
   display: flex;
   align-items: center;
@@ -700,32 +778,32 @@
   animation: eqBounce 0.9s ease-in-out infinite alternate;
 }
 
-.artist-loading-eq-bars .eq-bar.bar-1 {
-  animation-delay: 0.0s;
-  height: 6px;
+.artist-loading-eq-bars .eq-bar.bar-1 { animation-delay: 0.0s; height: 6px; }
+.artist-loading-eq-bars .eq-bar.bar-2 { animation-delay: 0.22s; height: 16px; }
+.artist-loading-eq-bars .eq-bar.bar-3 { animation-delay: 0.44s; height: 22px; }
+.artist-loading-eq-bars .eq-bar.bar-4 { animation-delay: 0.16s; height: 14px; }
+.artist-loading-eq-bars .eq-bar.bar-5 { animation-delay: 0.32s; height: 8px; }
+
+@keyframes eqBounce {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
 }
 
-.artist-loading-eq-bars .eq-bar.bar-2 {
-  animation-delay: 0.22s;
-  height: 16px;
+@keyframes loadingGlowPulse {
+  0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
 }
 
-.artist-loading-eq-bars .eq-bar.bar-3 {
-  animation-delay: 0.44s;
-  height: 22px;
+@keyframes loadingRingPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.06); opacity: 0.85; }
 }
 
-.artist-loading-eq-bars .eq-bar.bar-4 {
-  animation-delay: 0.16s;
-  height: 14px;
+@keyframes loadingRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.artist-loading-eq-bars .eq-bar.bar-5 {
-  animation-delay: 0.32s;
-  height: 8px;
-}
-
-/* Curation Engine Badge */
 .artist-loading-badge {
   display: inline-flex;
   align-items: center;
@@ -742,68 +820,52 @@
   margin-bottom: 14px;
 }
 
-/* Main Loading Typography */
 .artist-loading-title {
   font-family: var(--font-display);
   font-size: 2.15rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin: 0 0 10px;
-  background: linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 45%, #C084FC 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 24px rgba(168, 85, 247, 0.25);
+  color: #FFFFFF;
+  margin: 0 0 10px 0;
 }
 
 .artist-loading-subtitle {
   font-size: 0.95rem;
-  color: #94A3B8;
-  margin: 0 0 24px;
-  line-height: 1.55;
+  color: #9CA3AF;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
 }
 
 .artist-loading-highlight {
-  color: #F8FAFC;
+  color: #EDE9FE;
   font-weight: 600;
-  text-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
 }
 
-/* Glowing Progress Shimmer Line */
 .artist-loading-bar-wrap {
-  width: 280px;
-  height: 2px;
+  width: 240px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
-  position: relative;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .artist-loading-bar-shimmer {
-  position: absolute;
-  inset: 0;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    #A855F7 50%,
-    #E9D5FF 85%,
-    transparent 100%
-  );
-  border-radius: 2px;
-  animation: loadingShimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  background: linear-gradient(90deg, transparent, #C084FC, transparent);
+  animation: loadingShimmer 1.4s ease-in-out infinite;
 }
 
-/* Dynamic Phased Status Step */
+@keyframes loadingShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
 .artist-loading-status-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: #CBD5E1;
-  letter-spacing: 0.02em;
+  gap: 8px;
 }
 
 .artist-loading-status-pulse {
@@ -812,102 +874,43 @@
   border-radius: 50%;
   background: #A855F7;
   box-shadow: 0 0 8px #A855F7;
-  animation: loadingDotPulse 1.4s ease-in-out infinite;
 }
 
-/* Loading Animations */
-@keyframes loadingGlowPulse {
-  0%, 100% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(0.96);
-  }
-  50% {
-    opacity: 0.95;
-    transform: translate(-50%, -50%) scale(1.06);
-  }
+.artist-loading-status-text {
+  font-size: 0.78rem;
+  color: #A5A1AD;
+  font-family: var(--font-mono);
 }
 
-@keyframes loadingRingPulse {
-  0%, 100% {
-    opacity: 0.35;
-    transform: scale(0.98);
+/* ============================================================== */
+/* Responsive Design                                              */
+/* ============================================================== */
+@media (max-width: 1024px) {
+  .artist-dual-wing-stage {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 24px 24px 80px 24px;
   }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.02);
-  }
-}
 
-@keyframes loadingRotate {
-  from {
-    transform: rotate(0deg);
+  .artist-top-bar {
+    padding: 16px 24px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .artist-wing-turntable {
+    position: static;
   }
 }
 
-@keyframes eqBounce {
-  0% {
-    height: 4px;
-    opacity: 0.5;
-  }
-  100% {
-    height: 22px;
-    opacity: 1;
-  }
-}
-
-@keyframes loadingShimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(250%);
-  }
-}
-
-@keyframes loadingDotPulse {
-  0%, 100% {
-    transform: scale(0.85);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.25);
-    opacity: 1;
-    box-shadow: 0 0 12px #C084FC;
-  }
-}
-
-/* Responsive adjustments for mobile loading */
 @media (max-width: 640px) {
-  .artist-loading-topbar {
-    top: 20px;
-    left: 20px;
+  .artist-dual-wing-stage {
+    padding: 20px 16px 80px 16px;
   }
 
-  .artist-loading-title {
-    font-size: 1.6rem;
+  .artist-top-bar {
+    padding: 14px 16px;
   }
 
-  .artist-loading-subtitle {
-    font-size: 0.85rem;
-  }
-
-  .artist-loading-disc-stage {
-    width: 200px;
-    height: 200px;
-    margin-bottom: 20px;
-  }
-
-  .artist-loading-ring.ring-2 {
-    width: 170px;
-    height: 170px;
-  }
-
-  .artist-loading-ring.ring-3 {
-    width: 200px;
-    height: 200px;
+  .artist-headline-name {
+    font-size: 2rem;
   }
 }
-

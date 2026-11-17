@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, Music2, Play, FileVideo } from 'lucide-react';
+import { History, Play, FileVideo, Disc3 } from 'lucide-react';
 import { YoutubeIcon } from '../../components/ui/Icons';
 import SpotlightCard from '../../components/reactbits/SpotlightCard';
 import type { RecentSession, VideoSource } from '../../types/session';
@@ -31,14 +31,24 @@ export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSe
   };
 
   return (
-    <section className="recent-section" aria-label="Recently Played Sessions">
+    <section className="recent-section" aria-label="Studio Vault & Recent Sessions">
       <div className="recent-container">
         {/* Section Header */}
         <div className="recent-header">
           <div className="recent-title-group">
-            <Clock size={15} className="recent-header-icon" />
-            <h2 className="recent-heading">Recently Played</h2>
+            <div className="recent-label-row">
+              <History size={12} className="recent-label-icon" />
+              <span className="recent-label-tag">STUDIO VAULT ARCHIVE</span>
+            </div>
+            <h2 className="recent-heading">Recent Playback Sessions</h2>
           </div>
+
+          {displaySessions.length > 0 && (
+            <div className="recent-count-badge">
+              <Disc3 size={12} className="count-disc-icon" />
+              <span>{displaySessions.length} {displaySessions.length === 1 ? 'Record' : 'Records'} Cached</span>
+            </div>
+          )}
         </div>
 
         {/* Content: Empty State vs Cards */}
@@ -54,10 +64,11 @@ export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSe
               transition={{ duration: 0.25 }}
             >
               <div className="empty-state-icon-wrap">
-                <Music2 size={18} className="empty-state-icon" />
+                <Disc3 size={24} className="empty-state-icon" />
               </div>
+              <h3 className="empty-state-title">Your Studio Vault is Empty</h3>
               <p className="empty-state-text">
-                No recent sessions yet. Start playing a track or select a video to begin.
+                Paste any YouTube music video link or spin a curated record above to initiate your first synchronized lyrics session.
               </p>
             </motion.div>
           ) : (
@@ -104,6 +115,7 @@ export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSe
                     <div className="thumbnail-overlay">
                       <div className="play-pill">
                         <Play size={12} fill="currentColor" />
+                        <span>Resume</span>
                       </div>
                     </div>
                   </div>

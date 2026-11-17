@@ -3,6 +3,8 @@ import { AtmosphericBackground } from './components/AtmosphericBackground';
 import { Navbar } from './features/home/Navbar';
 import { Hero } from './features/home/Hero';
 import { VideoInput } from './features/home/VideoInput';
+import { KineticTicker } from './components/KineticTicker';
+import { CuratedShowcase } from './features/home/CuratedShowcase';
 import { RecentSessions } from './features/home/RecentSessions';
 import { Footer } from './features/home/Footer';
 import { AboutModal } from './features/home/AboutModal';
@@ -243,10 +245,15 @@ export const App: React.FC = () => {
             activeView="home"
           />
 
-          {/* Main Page Layout */}
+          {/* Main Page Layout - Exotic Asymmetric Composition */}
           <main className="main-viewport">
-            {/* Centered Hero & Video Input */}
-            <Hero>
+            {/* Asymmetric Dual-Wing Editorial Stage with Interactive Holographic Turntable & Input Console */}
+            <Hero
+              onQuickSpin={(src) => {
+                setPreviousView('home');
+                handleStartSession(src);
+              }}
+            >
               <VideoInput
                 onStartSession={(src) => {
                   setPreviousView('home');
@@ -255,7 +262,21 @@ export const App: React.FC = () => {
               />
             </Hero>
 
-            {/* Quiet Recently Played Area */}
+            {/* Kinetic Audio Engine Marquee Ticker */}
+            <KineticTicker />
+
+            {/* Exotic Curated Soundscapes & Master Productions Exhibition */}
+            <CuratedShowcase
+              onStartSession={(src) => {
+                setPreviousView('home');
+                handleStartSession(src);
+              }}
+              onOpenArtist={(artistName) => {
+                handleOpenArtist(artistName);
+              }}
+            />
+
+            {/* Studio Archives & Recent Sessions Shelf */}
             <RecentSessions
               sessions={recentSessions}
               onSelectSession={(src) => {
