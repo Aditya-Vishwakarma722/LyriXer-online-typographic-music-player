@@ -1,5 +1,5 @@
-import React from 'react';
-import { Play, ShieldCheck, Users, Disc3, Flame } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, ShieldCheck, Users, Disc3, Flame, Music2 } from 'lucide-react';
 import type { ArtistTrack } from '../../types/artist';
 import './ArtistTrackRow.css';
 
@@ -23,6 +23,28 @@ export const ArtistTrackRow: React.FC<ArtistTrackRowProps> = ({
   isTopHitsTab = false,
 }) => {
   const displayRank = track.rank || index + 1;
+  const [thumbSrc, setThumbSrc] = useState<string>(track.thumbnailUrl || '');
+  const [hasError, setHasError] = useState(false);
+
+  const handleImgError = () => {
+    if (thumbSrc.includes('hqdefault.jpg') && track.videoId) {
+      setThumbSrc(`https://img.youtube.com/vi/${track.videoId}/mqdefault.jpg`);
+    } else {
+      setHasError(true);
+    }
+  };
+
+  const handleImgLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    // YouTube returns a 120x90 image (gray TV with 3 dots) when a thumbnail is missing
+    if (img.naturalWidth <= 120 && img.naturalHeight <= 90) {
+      if (thumbSrc.includes('hqdefault.jpg') && track.videoId) {
+        setThumbSrc(`https://img.youtube.com/vi/${track.videoId}/mqdefault.jpg`);
+      } else {
+        setHasError(true);
+      }
+    }
+  };
 
   return (
     <div
@@ -62,18 +84,24 @@ export const ArtistTrackRow: React.FC<ArtistTrackRowProps> = ({
         </div>
       </div>
 
-      {/* Video Thumbnail */}
-      {track.thumbnailUrl && (
-        <div className="track-thumb-col">
+      {/* Video Thumbnail with Anti-Placeholder Fallback */}
+      <div className="track-thumb-col">
+        {!hasError && thumbSrc ? (
           <img
-            src={track.thumbnailUrl}
+            src={thumbSrc}
             alt={track.title}
             className="track-thumb-img"
             loading="lazy"
             referrerPolicy="no-referrer"
+            onError={handleImgError}
+            onLoad={handleImgLoad}
           />
-        </div>
-      )}
+        ) : (
+          <div className="track-thumb-fallback" title={track.title}>
+            <Music2 size={15} className="thumb-fallback-icon" />
+          </div>
+        )}
+      </div>
 
       {/* Title & Metadata */}
       <div className="track-info-col">
