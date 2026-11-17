@@ -1,0 +1,146 @@
+.brand-logo-root {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  user-select: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.brand-logo-root:hover {
+  transform: translateY(-1px);
+}
+
+/* Soundmark Box */
+.brand-glyph-box {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs, 2px);
+  background: rgba(18, 18, 24, 0.85);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6),
+              0 0 16px rgba(167, 139, 250, 0.18);
+  transition: all var(--transition-fast);
+  overflow: visible;
+}
+
+.brand-logo-root:hover .brand-glyph-box {
+  border-color: rgba(167, 139, 250, 0.65);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7),
+              0 0 24px rgba(167, 139, 250, 0.35);
+  transform: scale(1.04);
+}
+
+.brand-glyph-svg {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  z-index: 2;
+  transition: transform var(--transition-normal);
+}
+
+.brand-logo-root:hover .brand-glyph-svg {
+  transform: rotate(15deg);
+}
+
+.brand-glyph-ambient {
+  position: absolute;
+  inset: -6px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.35) 0%, transparent 70%);
+  filter: blur(8px);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.brand-logo-root:hover .brand-glyph-ambient {
+  opacity: 1;
+}
+
+/* Typographic Wordmark in Syne */
+.brand-wordmark-text {
+  font-family: var(--font-brand, 'Syne', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: baseline;
+  line-height: 1;
+}
+
+.wordmark-lyri {
+  color: #FFFFFF;
+  letter-spacing: -0.045em;
+}
+
+.wordmark-x {
+  color: #C4B5FD;
+  font-weight: 800;
+  text-shadow: 0 0 16px rgba(196, 181, 253, 0.6), 0 0 30px rgba(167, 139, 250, 0.4);
+  margin: 0 0.5px;
+  display: inline-block;
+  transform: translateY(-0.5px);
+  transition: transform var(--transition-fast), text-shadow var(--transition-fast);
+}
+
+.brand-logo-root:hover .wordmark-x {
+  transform: translateY(-1px) scale(1.08);
+  text-shadow: 0 0 20px #FFFFFF, 0 0 36px rgba(167, 139, 250, 0.8);
+}
+
+.wordmark-er {
+  color: #F3F0F9;
+  letter-spacing: -0.04em;
+}
+
+/* Pro Tag */
+.brand-pro-tag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs, 2px);
+  text-transform: uppercase;
+}
+
+/* Sizing */
+.brand-logo-root.size-sm {
+  gap: 8px;
+}
+.brand-logo-root.size-sm .brand-glyph-box {
+  width: 28px;
+  height: 28px;
+}
+.brand-logo-root.size-sm .brand-glyph-svg {
+  width: 18px;
+  height: 18px;
+}
+.brand-logo-root.size-sm .brand-wordmark-text {
+  font-size: 1.15rem;
+}
+
+.brand-logo-root.size-lg {
+  gap: 16px;
+}
+.brand-logo-root.size-lg .brand-glyph-box {
+  width: 44px;
+  height: 44px;
+}
+.brand-logo-root.size-lg .brand-glyph-svg {
+  width: 28px;
+  height: 28px;
+}
+.brand-logo-root.size-lg .brand-wordmark-text {
+  font-size: 1.75rem;
+}

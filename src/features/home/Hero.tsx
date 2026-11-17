@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Radio, Music4, Zap, ShieldCheck } from 'lucide-react';
-import { VinylTurntable, type VinylTrackInfo } from '../../components/VinylTurntable';
+import { AcousticPrismDeck, type PrismTrackInfo } from '../../components/AcousticPrismDeck';
 import ShinyText from '../../components/reactbits/ShinyText';
 import type { VideoSource } from '../../types/session';
 import './Hero.css';
@@ -11,7 +11,7 @@ interface HeroProps {
   onQuickSpin?: (source: VideoSource) => void;
 }
 
-const HERO_DEMO_TRACKS: (VinylTrackInfo & { videoId: string })[] = [
+const HERO_DEMO_TRACKS: (PrismTrackInfo & { videoId: string })[] = [
   {
     title: 'Lean With Me',
     artist: 'Juice WRLD',
@@ -129,7 +129,7 @@ export const Hero: React.FC<HeroProps> = React.memo<HeroProps>(({ children, onQu
           >
             <div className="crate-header">
               <Sparkles size={12} className="crate-sparkle" />
-              <span className="crate-label">INSTANT VINYL AUDITIONS:</span>
+              <span className="crate-label">INSTANT SPATIAL AUDITIONS:</span>
             </div>
 
             <div className="crate-pills-list">
@@ -172,17 +172,17 @@ export const Hero: React.FC<HeroProps> = React.memo<HeroProps>(({ children, onQu
         </div>
 
         {/* ============================================================== */}
-        {/* WING B: The Exotic Turntable Deck & Spatial Master Terminal     */}
+        {/* WING B: Spatial Acoustic Prism Deck & Master Terminal          */}
         {/* ============================================================== */}
         <div className="hero-wing-turntable">
-          {/* Interactive Holographic Turntable Platter */}
+          {/* Interactive Holographic Acoustic Prism Deck */}
           <motion.div
             className="hero-turntable-container"
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           >
-            <VinylTurntable
+            <AcousticPrismDeck
               track={activeDemo}
               isPlaying={true}
               onPlay={handleSpinDemo}

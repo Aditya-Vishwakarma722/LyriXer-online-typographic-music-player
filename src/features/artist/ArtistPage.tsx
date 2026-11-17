@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import { ArtistTrackRow } from './ArtistTrackRow';
 import { ArtistService } from '../../services/artist/artistService';
-import { VinylTurntable, type VinylTrackInfo } from '../../components/VinylTurntable';
+import { BrandLogo } from '../../components/ui/BrandLogo';
+import { AcousticPrismDeck, type PrismTrackInfo } from '../../components/AcousticPrismDeck';
 import { KineticTicker } from '../../components/KineticTicker';
 import type { ArtistProfile, ArtistTrack } from '../../types/artist';
 import type { VideoSource } from '../../types/session';
@@ -126,7 +127,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
 
   const currentActiveTrack = previewTrack || displayedTracks[0] || profile.tracks[0] || null;
 
-  const activeVinylInfo: VinylTrackInfo = {
+  const activePrismInfo: PrismTrackInfo = {
     title: currentActiveTrack?.title || profile.name,
     artist: profile.name,
     artworkUrl: currentActiveTrack?.thumbnailUrl || profile.heroImageUrl,
@@ -206,16 +207,13 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                 <div className="artist-loading-ring ring-2" />
                 <div className="artist-loading-ring ring-3" />
 
-                <div className="artist-loading-disc">
-                  <div className="artist-loading-disc-grooves" />
-                  <div className="artist-loading-disc-center">
-                    <div className="artist-loading-eq-bars">
-                      <span className="eq-bar bar-1" />
-                      <span className="eq-bar bar-2" />
-                      <span className="eq-bar bar-3" />
-                      <span className="eq-bar bar-4" />
-                      <span className="eq-bar bar-5" />
-                    </div>
+                <div className="artist-loading-prism-core">
+                  <div className="artist-loading-eq-bars">
+                    <span className="eq-bar bar-1" />
+                    <span className="eq-bar bar-2" />
+                    <span className="eq-bar bar-3" />
+                    <span className="eq-bar bar-4" />
+                    <span className="eq-bar bar-5" />
                   </div>
                 </div>
               </div>
@@ -291,6 +289,8 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
       {/* 2. Top Navigation Bar */}
       <header className="artist-top-bar">
         <div className="artist-nav-left">
+          <BrandLogo size="sm" onClick={onBackToHome} className="artist-header-brand" />
+
           {onBackToPlayer && (
             <button
               type="button"
@@ -473,13 +473,13 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
         </div>
 
         {/* ============================================================== */}
-        {/* WING B (Right): Exotic Turntable Deck & Live Sonic Spotlight    */}
+        {/* WING B (Right): Acoustic Prism Deck & Live Sonic Spotlight      */}
         {/* ============================================================== */}
-        <aside className="artist-wing-turntable" aria-label="Acoustic Turntable Stage">
-          {/* Turntable Platter */}
+        <aside className="artist-wing-turntable" aria-label="Acoustic Spatial Audio Stage">
+          {/* Spatial Audio Prism Deck */}
           <div className="artist-turntable-card">
-            <VinylTurntable
-              track={activeVinylInfo}
+            <AcousticPrismDeck
+              track={activePrismInfo}
               isPlaying={true}
               onPlay={() => {
                 if (currentActiveTrack) {

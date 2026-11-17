@@ -52,35 +52,25 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
           <defs>
             {/* Violet Radial Gradient for Ring 1 */}
             <radialGradient id="ringGrad1" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.22" />
-              <stop offset="60%" stopColor="#7C3AED" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#0B0B0D" stopOpacity="0" />
+              <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.14" />
+              <stop offset="60%" stopColor="#6D28D9" stopOpacity="0.04" />
+              <stop offset="100%" stopColor="#08080B" stopOpacity="0" />
             </radialGradient>
 
             {/* Linear Gradient for Inner Ring Stroke */}
             <linearGradient id="strokeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C4B5FD" stopOpacity="0.25" />
-              <stop offset="50%" stopColor="#8B5CF6" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="#6366F1" stopOpacity="0.03" />
+              <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.18" />
+              <stop offset="50%" stopColor="#7C3AED" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#4338CA" stopOpacity="0.02" />
             </linearGradient>
 
             {/* Linear Gradient for Middle Ring Stroke */}
             <linearGradient id="strokeGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.18" />
-              <stop offset="50%" stopColor="#7C3AED" stopOpacity="0.06" />
-              <stop offset="100%" stopColor="#4C1D95" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.14" />
+              <stop offset="50%" stopColor="#5B21B6" stopOpacity="0.05" />
+              <stop offset="100%" stopColor="#1E1B4B" stopOpacity="0.01" />
             </linearGradient>
-
-            {/* Outer Diffuse Gradient */}
-            <radialGradient id="outerFill" cx="50%" cy="50%" r="50%">
-              <stop offset="20%" stopColor="#8B5CF6" stopOpacity="0.12" />
-              <stop offset="65%" stopColor="#4C1D95" stopOpacity="0.04" />
-              <stop offset="100%" stopColor="#0B0B0D" stopOpacity="0" />
-            </radialGradient>
           </defs>
-
-          {/* Central diffuse fill */}
-          <circle cx="500" cy="500" r="320" fill="url(#outerFill)" />
 
           {/* Innermost ring */}
           <circle
@@ -88,9 +78,9 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
             cy="500"
             r="160"
             stroke="url(#strokeGrad1)"
-            strokeWidth="1.2"
+            strokeWidth="1.1"
             strokeDasharray="4 8"
-            opacity="0.6"
+            opacity="0.45"
           />
 
           {/* Inner Accent Ring */}
@@ -99,8 +89,8 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
             cy="500"
             r="230"
             stroke="url(#strokeGrad1)"
-            strokeWidth="1.4"
-            opacity="0.8"
+            strokeWidth="1.2"
+            opacity="0.5"
           />
 
           {/* Middle Concentric Ring */}
@@ -109,8 +99,8 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
             cy="500"
             r="320"
             stroke="url(#strokeGrad2)"
-            strokeWidth="1.2"
-            opacity="0.75"
+            strokeWidth="1"
+            opacity="0.4"
           />
 
           {/* Middle Outer Dashed Ring */}
@@ -119,9 +109,9 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
             cy="500"
             r="400"
             stroke="url(#strokeGrad2)"
-            strokeWidth="1"
+            strokeWidth="0.9"
             strokeDasharray="6 12"
-            opacity="0.5"
+            opacity="0.3"
           />
 
           {/* Outer Horizon Ring */}
@@ -131,7 +121,7 @@ export const HaloBackground: React.FC<HaloBackgroundProps> = ({ enablePulse = tr
             r="480"
             stroke="url(#strokeGrad2)"
             strokeWidth="0.8"
-            opacity="0.3"
+            opacity="0.2"
           />
         </svg>
       </motion.div>

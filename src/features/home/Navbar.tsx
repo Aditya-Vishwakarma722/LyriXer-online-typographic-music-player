@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Info, Mic2, Home } from 'lucide-react';
+import { SlidersHorizontal, Info, Mic2, Home, Radio } from 'lucide-react';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import './Navbar.css';
 
 interface NavbarProps {
@@ -30,35 +31,30 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
   return (
     <header className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-content">
-        {/* Brand Wordmark */}
-        <a
-          href="#home"
-          className="navbar-brand"
-          aria-label="LyriXer Home"
-          onClick={(e) => {
-            if (onOpenHome) {
-              e.preventDefault();
-              onOpenHome();
-            }
-          }}
-        >
-          <div className="navbar-logo-glyph">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="rgba(167, 139, 250, 0.4)" strokeWidth="1.2" />
-              <path
-                d="M6 12h2c.8 0 1.2-4 2.4-4s1.6 8 2.8 8 1.6-6 2.4-6 1.2 3 2 3h2.4"
-                stroke="#A78BFA"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="12" cy="12" r="1.8" fill="#F5F5F5" />
-            </svg>
-          </div>
-          <span className="navbar-wordmark">LyriXer</span>
-        </a>
+        {/* Redesigned LyriXer Brandmark */}
+        <div className="navbar-brand-wrap">
+          <BrandLogo
+            size="md"
+            onClick={onOpenHome}
+            className="navbar-brand-interactive"
+          />
+        </div>
 
-        {/* Minimal Navigation */}
+        {/* Center Live Acoustic Engine Beacon */}
+        <div className="navbar-center-beacon" aria-hidden="true">
+          <div className="beacon-chip">
+            <span className="beacon-indicator-dot" />
+            <Radio size={12} className="beacon-radio-icon" />
+            <span className="beacon-chip-label">24-BIT / 96kHz SPATIAL AUDIO</span>
+            <div className="beacon-mini-eq">
+              <span className="eq-bar bar-1" />
+              <span className="eq-bar bar-2" />
+              <span className="eq-bar bar-3" />
+            </div>
+          </div>
+        </div>
+
+        {/* Elevated Navigation Controls */}
         <nav className="navbar-nav" aria-label="Main Navigation">
           {onOpenHome && activeView === 'artists' && (
             <button
@@ -67,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
               onClick={onOpenHome}
               aria-label="Home"
             >
-              <Home size={15} className="navbar-link-icon" />
+              <Home size={14} className="navbar-link-icon" />
               <span>Home</span>
             </button>
           )}
@@ -79,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
               onClick={onOpenArtists}
               aria-label="Artists Catalogue"
             >
-              <Mic2 size={15} className="navbar-link-icon" />
+              <Mic2 size={14} className="navbar-link-icon" />
               <span>Artists</span>
             </button>
           )}
@@ -90,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
             onClick={onOpenAbout}
             aria-label="About LyriXer"
           >
-            <Info size={15} className="navbar-link-icon" />
+            <Info size={14} className="navbar-link-icon" />
             <span>About</span>
           </button>
 
@@ -100,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
             onClick={onOpenSettings}
             aria-label="Application Settings"
           >
-            <SlidersHorizontal size={15} className="navbar-link-icon" />
+            <SlidersHorizontal size={14} className="navbar-link-icon" />
             <span>Settings</span>
           </button>
         </nav>

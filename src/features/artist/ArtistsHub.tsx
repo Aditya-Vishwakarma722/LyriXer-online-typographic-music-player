@@ -10,8 +10,11 @@ import {
   Music,
   Headphones,
   Mic2,
+  Radio,
 } from 'lucide-react';
 import { CURATED_ARTISTS } from '../../services/artist/artistService';
+import { KineticTicker } from '../../components/KineticTicker';
+import ShinyText from '../../components/reactbits/ShinyText';
 import type { VideoSource } from '../../types/session';
 import './ArtistsHub.css';
 
@@ -22,20 +25,26 @@ interface ArtistsHubProps {
   onResumePlayer?: () => void;
 }
 
-type GenreFilter = 'all' | 'hiphop' | 'rnb' | 'rock' | 'electronic' | 'pop';
+const ARTISTS_TICKER_ITEMS = [
+  '20+ VERIFIED MASTER ARTISTS',
+  '4K ULTRA-HD MASTER PHOTOGRAPHY',
+  'FULL-VIEWPORT EDITORIAL 9:16 MOSAIC',
+  'OFFICIAL MUSIC VIDEOS & COLLABORATIONS',
+  'REAL-TIME MILLISECOND VOCAL MATCHING',
+  'LRCLIB GLOBAL LYRICS ENGINE',
+  'LOSSLESS 24-BIT VOCAL STEM ARCHIVES',
+  'ZERO-LATENCY INSTANT AUTOCOMPLETE',
+];
 
-interface GenreOption {
-  id: GenreFilter;
-  label: string;
-}
-
-const GENRE_OPTIONS: GenreOption[] = [
-  { id: 'all', label: 'All Artists' },
-  { id: 'hiphop', label: 'Hip-Hop & Trap' },
-  { id: 'rnb', label: 'R&B / Soul' },
-  { id: 'rock', label: 'Rock & Classics' },
-  { id: 'electronic', label: 'Electronic & Synth' },
-  { id: 'pop', label: 'Pop & Alternative' },
+const SPOTLIGHT_ARTISTS = [
+  'Juice WRLD',
+  'The Weeknd',
+  'Taylor Swift',
+  'Travis Scott',
+  'Kendrick Lamar',
+  'Coldplay',
+  'Billie Eilish',
+  'Post Malone',
 ];
 
 interface ArtistSuggestion {
@@ -53,7 +62,6 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
   onResumePlayer,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<GenreFilter>('all');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [liveSuggestions, setLiveSuggestions] = useState<ArtistSuggestion[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -153,44 +161,6 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
   const filteredArtists = useMemo(() => {
     let result = artistList;
 
-    // Filter by genre
-    if (selectedGenre !== 'all') {
-      result = result.filter((artist) => {
-        const genre = artist.genre.toLowerCase();
-        switch (selectedGenre) {
-          case 'hiphop':
-            return (
-              genre.includes('rap') ||
-              genre.includes('hip-hop') ||
-              genre.includes('trap') ||
-              genre.includes('emo')
-            );
-          case 'rnb':
-            return genre.includes('r&b') || genre.includes('soul');
-          case 'rock':
-            return (
-              genre.includes('rock') ||
-              genre.includes('glam') ||
-              genre.includes('legend')
-            );
-          case 'electronic':
-            return (
-              genre.includes('electronic') ||
-              genre.includes('synth') ||
-              genre.includes('french touch')
-            );
-          case 'pop':
-            return (
-              genre.includes('pop') ||
-              genre.includes('alternative') ||
-              genre.includes('alt-pop')
-            );
-          default:
-            return true;
-        }
-      });
-    }
-
     // Filter by search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -204,7 +174,7 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
     }
 
     return result;
-  }, [artistList, selectedGenre, searchQuery]);
+  }, [artistList, searchQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,67 +202,58 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
   return (
     <div className="artists-hub-page">
       <main className="artists-hub-viewport">
-        {/* Hero Section */}
-        <section className="artists-hub-hero">
-          {/* Authentic & Classy Artists Master Insignia Logo */}
+        {/* ============================================================== */}
+        {/* Editorial Master Stage - Vibe & Dynamics of Homepage          */}
+        {/* ============================================================== */}
+        <section className="artists-hub-hero" aria-label="Artists Discovery Stage">
+          {/* Live Engine Beacon Row */}
           <motion.div
-            className="artists-master-logo"
-            initial={{ opacity: 0, scale: 0.9, y: -12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            className="artists-beacon-row"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="master-logo-halo" />
-            <div className="master-logo-glyph">
-              <svg width="40" height="40" viewBox="0 0 28 28" fill="none">
-                <circle
-                  cx="14"
-                  cy="14"
-                  r="12"
-                  stroke="rgba(167, 139, 250, 0.45)"
-                  strokeWidth="1.2"
-                  strokeDasharray="3 2"
-                />
-                <circle
-                  cx="14"
-                  cy="14"
-                  r="8.5"
-                  stroke="rgba(167, 139, 250, 0.25)"
-                  strokeWidth="1"
-                />
-                <path
-                  d="M14 6v16M10 9v10M18 9v10M7 11v6M21 11v6"
-                  stroke="#A78BFA"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-                <circle cx="14" cy="14" r="2.5" fill="#FFFFFF" />
-              </svg>
+            <div className="artists-live-beacon">
+              <span className="beacon-pulse-dot" />
+              <Radio size={12} className="beacon-radio-icon" />
+              <span className="beacon-text">VERIFIED MASTER DISCOGRAPHIES</span>
             </div>
-            <div className="master-logo-badge">
-              <Sparkles size={11} className="text-accent" />
-              <span>LYRIXER ARTISTS &bull; VERIFIED DISCOGRAPHIES</span>
-            </div>
+            <span className="artists-sync-beacon">9:16 ULTRA-HD ARCHIVES</span>
+            <span className="artists-count-pill">{artistList.length} CURATED ARTISTS</span>
           </motion.div>
 
+          {/* Monumental Headline matching Homepage */}
           <motion.h1
-            className="artists-hero-title"
-            initial={{ opacity: 0, y: 12 }}
+            className="artists-monumental-headline"
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
-            Discover Artists & Complete Discographies
+            <span className="headline-lead">DISCOVER THE ICONS.</span>
+            <span className="headline-accent-wrap">
+              <ShinyText
+                text="EXPLORE THE MASTERS."
+                color="#D8B4FE"
+                shineColor="#FFFFFF"
+                speed={3}
+                glow={0.35}
+                className="headline-shiny-accent"
+              />
+            </span>
           </motion.h1>
 
+          {/* Editorial Sub-manifesto */}
           <motion.p
-            className="artists-hero-subtitle"
-            initial={{ opacity: 0, y: 12 }}
+            className="artists-editorial-copy"
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.18 }}
+            transition={{ duration: 0.6, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
           >
-            Explore verified studio collections, 4K master visuals, collaborations, and complete song catalogues.
+            Music videos unconstrained by player frames. Verified master portraits, official
+            collaborations, and complete discographies rendered with real-time typographic lyrics sync.
           </motion.p>
 
-          {/* Interactive Search Bar Container with Autocomplete Options Dropdown */}
+          {/* Interactive Search Console Container */}
           <div ref={searchContainerRef} className="artists-search-container">
             <motion.form
               className="artists-search-form"
@@ -442,42 +403,51 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
             </AnimatePresence>
           </div>
 
-          {/* Genre / Mood Filter Chips */}
+          {/* Quick Spotlight Artists Pills */}
           <motion.div
-            className="artists-genre-chips"
+            className="artists-quick-spotlight"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.3 }}
           >
-            {GENRE_OPTIONS.map((genre) => (
-              <button
-                key={genre.id}
-                type="button"
-                className={`artists-genre-chip ${
-                  selectedGenre === genre.id ? 'active' : ''
-                }`}
-                onClick={() => setSelectedGenre(genre.id)}
-              >
-                {selectedGenre === genre.id && (
-                  <Sparkles size={11} className="chip-sparkle" />
-                )}
-                <span>{genre.label}</span>
-              </button>
-            ))}
+            <span className="spotlight-label">
+              <Sparkles size={11} className="text-accent" />
+              <span>CURATED SPOTLIGHT:</span>
+            </span>
+            <div className="spotlight-pills-list">
+              {SPOTLIGHT_ARTISTS.map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  className="spotlight-pill-btn"
+                  onClick={() => onSelectArtist(name)}
+                >
+                  <span>{name}</span>
+                  <ArrowRight size={10} className="pill-arrow-icon" />
+                </button>
+              ))}
+            </div>
           </motion.div>
         </section>
+
+        {/* Kinetic Ticker Marquee Ribbon matching Homepage */}
+        <KineticTicker items={ARTISTS_TICKER_ITEMS} speed="normal" className="artists-kinetic-ribbon" />
 
         {/* Featured Artists Grid */}
         <section className="artists-grid-section">
           <div className="artists-grid-header">
             <div className="grid-header-title-wrap">
+              <div className="grid-sub-beacon">
+                <span className="beacon-pulse-dot" />
+                <span>BILLBOARD 9:16 MASTER MOSAIC</span>
+              </div>
               <h2 className="artists-grid-title">
                 {searchQuery
                   ? `Search Results (${filteredArtists.length})`
                   : 'Featured Master Artists'}
               </h2>
               <span className="artists-grid-caption">
-                Verified high-resolution photography & extensive official song catalogues
+                Verified high-definition portrait photography & complete official song catalogues
               </span>
             </div>
             <div className="artists-count-badge">

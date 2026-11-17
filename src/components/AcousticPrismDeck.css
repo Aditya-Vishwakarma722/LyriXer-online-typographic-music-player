@@ -1,0 +1,368 @@
+.acoustic-prism-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+/* 1. Ambient Violet Backlight Halo */
+.prism-ambient-halo {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.22) 0%, rgba(99, 102, 241, 0.08) 45%, transparent 70%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 2. Holographic Concentric Resonant Rings */
+.prism-radar-assembly {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.radar-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+}
+
+.radar-ring.ring-1 {
+  inset: 20px;
+  border: 1px dashed rgba(192, 132, 252, 0.28);
+  animation: rotateRadar 24s linear infinite;
+}
+
+.radar-ring.ring-2 {
+  inset: 55px;
+  border: 1px solid rgba(129, 140, 248, 0.22);
+}
+
+.radar-ring.ring-3 {
+  inset: 90px;
+  border: 1px dashed rgba(167, 139, 250, 0.35);
+  animation: rotateRadar 16s linear infinite reverse;
+}
+
+.radar-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(167, 139, 250, 0.6) 0%, transparent 100%);
+  transform-origin: 0 0;
+  animation: sweepBeam 6s linear infinite;
+}
+
+@keyframes rotateRadar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sweepBeam {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 3. Central Prismatic Hologram Disc */
+.prism-core-housing {
+  position: relative;
+  z-index: 2;
+  width: 250px;
+  height: 250px;
+  border-radius: 24px;
+  padding: 10px;
+  background: rgba(18, 18, 23, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8),
+              0 0 32px rgba(139, 92, 246, 0.2);
+  transition: transform var(--transition-normal), border-color var(--transition-normal);
+}
+
+.prism-core-housing:hover {
+  border-color: rgba(167, 139, 250, 0.45);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.9),
+              0 0 44px rgba(167, 139, 250, 0.3);
+}
+
+.housing-frosted-bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.housing-artwork-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #101015;
+}
+
+.prism-artwork-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prism-core-housing:hover .prism-artwork-image {
+  transform: scale(1.08);
+}
+
+.prism-artwork-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1C1B24 0%, #0E0D14 100%);
+}
+
+.fallback-audio-icon {
+  color: var(--accent-violet);
+  opacity: 0.6;
+}
+
+.artwork-glass-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    transparent 60%,
+    rgba(167, 139, 250, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+/* Play Trigger Overlay */
+.prism-play-trigger {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: rgba(8, 8, 11, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  cursor: pointer;
+  z-index: 5;
+}
+
+.prism-core-housing:hover .prism-play-trigger {
+  opacity: 1;
+}
+
+.play-trigger-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #7C3AED;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5), 0 0 16px rgba(167, 139, 250, 0.4);
+  transform: translateY(6px);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.prism-core-housing:hover .play-trigger-pill {
+  transform: translateY(0);
+}
+
+.play-trigger-pill:hover {
+  background: #8B5CF6;
+  transform: scale(1.05);
+}
+
+/* 4. Dynamic 16-Bar Spectrum Visualizer Deck */
+.prism-spectrum-deck {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 250px;
+  height: 28px;
+  margin-top: 14px;
+  background: rgba(18, 18, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spectrum-bars-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  gap: 3px;
+}
+
+.spectrum-bar-column {
+  flex: 1;
+  background: linear-gradient(180deg, #C4B5FD 0%, #7C3AED 100%);
+  border-radius: 1px;
+  transition: height 0.18s ease-out;
+}
+
+/* 5. Spatial Telemetry & Active Track Metadata */
+.prism-telemetry-banner {
+  margin-top: 18px;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.telemetry-top-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.telemetry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+}
+
+.telemetry-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 8px #34D399;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.telemetry-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.telemetry-icon {
+  color: var(--accent-violet);
+}
+
+.prism-track-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 380px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prism-track-artist {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.prism-lyrics-preview {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #C4B5FD;
+  background: rgba(167, 139, 250, 0.08);
+  border: 1px solid rgba(167, 139, 250, 0.16);
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  max-width: 360px;
+}
+
+.lyrics-preview-sparkle {
+  color: #A78BFA;
+  flex-shrink: 0;
+}
+
+.lyrics-preview-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Size Variants */
+.acoustic-prism-root.size-sm .prism-core-housing {
+  width: 180px;
+  height: 180px;
+}
+.acoustic-prism-root.size-sm .prism-spectrum-deck {
+  max-width: 180px;
+}
+
+.acoustic-prism-root.size-lg .prism-core-housing {
+  width: 290px;
+  height: 290px;
+}
+.acoustic-prism-root.size-lg .prism-spectrum-deck {
+  max-width: 290px;
+}

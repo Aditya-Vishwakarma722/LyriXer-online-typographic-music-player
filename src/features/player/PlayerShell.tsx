@@ -10,8 +10,9 @@ import { cleanTrackTitle } from '../../utils/youtube';
 import type { VideoPlayerAdapter, VideoPlayerState, VideoPlayerListener } from '../../services/video/types';
 import type { VideoSource, UserPreferences } from '../../types/session';
 import type { LyricTrack } from '../../services/lyrics/lrcParser';
-import { Sparkles, Search, Upload, X, CheckCircle2, UserRound, Clock, HelpCircle } from 'lucide-react';
+import { Search, Upload, X, CheckCircle2, UserRound, Clock, HelpCircle } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import './PlayerShell.css';
 
 interface PlayerShellProps {
@@ -468,10 +469,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       {/* Floating Top Header Overlay */}
       <header className={`player-top-header ${controlsVisible ? 'visible' : 'hidden'}`}>
         <div className="header-brand">
-          <div className="header-wordmark">
-            <Sparkles size={16} className="header-sparkle" />
-            <span>LyriXer</span>
-          </div>
+          <BrandLogo size="sm" onClick={onExit} />
 
           <div className="header-track-info">
             <span className="header-track-title" title={trackInfo.title}>

@@ -4,7 +4,7 @@ import { Navbar } from './features/home/Navbar';
 import { Hero } from './features/home/Hero';
 import { VideoInput } from './features/home/VideoInput';
 import { KineticTicker } from './components/KineticTicker';
-import { CuratedShowcase } from './features/home/CuratedShowcase';
+import { TrendingTracksSection } from './features/home/TrendingTracksSection';
 import { RecentSessions } from './features/home/RecentSessions';
 import { Footer } from './features/home/Footer';
 import { AboutModal } from './features/home/AboutModal';
@@ -265,8 +265,8 @@ export const App: React.FC = () => {
             {/* Kinetic Audio Engine Marquee Ticker */}
             <KineticTicker />
 
-            {/* Exotic Curated Soundscapes & Master Productions Exhibition */}
-            <CuratedShowcase
+            {/* Current Trending Instagram & YouTube Songs Section */}
+            <TrendingTracksSection
               onStartSession={(src) => {
                 setPreviousView('home');
                 handleStartSession(src);
