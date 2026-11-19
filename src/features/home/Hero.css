@@ -1,22 +1,68 @@
+/* ==========================================================================
+   Hero.css
+   Authentic Minimalist Cyberpunk HUD Stage (Ref: Hybrid Human Web Concept)
+   ========================================================================== */
+
 .hero-section {
   position: relative;
   z-index: 10;
   width: 100%;
-  padding-top: clamp(100px, 13vh, 140px);
-  padding-bottom: clamp(40px, 7vh, 64px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: clamp(100px, 14vh, 140px);
+  padding-bottom: clamp(48px, 8vh, 80px);
+  padding-left: 24px;
+  padding-right: 24px;
   display: flex;
   justify-content: center;
 }
 
+/* Outer HUD Chassis Container (Inspired by Hybrid Human HUD Frame) */
 .hero-stage-container {
+  position: relative;
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(11, 13, 18, 0.7) 0%, rgba(5, 6, 8, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: clamp(36px, 5vw, 64px) clamp(24px, 4vw, 56px);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  backdrop-filter: blur(20px);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 20px) 0,
+    100% 20px,
+    100% 100%,
+    20px 100%,
+    0 calc(100% - 20px)
+  );
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Corner HUD Brackets */
+.hero-stage-container::before,
+.hero-stage-container::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  border-color: var(--cyber-cyan, #00F2FE);
+  border-style: solid;
+  opacity: 0.85;
+}
+
+.hero-stage-container::before {
+  top: 4px;
+  left: 4px;
+  border-width: 2px 0 0 2px;
+}
+
+.hero-stage-container::after {
+  bottom: 4px;
+  right: 4px;
+  border-width: 0 2px 2px 0;
 }
 
 /* Beacon Row */
@@ -24,27 +70,26 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .hero-live-beacon {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(14, 17, 23, 0.85);
-  border: 1px solid rgba(167, 139, 250, 0.35);
-  padding: 5px 14px;
-  border-radius: 9999px;
-  box-shadow: 0 0 16px rgba(167, 139, 250, 0.15);
-  backdrop-filter: blur(12px);
+  background: rgba(14, 17, 23, 0.9);
+  border: 1px solid rgba(0, 242, 254, 0.28);
+  padding: 4px 14px;
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.12);
 }
 
 .beacon-pulse-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-violet-light, #C084FC);
-  box-shadow: 0 0 8px var(--accent-violet, #A855F7);
+  background: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 8px var(--cyber-cyan, #00F2FE);
   animation: pulseDot 2s infinite ease-in-out;
 }
 
@@ -54,43 +99,43 @@
 }
 
 .beacon-radio-icon {
-  color: var(--accent-violet-light, #C084FC);
+  color: var(--cyber-cyan, #00F2FE);
 }
 
 .beacon-text {
   font-family: var(--font-code, monospace);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: #FFFFFF;
   text-transform: uppercase;
 }
 
 .hero-sync-beacon {
   font-family: var(--font-code, monospace);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: var(--accent-violet-light, #DDD6FE);
+  color: var(--cyber-cyan, #00F2FE);
   text-transform: uppercase;
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
   padding-left: 12px;
 }
 
-/* Monumental Headline */
+/* Monumental Stark Headline (Ref: Hybrid Human Titles) */
 .hero-monumental-headline {
-  font-family: var(--font-display, sans-serif);
-  font-size: clamp(2.6rem, 5.4vw, 4.8rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-family: var(--font-cyber, 'Rajdhani', sans-serif);
+  font-size: clamp(2.8rem, 5.8vw, 5.2rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #FFFFFF;
   margin: 0 0 20px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8), 0 0 40px rgba(168, 85, 247, 0.22);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
 }
 
 .headline-lead {
@@ -99,44 +144,35 @@
 
 .headline-accent-wrap {
   display: inline-block;
-  background: linear-gradient(135deg, #FFFFFF 0%, #E9D5FF 40%, #C084FC 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #FFFFFF;
 }
 
-.headline-shiny-accent {
-  display: inline-block;
-  font-weight: 800;
-}
-
-/* Editorial Copy */
+/* Editorial Copy - Monospace, Calm, Clean */
 .hero-editorial-copy {
-  font-size: clamp(1rem, 1.35vw, 1.15rem);
-  line-height: 1.62;
-  color: rgba(255, 255, 255, 0.72);
-  max-width: 640px;
+  font-family: var(--font-sans);
+  font-size: clamp(0.95rem, 1.25vw, 1.08rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 600px;
   margin: 0 auto 36px auto;
   letter-spacing: -0.01em;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* Primary Input Console Wrapper */
 .hero-input-console-wrapper {
   width: 100%;
-  max-width: 760px;
-  margin: 0 auto 24px auto;
-  display: flex;
-  justify-content: center;
+  max-width: 720px;
+  margin: 0 auto 32px auto;
 }
 
-/* Quick Demo Auditions */
+/* Quick Demo Auditions Bar (Minimalist Chamfered Chips) */
 .hero-quick-auditions {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-bottom: 32px;
   width: 100%;
+  margin-bottom: 28px;
 }
 
 .quick-auditions-header {
@@ -145,113 +181,91 @@
   gap: 6px;
 }
 
-.quick-auditions-sparkle {
-  color: var(--accent-violet-light, #C084FC);
-}
-
 .quick-auditions-label {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.7rem;
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
 }
 
 .quick-auditions-chips {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   justify-content: center;
-  gap: 10px;
-  max-width: 840px;
+  gap: 8px;
+  width: 100%;
+  max-width: 780px;
 }
 
 .quick-audition-chip {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.78rem;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(14, 17, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-code, monospace);
+  font-size: 0.72rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-fast, 0.15s ease);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
 }
 
 .quick-audition-chip:hover {
-  background: rgba(167, 139, 250, 0.18);
-  border-color: rgba(167, 139, 250, 0.45);
+  background: rgba(0, 242, 254, 0.12);
+  border-color: var(--cyber-cyan, #00F2FE);
   color: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.25);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+  transform: translateY(-1px);
 }
 
 .chip-play-icon {
-  color: var(--accent-violet-light, #C084FC);
-  transition: transform 0.15s ease;
-}
-
-.quick-audition-chip:hover .chip-play-icon {
-  transform: scale(1.15);
-}
-
-.chip-artist {
-  font-weight: 600;
-  color: #FFFFFF;
+  color: var(--cyber-cyan, #00F2FE);
 }
 
 .chip-sep {
-  opacity: 0.4;
-}
-
-.chip-title {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .chip-badge {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
   padding: 1px 6px;
-  border-radius: 4px;
-  background: rgba(167, 139, 250, 0.2);
-  border: 1px solid rgba(167, 139, 250, 0.4);
-  color: #DDD6FE;
-  text-transform: uppercase;
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  color: var(--cyber-cyan, #00F2FE);
+  margin-left: 4px;
 }
 
-/* Performance Metrics */
+/* Performance Metrics - Monospace HUD Telemetry */
 .hero-performance-metrics {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 14px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: var(--font-mono, monospace);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  max-width: 760px;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   width: 100%;
+  max-width: 680px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
 }
 
 .metric-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-weight: 600;
   color: rgba(255, 255, 255, 0.55);
 }
 
 .metric-icon {
-  color: var(--accent-violet-light, #C084FC);
+  color: var(--cyber-cyan, #00F2FE);
 }
 
 .metric-divider {
@@ -262,28 +276,20 @@
 @media (max-width: 768px) {
   .hero-section {
     padding-top: 90px;
-    padding-bottom: 32px;
+    padding-bottom: 40px;
   }
 
   .hero-stage-container {
-    padding: 0 16px;
+    padding: 28px 16px;
   }
 
   .hero-monumental-headline {
-    font-size: 2.2rem;
+    font-size: 2.3rem;
+    letter-spacing: 0.04em;
   }
 
-  .hero-beacon-row {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .hero-sync-beacon {
-    border-left: none;
-    padding-left: 0;
-  }
-
-  .quick-auditions-chips {
-    gap: 8px;
+  .quick-audition-chip {
+    padding: 5px 10px;
+    font-size: 0.68rem;
   }
 }

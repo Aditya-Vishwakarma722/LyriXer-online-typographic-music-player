@@ -85,7 +85,7 @@ export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSe
                 <SpotlightCard
                   key={session.id}
                   className="recent-card"
-                  spotlightColor="rgba(167, 139, 250, 0.2)"
+                  spotlightColor="rgba(0, 242, 254, 0.16)"
                   intensity={0.2}
                   spotlightSize={180}
                   borderGlow={0.5}

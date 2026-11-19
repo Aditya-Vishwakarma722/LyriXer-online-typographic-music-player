@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { CURATED_ARTISTS } from '../../services/artist/artistService';
 import { KineticTicker } from '../../components/KineticTicker';
-import ShinyText from '../../components/reactbits/ShinyText';
 import type { VideoSource } from '../../types/session';
 import './ArtistsHub.css';
 
@@ -222,7 +221,7 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
             <span className="artists-count-pill">{artistList.length} CURATED ARTISTS</span>
           </motion.div>
 
-          {/* Monumental Headline matching Homepage */}
+          {/* Monumental Headline - Authentic Stark Cyberpunk */}
           <motion.h1
             className="artists-monumental-headline"
             initial={{ opacity: 0, y: 16 }}
@@ -231,14 +230,7 @@ export const ArtistsHub: React.FC<ArtistsHubProps> = ({
           >
             <span className="headline-lead">DISCOVER THE ICONS.</span>
             <span className="headline-accent-wrap">
-              <ShinyText
-                text="EXPLORE THE MASTERS."
-                color="#D8B4FE"
-                shineColor="#FFFFFF"
-                speed={3}
-                glow={0.35}
-                className="headline-shiny-accent"
-              />
+              EXPLORE THE MASTERS.
             </span>
           </motion.h1>
 

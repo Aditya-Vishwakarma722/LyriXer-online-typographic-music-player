@@ -6,118 +6,65 @@
   overflow: hidden;
   pointer-events: none !important;
   z-index: 0;
-  background-color: var(--bg-base, #08080B);
+  background-color: var(--bg-base, #050608);
   contain: strict;
 }
 
 .base-canvas-layer {
   position: absolute;
   inset: 0;
-  background-color: var(--bg-base, #08080B);
+  background-color: var(--bg-base, #050608);
   pointer-events: none !important;
   z-index: 0;
 }
 
 /* ============================================================== */
-/* Authentic Animated Chromatic Sound Nebula / Fluid Aurora Mesh  */
+/* Minimalist Cybernetic Ambient Backlight (Zero Purple Blobs)    */
 /* ============================================================== */
 .aurora-mesh-container {
   position: absolute;
-  inset: -15%;
-  width: 130%;
-  height: 130%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none !important;
   z-index: 1;
-  filter: blur(80px);
-  -webkit-filter: blur(80px);
-  opacity: 0.85;
-  transform: translateZ(0);
+  opacity: 0.6;
 }
 
 .aurora-glow-node {
   position: absolute;
   border-radius: 50%;
   pointer-events: none !important;
-  will-change: transform, opacity;
 }
 
-/* Node 1: Deep Violet Acoustic Center */
+/* Discreet Laser Cyan Ambient Glow at Top Focus */
 .node-primary {
-  top: 12%;
-  left: 15%;
-  width: 640px;
-  height: 640px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.38) 0%, rgba(91, 33, 182, 0.16) 45%, transparent 72%);
-  animation: floatAurora1 20s ease-in-out infinite alternate;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 480px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(0, 242, 254, 0.06) 0%, rgba(2, 132, 199, 0.02) 45%, transparent 70%);
+  filter: blur(60px);
 }
 
-/* Node 2: Radiant Electric Violet Beacon */
-.node-secondary {
-  top: 38%;
-  right: 12%;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.34) 0%, rgba(79, 70, 229, 0.14) 50%, transparent 72%);
-  animation: floatAurora2 26s ease-in-out infinite alternate;
-}
-
-/* Node 3: Deep Midnight Indigo Ambient Anchor */
-.node-tertiary {
-  bottom: 8%;
-  left: 25%;
-  width: 580px;
-  height: 580px;
-  background: radial-gradient(circle, rgba(67, 56, 202, 0.3) 0%, rgba(192, 38, 211, 0.12) 48%, transparent 70%);
-  animation: floatAurora3 22s ease-in-out infinite alternate;
-}
-
-/* Node 4: Cosmic Magenta Frequency Node */
+.node-secondary,
+.node-tertiary,
 .node-quaternary {
-  top: 25%;
-  right: 32%;
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, rgba(147, 51, 234, 0.32) 0%, rgba(59, 130, 246, 0.1) 50%, transparent 70%);
-  animation: floatAurora4 18s ease-in-out infinite alternate;
-}
-
-@keyframes floatAurora1 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(70px, 50px) scale(1.15); }
-  100% { transform: translate(-50px, 80px) scale(0.9); }
-}
-
-@keyframes floatAurora2 {
-  0% { transform: translate(0, 0) scale(0.95); }
-  50% { transform: translate(-80px, -60px) scale(1.18); }
-  100% { transform: translate(50px, -90px) scale(1.05); }
-}
-
-@keyframes floatAurora3 {
-  0% { transform: translate(0, 0) scale(1.05); }
-  50% { transform: translate(60px, -70px) scale(0.92); }
-  100% { transform: translate(-70px, -40px) scale(1.12); }
-}
-
-@keyframes floatAurora4 {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-50px, 60px) scale(1.16); }
-  100% { transform: translate(60px, -40px) scale(0.94); }
+  display: none !important;
 }
 
 /* ============================================================== */
-/* Halo Layer                                                     */
+/* Soundscape Canvas & Halo - Clean Minimalist State              */
 /* ============================================================== */
 .halo-layer {
   position: absolute;
   inset: 0;
   pointer-events: none !important;
   z-index: 2;
+  opacity: 0.15;
 }
 
-/* ============================================================== */
-/* Soundscape Canvas Layer (Acoustic Wave Ribbons & Stardust)      */
-/* ============================================================== */
 .soundscape-canvas-layer {
   position: absolute;
   inset: 0;
@@ -125,6 +72,7 @@
   height: 100%;
   pointer-events: none !important;
   z-index: 3;
+  opacity: 0.12;
 }
 
 /* ============================================================== */
@@ -136,10 +84,10 @@
   z-index: 5;
   pointer-events: none !important;
   background: radial-gradient(
-    ellipse at 50% 42%,
-    transparent 35%,
-    rgba(8, 8, 11, 0.45) 70%,
-    var(--bg-base, #08080B) 96%
+    ellipse at 50% 45%,
+    transparent 45%,
+    rgba(5, 6, 8, 0.65) 80%,
+    rgba(5, 6, 8, 0.95) 100%
   );
 }
 

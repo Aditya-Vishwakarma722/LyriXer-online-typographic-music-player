@@ -25,10 +25,10 @@ interface WaveConfig {
 }
 
 const PARTICLE_COLORS = [
-  'rgba(167, 139, 250, ', // violet
-  'rgba(192, 132, 252, ', // purple
-  'rgba(129, 140, 248, ', // indigo
-  'rgba(232, 121, 249, ', // fuchsia
+  'rgba(0, 242, 254, ', // laser cyan
+  'rgba(56, 189, 248, ', // sky cyan
+  'rgba(255, 255, 255, ', // stark white
+  'rgba(148, 163, 184, ', // muted slate
 ];
 
 export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
@@ -90,47 +90,37 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
       });
     }
 
-    // Initialize 4 layered harmonic wave ribbons
+    // Initialize 3 subtle harmonic wave ribbons
     const waves: WaveConfig[] = [
       {
         baseYPercent: 0.38,
-        amplitude: 42,
-        frequency: 0.0018,
-        speed: 0.012,
-        colorStart: 'rgba(139, 92, 246, 0.45)', // Vivid violet
-        colorEnd: 'rgba(99, 102, 241, 0.15)',   // Indigo
-        lineWidth: 1.8,
+        amplitude: 32,
+        frequency: 0.0012,
+        speed: 0.008,
+        colorStart: 'rgba(0, 242, 254, 0.22)', // Laser Cyan
+        colorEnd: 'rgba(2, 132, 199, 0.06)',   // Deep Cyan
+        lineWidth: 1.2,
         phase: 0,
       },
       {
-        baseYPercent: 0.42,
-        amplitude: 56,
-        frequency: 0.0014,
-        speed: 0.009,
-        colorStart: 'rgba(168, 85, 247, 0.4)',  // Purple
-        colorEnd: 'rgba(217, 70, 239, 0.12)',   // Fuchsia
-        lineWidth: 1.5,
+        baseYPercent: 0.44,
+        amplitude: 24,
+        frequency: 0.0016,
+        speed: 0.012,
+        colorStart: 'rgba(56, 189, 248, 0.18)', // Sky
+        colorEnd: 'rgba(255, 255, 255, 0.04)', // Stark White
+        lineWidth: 1.0,
         phase: 1.8,
       },
       {
-        baseYPercent: 0.46,
-        amplitude: 38,
-        frequency: 0.0022,
-        speed: 0.015,
-        colorStart: 'rgba(79, 70, 229, 0.35)',  // Deep Indigo
-        colorEnd: 'rgba(147, 51, 234, 0.1)',    // Deep Violet
-        lineWidth: 1.4,
+        baseYPercent: 0.48,
+        amplitude: 28,
+        frequency: 0.0014,
+        speed: 0.009,
+        colorStart: 'rgba(0, 242, 254, 0.16)', // Subtle Cyan
+        colorEnd: 'rgba(2, 132, 199, 0.04)',   // Cyan Dim
+        lineWidth: 1.0,
         phase: 3.2,
-      },
-      {
-        baseYPercent: 0.50,
-        amplitude: 48,
-        frequency: 0.0016,
-        speed: 0.008,
-        colorStart: 'rgba(192, 38, 211, 0.3)',  // Cyber magenta
-        colorEnd: 'rgba(124, 58, 237, 0.08)',   // Violet
-        lineWidth: 1.2,
-        phase: 4.5,
       },
     ];
 
@@ -150,7 +140,7 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
 
         const grad = ctx.createLinearGradient(0, baseY - wave.amplitude, width, baseY + wave.amplitude);
         grad.addColorStop(0, wave.colorStart);
-        grad.addColorStop(0.5, idx % 2 === 0 ? 'rgba(167, 139, 250, 0.5)' : 'rgba(129, 140, 248, 0.45)');
+        grad.addColorStop(0.5, idx % 2 === 0 ? 'rgba(0, 242, 254, 0.25)' : 'rgba(56, 189, 248, 0.2)');
         grad.addColorStop(1, wave.colorEnd);
 
         ctx.strokeStyle = grad;

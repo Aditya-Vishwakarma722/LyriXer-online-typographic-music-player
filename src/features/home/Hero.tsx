@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Radio, Music4, Zap, ShieldCheck, Play } from 'lucide-react';
-import ShinyText from '../../components/reactbits/ShinyText';
 import type { VideoSource } from '../../types/session';
 import './Hero.css';
 
@@ -94,7 +93,7 @@ export const Hero: React.FC<HeroProps> = React.memo<HeroProps>(({ children, onQu
           <span className="hero-sync-beacon">LRCLIB SPATIAL SYNC</span>
         </motion.div>
 
-        {/* Monumental Editorial Headline */}
+        {/* Monumental Editorial Headline - Authentic Stark White (Ref: Hybrid Human) */}
         <motion.h1
           className="hero-monumental-headline"
           initial={{ opacity: 0, y: 18 }}
@@ -103,14 +102,7 @@ export const Hero: React.FC<HeroProps> = React.memo<HeroProps>(({ children, onQu
         >
           <span className="headline-lead">FEEL THE SOUND.</span>
           <span className="headline-accent-wrap">
-            <ShinyText
-              text="SEE THE LYRICS."
-              color="#D8B4FE"
-              shineColor="#FFFFFF"
-              speed={3}
-              glow={0.35}
-              className="headline-shiny-accent"
-            />
+            SEE THE LYRICS.
           </span>
         </motion.h1>
 

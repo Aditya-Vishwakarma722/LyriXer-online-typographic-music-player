@@ -113,11 +113,11 @@ export const App: React.FC = () => {
     // Apply theme dynamic tokens if customized
     const root = document.documentElement;
     if (preferences.theme === 'abyss') {
-      root.style.setProperty('--bg-base', '#060608');
+      root.style.setProperty('--bg-base', '#020304');
     } else if (preferences.theme === 'obsidian') {
-      root.style.setProperty('--bg-base', '#0E0B14');
+      root.style.setProperty('--bg-base', '#080A0E');
     } else {
-      root.style.setProperty('--bg-base', '#0B0B0D');
+      root.style.setProperty('--bg-base', '#050608');
     }
     root.style.setProperty('--bg-blur', `${preferences.blurLevel ?? 0}px`);
   }, [preferences.theme, preferences.blurLevel]);

@@ -41,15 +41,15 @@ export const BrandLogo: React.FC<BrandLogoProps> = React.memo<BrandLogoProps>(({
         >
           <defs>
             <linearGradient id="lyrixerGradPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#EDE9FE" />
-              <stop offset="45%" stopColor="#C4B5FD" />
-              <stop offset="100%" stopColor="#7C3AED" />
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="50%" stopColor="#38BDF8" />
+              <stop offset="100%" stopColor="#00F2FE" />
             </linearGradient>
 
             <linearGradient id="lyrixerGradRing" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8" />
-              <stop offset="50%" stopColor="#C4B5FD" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#A78BFA" stopOpacity="0.9" />
+              <stop offset="0%" stopColor="#0284C7" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#00F2FE" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.9" />
             </linearGradient>
 
             <filter id="glyphGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -80,7 +80,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = React.memo<BrandLogoProps>(({
           {/* Cross Acoustic Laser Needle */}
           <path
             d="M11 20L21 12"
-            stroke="#EDE9FE"
+            stroke="#FFFFFF"
             strokeWidth="1.6"
             strokeLinecap="round"
             className="glyph-needle"
