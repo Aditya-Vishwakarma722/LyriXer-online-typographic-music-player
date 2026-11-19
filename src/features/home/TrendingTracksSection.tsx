@@ -1,229 +1,21 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Flame,
   Play,
   Sparkles,
-  Video,
-  Activity,
-  Compass,
+  RotateCcw,
+  CheckCircle2,
+  TrendingUp,
 } from 'lucide-react';
+import {
+  TrendingFeedService,
+  type TrendingTrackItem,
+} from '../../services/trending/trendingFeedService';
 import type { VideoSource } from '../../types/session';
 import './TrendingTracksSection.css';
 
 export type TrendingPlatformFilter = 'all' | 'instagram' | 'youtube';
-
-export interface TrendingTrack {
-  id: string;
-  title: string;
-  artist: string;
-  videoId: string;
-  thumbnailUrl: string;
-  duration: number;
-  platform: 'instagram' | 'youtube' | 'both';
-  reelsCount?: string;
-  viewsCount?: string;
-  rank: number;
-  badge: string;
-  tags: string[];
-  lyricsSnippet: string;
-  genre: string;
-}
-
-const TRENDING_TRACKS_DATABASE: TrendingTrack[] = [
-  {
-    id: 'trending-1',
-    title: 'APT.',
-    artist: 'ROSÉ & Bruno Mars',
-    videoId: 'ekr2nIex040',
-    thumbnailUrl: 'https://i.ytimg.com/vi/ekr2nIex040/hqdefault.jpg',
-    duration: 173,
-    platform: 'both',
-    reelsCount: '6.4M Reels',
-    viewsCount: '620M Views',
-    rank: 1,
-    badge: '#1 GLOBAL VIRAL',
-    tags: ['Reels Anthem', 'Billboard #1', 'TikTok Viral'],
-    lyricsSnippet: "Apateu apateu, apateu apateu... Don't you want me like I want you, baby?",
-    genre: 'Pop / Dance',
-  },
-  {
-    id: 'trending-2',
-    title: 'Die With A Smile',
-    artist: 'Lady Gaga & Bruno Mars',
-    videoId: 'kPa7bsKwL-c',
-    thumbnailUrl: 'https://i.ytimg.com/vi/kPa7bsKwL-c/hqdefault.jpg',
-    duration: 252,
-    platform: 'youtube',
-    reelsCount: '3.6M Reels',
-    viewsCount: '710M Views',
-    rank: 2,
-    badge: 'YOUTUBE TOP #1',
-    tags: ['Soul Pop', 'Worldwide Hit', 'Grammy Nominee'],
-    lyricsSnippet: "If the world was ending, I'd wanna be next to you...",
-    genre: 'Pop Ballad',
-  },
-  {
-    id: 'trending-3',
-    title: 'Espresso',
-    artist: 'Sabrina Carpenter',
-    videoId: 'eVli-tstM5E',
-    thumbnailUrl: 'https://i.ytimg.com/vi/eVli-tstM5E/hqdefault.jpg',
-    duration: 175,
-    platform: 'instagram',
-    reelsCount: '8.2M Reels',
-    viewsCount: '560M Views',
-    rank: 3,
-    badge: 'INSTAGRAM VIRAL #1',
-    tags: ['Reels Dance', 'Summer Sensation', 'Grammy Record'],
-    lyricsSnippet: "Now he's thinkin' 'bout me every night, oh... Is it that sweet? I guess so!",
-    genre: 'Pop / Disco',
-  },
-  {
-    id: 'trending-4',
-    title: 'Birds of a Feather',
-    artist: 'Billie Eilish',
-    videoId: 'V9PVRfjEBTI',
-    thumbnailUrl: 'https://i.ytimg.com/vi/V9PVRfjEBTI/hqdefault.jpg',
-    duration: 196,
-    platform: 'instagram',
-    reelsCount: '6.8M Reels',
-    viewsCount: '430M Views',
-    rank: 4,
-    badge: 'REELS AUDIO TREND',
-    tags: ['Emotional Viral', 'Acoustic Soul', 'Hot 100'],
-    lyricsSnippet: "I want you to stay, 'til I'm in the grave, 'til I rot away, dead and buried...",
-    genre: 'Indie Pop',
-  },
-  {
-    id: 'trending-5',
-    title: 'Not Like Us',
-    artist: 'Kendrick Lamar',
-    videoId: 'T6eK-2OQtew',
-    thumbnailUrl: 'https://i.ytimg.com/vi/T6eK-2OQtew/hqdefault.jpg',
-    duration: 274,
-    platform: 'youtube',
-    reelsCount: '4.5M Reels',
-    viewsCount: '340M Views',
-    rank: 5,
-    badge: 'YOUTUBE HIP-HOP #1',
-    tags: ['West Coast', 'Record Breaker', 'Global Anthem'],
-    lyricsSnippet: "They not like us, they not like us, they not like us...",
-    genre: 'Hip-Hop',
-  },
-  {
-    id: 'trending-6',
-    title: 'Taste',
-    artist: 'Sabrina Carpenter',
-    videoId: 'KEG7b851Ric',
-    thumbnailUrl: 'https://i.ytimg.com/vi/KEG7b851Ric/hqdefault.jpg',
-    duration: 157,
-    platform: 'both',
-    reelsCount: '3.4M Reels',
-    viewsCount: '220M Views',
-    rank: 6,
-    badge: 'TRENDING VELOCITY',
-    tags: ['Music Video Hit', 'Pop Sensation', 'Shorts Viral'],
-    lyricsSnippet: "I heard you're back together and if that's true, you'll just have to taste me when he's kissin' you...",
-    genre: 'Pop / Rock',
-  },
-  {
-    id: 'trending-7',
-    title: 'Million Dollar Baby',
-    artist: 'Tommy Richman',
-    videoId: 'Zf1d8SGuxfs',
-    thumbnailUrl: 'https://i.ytimg.com/vi/Zf1d8SGuxfs/hqdefault.jpg',
-    duration: 155,
-    platform: 'instagram',
-    reelsCount: '5.8M Reels',
-    viewsCount: '240M Views',
-    rank: 7,
-    badge: 'REELS VIRAL SOUND',
-    tags: ['Synth Funk', 'Bass Groove', 'Viral Audio'],
-    lyricsSnippet: "I ain't never rep a set, baby... I ain't never did no wrong...",
-    genre: 'R&B / Funk',
-  },
-  {
-    id: 'trending-8',
-    title: 'Gata Only',
-    artist: 'FloyyMenor & Cris Mj',
-    videoId: 'Cm_ocUG67Wo',
-    thumbnailUrl: 'https://i.ytimg.com/vi/Cm_ocUG67Wo/hqdefault.jpg',
-    duration: 222,
-    platform: 'instagram',
-    reelsCount: '9.1M Reels',
-    viewsCount: '520M Views',
-    rank: 8,
-    badge: 'LATIN REELS HIT',
-    tags: ['Global Reggaeton', 'Club Viral', 'TikTok #1'],
-    lyricsSnippet: "Mami, dime si tú estás pa' mí, como yo estoy puesto pa' ti...",
-    genre: 'Reggaeton',
-  },
-  {
-    id: 'trending-9',
-    title: 'Timeless',
-    artist: 'The Weeknd & Playboi Carti',
-    videoId: '5Rmv3nliwCs',
-    thumbnailUrl: 'https://i.ytimg.com/vi/5Rmv3nliwCs/hqdefault.jpg',
-    duration: 256,
-    platform: 'youtube',
-    reelsCount: '2.8M Reels',
-    viewsCount: '120M Views',
-    rank: 9,
-    badge: 'YOUTUBE PREMIERE',
-    tags: ['Synthwave Trap', 'Billboard Debut', 'Chart Topper'],
-    lyricsSnippet: "Ever since I was a jit, I knew I was the shit...",
-    genre: 'Synth Trap',
-  },
-  {
-    id: 'trending-10',
-    title: 'Good Luck, Babe!',
-    artist: 'Chappell Roan',
-    videoId: '1RKqOmSkGgM',
-    thumbnailUrl: 'https://i.ytimg.com/vi/1RKqOmSkGgM/hqdefault.jpg',
-    duration: 218,
-    platform: 'both',
-    reelsCount: '4.8M Reels',
-    viewsCount: '205M Views',
-    rank: 10,
-    badge: 'VIRAL BREAKTHROUGH',
-    tags: ['Reels Chorus', 'Vocal Powerhouse', 'Indie Pop'],
-    lyricsSnippet: "You'd have to stop the world just to stop the feeling...",
-    genre: 'Synthpop',
-  },
-  {
-    id: 'trending-11',
-    title: 'Starboy',
-    artist: 'The Weeknd ft. Daft Punk',
-    videoId: '34Na4j8AVgA',
-    thumbnailUrl: 'https://i.ytimg.com/vi/34Na4j8AVgA/hqdefault.jpg',
-    duration: 230,
-    platform: 'youtube',
-    reelsCount: '4.1M Reels',
-    viewsCount: '2.5B Views',
-    rank: 11,
-    badge: 'ALL-TIME YOUTUBE GIANT',
-    tags: ['Classic Viral', 'Shorts Trend', 'Electro Pop'],
-    lyricsSnippet: "I'm tryna put you in the worst mood, ah... P1 cleaner than your church shoes, ah...",
-    genre: 'Electro Pop',
-  },
-  {
-    id: 'trending-12',
-    title: 'Greedy',
-    artist: 'Tate McRae',
-    videoId: 'To4SWGZkEPk',
-    thumbnailUrl: 'https://i.ytimg.com/vi/To4SWGZkEPk/hqdefault.jpg',
-    duration: 131,
-    platform: 'instagram',
-    reelsCount: '5.3M Reels',
-    viewsCount: '290M Views',
-    rank: 12,
-    badge: 'REELS CHOREO VIRAL',
-    tags: ['Dance Trend', 'Viral Chorus', 'Billboard Hot 100'],
-    lyricsSnippet: "I would want myself... Baby, please believe me, I'll put you through hell...",
-    genre: 'Dance Pop',
-  },
-];
 
 interface TrendingTracksSectionProps {
   onStartSession: (source: VideoSource) => void;
@@ -235,20 +27,41 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
   onOpenArtist,
 }) => {
   const [platformFilter, setPlatformFilter] = useState<TrendingPlatformFilter>('all');
-  const [hoveredTrackId, setHoveredTrackId] = useState<string | null>(null);
+  const [feedData, setFeedData] = useState(() => TrendingFeedService.getDailyTrendingFeed());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Auto-verify daily refresh status on mount
+  useEffect(() => {
+    const daily = TrendingFeedService.getDailyTrendingFeed();
+    setFeedData(daily);
+  }, []);
+
+  const handleManualRefresh = () => {
+    setIsRefreshing(true);
+    const refreshed = TrendingFeedService.refreshDailyFeed();
+    setFeedData({
+      tracks: refreshed.tracks,
+      lastUpdatedDateString: refreshed.lastUpdatedDateString,
+      isFreshToday: true,
+    });
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 500);
+  };
 
   const filteredTracks = useMemo(() => {
-    if (platformFilter === 'all') return TRENDING_TRACKS_DATABASE;
+    const all = feedData.tracks;
+    if (platformFilter === 'all') return all;
     if (platformFilter === 'instagram') {
-      return TRENDING_TRACKS_DATABASE.filter(t => t.platform === 'instagram' || t.platform === 'both');
+      return all.filter((t) => t.platform === 'instagram' || t.platform === 'both');
     }
-    return TRENDING_TRACKS_DATABASE.filter(t => t.platform === 'youtube' || t.platform === 'both');
-  }, [platformFilter]);
+    return all.filter((t) => t.platform === 'youtube' || t.platform === 'both');
+  }, [feedData.tracks, platformFilter]);
 
-  const spotlightTrack = filteredTracks[0] || TRENDING_TRACKS_DATABASE[0];
-  const listTracks = filteredTracks.slice(1);
+  const spotlightTrack = filteredTracks[0];
+  const gridTracks = filteredTracks.slice(1);
 
-  const handlePlayTrack = (track: TrendingTrack) => {
+  const handlePlayTrack = (track: TrendingTrackItem) => {
     onStartSession({
       kind: 'youtube',
       sourceId: track.videoId,
@@ -260,334 +73,231 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
   };
 
   return (
-    <section className="trending-section" aria-label="Current Trending Instagram and YouTube Songs">
+    <section className="trending-section" aria-label="Trending on Instagram & YouTube">
       <div className="trending-container">
-        {/* Top Cybernetic HUD Telemetry Ribbon */}
-        <div className="cyber-telemetry-ribbon" aria-hidden="true">
-          <div className="ribbon-node">
-            <span className="node-dot pulse-cyan" />
-            <span>SYS_NODE // 0x8F-ALPHA</span>
-          </div>
-          <div className="ribbon-divider" />
-          <div className="ribbon-node">
-            <span>STREAM // VIRAL_FEED_ONLINE</span>
-          </div>
-          <div className="ribbon-divider" />
-          <div className="ribbon-node">
-            <span>RADAR // IG_REELS + YT_SHORTS</span>
-          </div>
-          <div className="ribbon-divider" />
-          <div className="ribbon-node telemetry-coord">
-            <span>LAT_LON // 37.7749&deg; N, 122.4194&deg; W</span>
-          </div>
-          <div className="ribbon-bracket">[ + ]</div>
-        </div>
-
-        {/* Section Header */}
+        {/* Section Top Header & Filters */}
         <div className="trending-header">
           <div className="trending-title-group">
-            <div className="trending-label-row">
-              <span className="hud-code-prefix">// VIRAL_DATA</span>
-              <Flame size={13} className="trending-fire-icon" />
-              <span>REAL-TIME TELEMETRY ENGINE</span>
-              <span className="trending-live-dot" />
-              <span className="trending-live-text">[ ACTIVE_BUFFER: 100% ]</span>
+            {/* Live 24H Radar Badge */}
+            <div className="trending-radar-pill">
+              <span className="radar-live-dot" />
+              <Flame size={13} className="radar-fire-icon" />
+              <span className="radar-title">DAILY 24-HOUR RADAR</span>
+              <span className="radar-sep">&middot;</span>
+              <span className="radar-date">Updated {feedData.lastUpdatedDateString}</span>
             </div>
+
             <h2 className="trending-heading">
               Trending on Instagram &amp; YouTube
             </h2>
             <p className="trending-subheading">
-              Global viral sounds, high-velocity Reels choreography anthems, and YouTube trending sensations.
-              Select any transmission to ignite 24-bit real-time synchronized lyrics.
+              Official music videos of current global viral tracks, high-velocity Reels anthems, and YouTube chart leaders.
+              Select any song to enjoy synchronized 24-bit real-time lyrics.
             </p>
           </div>
 
-          {/* Platform Category Tabs (Cybernetic Chamfered Tabs) */}
-          <div className="trending-filter-tabs" role="tablist" aria-label="Platform Filters">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={platformFilter === 'all'}
-              className={`trending-tab ${platformFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setPlatformFilter('all')}
-            >
-              <Sparkles size={13} />
-              <span>[ ALL_SIGNALS // {TRENDING_TRACKS_DATABASE.length} ]</span>
-            </button>
+          {/* Action Row: Platform Filter Tabs & Refresh Button */}
+          <div className="trending-actions-bar">
+            <div className="trending-filter-tabs" role="tablist" aria-label="Platform Filters">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={platformFilter === 'all'}
+                className={`trending-tab ${platformFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setPlatformFilter('all')}
+              >
+                <Sparkles size={13} />
+                <span>All Viral ({feedData.tracks.length})</span>
+              </button>
 
-            <button
-              type="button"
-              role="tab"
-              aria-selected={platformFilter === 'instagram'}
-              className={`trending-tab tab-instagram ${platformFilter === 'instagram' ? 'active' : ''}`}
-              onClick={() => setPlatformFilter('instagram')}
-            >
-              <div className="instagram-gradient-dot" />
-              <span>[ // INSTAGRAM_REELS ]</span>
-            </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={platformFilter === 'instagram'}
+                className={`trending-tab tab-instagram ${platformFilter === 'instagram' ? 'active' : ''}`}
+                onClick={() => setPlatformFilter('instagram')}
+              >
+                <span className="ig-color-dot" />
+                <span>Instagram Reels</span>
+              </button>
 
+              <button
+                type="button"
+                role="tab"
+                aria-selected={platformFilter === 'youtube'}
+                className={`trending-tab tab-youtube ${platformFilter === 'youtube' ? 'active' : ''}`}
+                onClick={() => setPlatformFilter('youtube')}
+              >
+                <span className="yt-color-dot" />
+                <span>YouTube Trending</span>
+              </button>
+            </div>
+
+            {/* Refresh Daily Feed Button */}
             <button
               type="button"
-              role="tab"
-              aria-selected={platformFilter === 'youtube'}
-              className={`trending-tab tab-youtube ${platformFilter === 'youtube' ? 'active' : ''}`}
-              onClick={() => setPlatformFilter('youtube')}
+              className={`trending-refresh-btn ${isRefreshing ? 'refreshing' : ''}`}
+              onClick={handleManualRefresh}
+              title="Resync daily 24h trending charts"
+              aria-label="Refresh trending charts"
             >
-              <Video size={13} className="youtube-tab-icon" />
-              <span>[ // YOUTUBE_SHORTS ]</span>
+              <RotateCcw size={13} className={isRefreshing ? 'animate-spin' : ''} />
+              <span>Refresh</span>
             </button>
           </div>
         </div>
 
-        {/* Cinematic Spotlight Banner for #1 Filtered Track */}
+        {/* Featured #1 Spotlight Hero Card */}
         {spotlightTrack && (
           <motion.div
             key={spotlightTrack.id}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="trending-spotlight-card cyber-chamfer-box"
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="trending-spotlight-card"
           >
-            {/* HUD Corner Accents */}
-            <span className="hud-corner-bracket corner-tl" aria-hidden="true" />
-            <span className="hud-corner-bracket corner-tr" aria-hidden="true" />
-            <span className="hud-corner-bracket corner-bl" aria-hidden="true" />
-            <span className="hud-corner-bracket corner-br" aria-hidden="true" />
-
-            {/* Hardware Top Spec Bar */}
-            <div className="spotlight-hud-spec-bar" aria-hidden="true">
-              <span className="spec-item"><span className="spec-label">SYS_ID:</span> #01-VIRAL-PRIME</span>
-              <span className="spec-dot">&middot;</span>
-              <span className="spec-item"><span className="spec-label">VELOCITY:</span> 98.4%</span>
-              <span className="spec-dot">&middot;</span>
-              <span className="spec-item"><span className="spec-label">AUDIO:</span> 24-BIT / SPATIAL_SYNC</span>
-              <span className="spec-spacer" />
-              <span className="spec-code">[ TRANSMISSION // ACTIVE ]</span>
+            <div className="spotlight-media-wrap">
+              <img
+                src={spotlightTrack.thumbnailUrl}
+                alt={`${spotlightTrack.artist} - ${spotlightTrack.title} Official Music Video`}
+                className="spotlight-thumb-img"
+                loading="lazy"
+              />
+              <div className="spotlight-media-overlay" />
+              <div className="spotlight-rank-badge">#01 SPOTLIGHT</div>
             </div>
 
-            <div className="spotlight-body-layout">
-              <div className="spotlight-media-pane">
-                <img
-                  src={spotlightTrack.thumbnailUrl}
-                  alt={`${spotlightTrack.title} by ${spotlightTrack.artist}`}
-                  className="spotlight-thumb-image"
-                  loading="lazy"
-                />
-                <div className="spotlight-media-scrim" />
-                <div className="spotlight-scanline-grid" aria-hidden="true" />
-
-                <div className="spotlight-rank-badge">
-                  <span className="rank-hash">#</span>
-                  <span className="rank-num">0{spotlightTrack.rank}</span>
-                  <span className="rank-label">TOP_TRANSMISSION</span>
-                </div>
-
-                <div className="spotlight-sound-indicator">
-                  <span className="sound-wave-bar bar-1" />
-                  <span className="sound-wave-bar bar-2" />
-                  <span className="sound-wave-bar bar-3" />
-                  <span className="sound-wave-bar bar-4" />
-                </div>
+            <div className="spotlight-info-col">
+              <div className="spotlight-meta-top">
+                <span className="spotlight-badge">{spotlightTrack.badge}</span>
+                <span className="spotlight-platform-pill">
+                  {spotlightTrack.platform === 'both' ? 'Instagram & YouTube Viral' : spotlightTrack.platform === 'instagram' ? 'Instagram Reels #1' : 'YouTube Top Hit'}
+                </span>
+                {spotlightTrack.dailyVelocity && (
+                  <span className="spotlight-velocity-tag">
+                    <TrendingUp size={11} />
+                    <span>{spotlightTrack.dailyVelocity}</span>
+                  </span>
+                )}
               </div>
 
-              <div className="spotlight-content-pane">
-                <div className="spotlight-meta-top">
-                  <span className="spotlight-viral-pill">
-                    <Flame size={12} className="pill-flame-icon" />
-                    <span>[ {spotlightTrack.badge} ]</span>
-                  </span>
+              <h3 className="spotlight-track-title">{spotlightTrack.title}</h3>
 
-                  <div className="spotlight-platform-tags">
-                    {(spotlightTrack.platform === 'instagram' || spotlightTrack.platform === 'both') && (
-                      <span className="platform-tag instagram">
-                        <span className="tag-ig-gradient" />
-                        <span>// IG: {spotlightTrack.reelsCount || 'Reels Viral'}</span>
-                      </span>
-                    )}
-                    {(spotlightTrack.platform === 'youtube' || spotlightTrack.platform === 'both') && (
-                      <span className="platform-tag youtube">
-                        <Video size={11} />
-                        <span>// YT: {spotlightTrack.viewsCount || 'YouTube Trending'}</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <h3 className="spotlight-track-title">{spotlightTrack.title}</h3>
-
-                <div className="spotlight-artist-row">
-                  <span className="spotlight-artist-name">{spotlightTrack.artist}</span>
-                  {onOpenArtist && (
-                    <button
-                      type="button"
-                      className="spotlight-artist-link"
-                      onClick={() => onOpenArtist(spotlightTrack.artist.split('&')[0].split('ft.')[0].trim())}
-                      title={`View ${spotlightTrack.artist} discography`}
-                    >
-                      <Compass size={11} />
-                      <span>[ VIEW_ARTIST // &rarr; ]</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Telemetry Velocity Bar */}
-                <div className="spotlight-telemetry-gauge">
-                  <div className="gauge-label-row">
-                    <span className="gauge-title">STREAM_VELOCITY</span>
-                    <span className="gauge-value">98.4% [ PEAK ]</span>
-                  </div>
-                  <div className="gauge-bar-track">
-                    <div className="gauge-bar-fill" style={{ width: '98.4%' }} />
-                    <div className="gauge-bar-scanline" />
-                  </div>
-                </div>
-
-                <div className="spotlight-lyrics-quote-box">
-                  <span className="quote-tag">// LYRIC_STREAM_SAMPLE</span>
-                  <p className="spotlight-lyrics-quote">
-                    "{spotlightTrack.lyricsSnippet}"
-                  </p>
-                </div>
-
-                <div className="spotlight-tags-list">
-                  {spotlightTrack.tags.map((tag) => (
-                    <span key={tag} className="spotlight-tag-item">
-                      #{tag.toUpperCase().replace(/\s+/g, '_')}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="spotlight-actions-bar">
+              <div className="spotlight-artist-row">
+                <span className="spotlight-artist-name">{spotlightTrack.artist}</span>
+                <CheckCircle2 size={13} className="verified-artist-icon" />
+                {onOpenArtist && (
                   <button
                     type="button"
-                    className="spotlight-play-btn cyber-btn-primary"
-                    onClick={() => handlePlayTrack(spotlightTrack)}
+                    className="spotlight-view-artist-btn"
+                    onClick={() => onOpenArtist(spotlightTrack.artist)}
+                    title={`View ${spotlightTrack.artist} catalog`}
                   >
-                    <Play size={16} fill="currentColor" />
-                    <span>LAUNCH IN EDIT SUITE [ + ]</span>
+                    View Artist
                   </button>
+                )}
+              </div>
 
-                  <div className="spotlight-engine-stat">
-                    <Activity size={13} className="engine-stat-icon" />
-                    <span>LRCLIB // 24-BIT SPATIAL READY</span>
-                  </div>
-                </div>
+              <p className="spotlight-lyrics-quote">
+                &ldquo;{spotlightTrack.lyricsSnippet}&rdquo;
+              </p>
+
+              <div className="spotlight-stats-row">
+                <span className="spotlight-stat">{spotlightTrack.viewsCount}</span>
+                <span className="spotlight-stat-sep">&middot;</span>
+                <span className="spotlight-stat">{spotlightTrack.reelsCount}</span>
+                <span className="spotlight-stat-sep">&middot;</span>
+                <span className="spotlight-stat genre-tag">{spotlightTrack.genre}</span>
+              </div>
+
+              <div className="spotlight-actions">
+                <button
+                  type="button"
+                  className="spotlight-play-btn"
+                  onClick={() => handlePlayTrack(spotlightTrack)}
+                  title={`Play official video for ${spotlightTrack.title}`}
+                >
+                  <Play size={16} fill="currentColor" />
+                  <span>Play Official Video</span>
+                </button>
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Viral Tracks Grid */}
-        <div className="trending-grid" role="list">
+        {/* Grid of Verified Official Music Videos */}
+        <div className="trending-grid">
           <AnimatePresence mode="popLayout">
-            {listTracks.map((track, index) => {
-              const isHovered = hoveredTrackId === track.id;
+            {gridTracks.map((track) => (
+              <motion.article
+                key={track.id}
+                layout
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="trending-card"
+                onClick={() => handlePlayTrack(track)}
+              >
+                {/* 16:9 Official Music Video Thumbnail */}
+                <div className="card-thumb-wrap">
+                  <img
+                    src={track.thumbnailUrl}
+                    alt={`${track.artist} - ${track.title}`}
+                    className="card-thumb-img"
+                    loading="lazy"
+                  />
+                  <div className="card-thumb-gradient" />
 
-              return (
-                <motion.article
-                  key={track.id}
-                  layout
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4, delay: index * 0.04 }}
-                  className="trending-card cyber-chamfer-box"
-                  onMouseEnter={() => setHoveredTrackId(track.id)}
-                  onMouseLeave={() => setHoveredTrackId(null)}
-                >
-                  {/* Card Corner HUD Accents */}
-                  <span className="card-hud-corner tl" aria-hidden="true" />
-                  <span className="card-hud-corner tr" aria-hidden="true" />
-                  <span className="card-hud-corner bl" aria-hidden="true" />
-                  <span className="card-hud-corner br" aria-hidden="true" />
+                  {/* Rank Badge */}
+                  <span className="card-rank-tag">
+                    #{track.rank < 10 ? `0${track.rank}` : track.rank}
+                  </span>
 
-                  {/* Card Top System Tag */}
-                  <div className="card-top-system-tag" aria-hidden="true">
-                    <span className="card-sys-id">// DATA_0{track.rank}</span>
-                    <span className="card-genre-tag">[ {track.genre.toUpperCase()} ]</span>
+                  {/* Platform Indicator */}
+                  <span className={`card-platform-pill platform-${track.platform}`}>
+                    {track.platform === 'instagram' ? 'Reels' : track.platform === 'youtube' ? 'YouTube' : 'Reels + YT'}
+                  </span>
+
+                  {/* Play Button Overlay on Hover */}
+                  <div className="card-play-hover-btn" aria-hidden="true">
+                    <Play size={18} fill="currentColor" className="ml-0.5" />
+                  </div>
+                </div>
+
+                {/* Card Editorial Info */}
+                <div className="card-body">
+                  <div className="card-badge-row">
+                    <span className="card-badge-pill">{track.badge}</span>
+                    <span className="card-genre-pill">{track.genre}</span>
                   </div>
 
-                  {/* Card Thumbnail Stage */}
-                  <div className="card-media-stage">
-                    <img
-                      src={track.thumbnailUrl}
-                      alt={`${track.title} by ${track.artist}`}
-                      className="card-thumb"
-                      loading="lazy"
-                    />
-                    <div className="card-thumb-scrim" />
-                    <div className="card-scanline-mesh" aria-hidden="true" />
+                  <h4 className="card-title" title={track.title}>
+                    {track.title}
+                  </h4>
 
-                    {/* Rank Badge */}
-                    <div className="card-rank-tag">
-                      <span>#{track.rank < 10 ? `0${track.rank}` : track.rank}</span>
-                    </div>
-
-                    {/* Live Equalizer bars on hover */}
-                    <div className={`card-eq-bars ${isHovered ? 'active' : ''}`} aria-hidden="true">
-                      <span className="eq-line line-1" />
-                      <span className="eq-line line-2" />
-                      <span className="eq-line line-3" />
-                      <span className="eq-line line-4" />
-                    </div>
-
-                    {/* Quick Play Trigger Button */}
-                    <button
-                      type="button"
-                      className="card-play-trigger"
-                      onClick={() => handlePlayTrack(track)}
-                      title={`Play ${track.title} with synced lyrics`}
-                      aria-label={`Play ${track.title} with synced lyrics`}
-                    >
-                      <Play size={18} fill="currentColor" />
-                    </button>
+                  <div className="card-artist-row">
+                    <span className="card-artist" title={track.artist}>
+                      {track.artist}
+                    </span>
+                    <CheckCircle2 size={12} className="card-verified-icon" />
                   </div>
 
-                  {/* Card Details */}
-                  <div className="card-details">
-                    <div className="card-meta-row">
-                      <span className="card-badge-pill">{track.badge}</span>
-                      
-                      <div className="card-platform-pills">
-                        {(track.platform === 'instagram' || track.platform === 'both') && (
-                          <span className="platform-mini-pill ig" title="Instagram Reels Viral">
-                            <span className="ig-dot" />
-                            <span>{track.reelsCount || 'Reels'}</span>
-                          </span>
-                        )}
-                        {(track.platform === 'youtube' || track.platform === 'both') && (
-                          <span className="platform-mini-pill yt" title="YouTube Trending">
-                            <Video size={10} />
-                            <span>{track.viewsCount || 'YouTube'}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                  <p className="card-quote">
+                    &ldquo;{track.lyricsSnippet}&rdquo;
+                  </p>
 
-                    <h4 className="card-title" title={track.title}>{track.title}</h4>
-                    
-                    <div className="card-artist-line">
-                      <span className="card-artist" title={track.artist}>{track.artist}</span>
-                    </div>
-
-                    <p className="card-lyric-snippet">"{track.lyricsSnippet}"</p>
-
-                    <div className="card-footer-row">
-                      <span className="card-genre">// {track.genre}</span>
-                      
-                      <button
-                        type="button"
-                        className="card-audition-btn cyber-btn-secondary"
-                        onClick={() => handlePlayTrack(track)}
-                      >
-                        <Play size={12} fill="currentColor" />
-                        <span>AUDITION [ + ]</span>
-                      </button>
-                    </div>
+                  <div className="card-footer-stats">
+                    <span className="card-stat-text">{track.viewsCount}</span>
+                    <span className="card-stat-dot">&middot;</span>
+                    <span className="card-stat-text">{track.reelsCount}</span>
+                    {track.dailyVelocity && (
+                      <span className="card-velocity-tag">{track.dailyVelocity}</span>
+                    )}
                   </div>
-                </motion.article>
-              );
-            })}
+                </div>
+              </motion.article>
+            ))}
           </AnimatePresence>
         </div>
       </div>
