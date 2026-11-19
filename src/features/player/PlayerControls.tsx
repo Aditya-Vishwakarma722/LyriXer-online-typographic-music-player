@@ -4,6 +4,7 @@ import {
   Pause,
   Volume2,
   VolumeX,
+  Volume1,
   Maximize2,
   Minimize2,
   ArrowLeft,
@@ -19,6 +20,7 @@ import {
   X,
   Search,
   Check,
+  Info,
 } from 'lucide-react';
 import type { VideoPlayerState } from '../../services/video/types';
 import type { TypographyPreset, UserPreferences } from '../../types/session';
@@ -34,11 +36,15 @@ interface PlayerControlsProps {
   preferences: UserPreferences;
   isFullScreen: boolean;
   lyricsVisible: boolean;
+  isInfoOpen?: boolean;
   onPlay: () => void;
   onPause: () => void;
   onSeek: (seconds: number) => void;
+  onRewind10?: () => void;
+  onForward10?: () => void;
   onVolumeChange: (volume: number) => void;
   onToggleMute: () => void;
+  onToggleInfo?: () => void;
   onAutoSync?: () => void;
   onAlignVocalsToNow?: () => void;
   onNudgeOffset?: (delta: number) => void;
@@ -49,6 +55,7 @@ interface PlayerControlsProps {
   onOpenArtist?: () => void;
   onToggleLyricsVisible: () => void;
   onToggleFullScreen: () => void;
+  onTogglePiP?: () => void;
   onExitPlayer: () => void;
   onUpdatePreferences: (updates: Partial<UserPreferences>) => void;
 }
@@ -62,11 +69,15 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
   preferences,
   isFullScreen,
   lyricsVisible,
+  isInfoOpen = false,
   onPlay,
   onPause,
   onSeek,
+  onRewind10,
+  onForward10,
   onVolumeChange,
   onToggleMute,
+  onToggleInfo,
   onAutoSync,
   onAlignVocalsToNow,
   onNudgeOffset,
@@ -77,13 +88,18 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
   onOpenArtist,
   onToggleLyricsVisible,
   onToggleFullScreen,
+  onTogglePiP,
   onExitPlayer,
   onUpdatePreferences,
 }) => {
   const [showTypographyMenu, setShowTypographyMenu] = useState(false);
   const [showEffectsMenu, setShowEffectsMenu] = useState(false);
   const [isSyncManagerOpen, setIsSyncManagerOpen] = useState(false);
+  const [scrubHoverTime, setScrubHoverTime] = useState<number | null>(null);
+  const [scrubHoverX, setScrubHoverX] = useState<number>(0);
+
   const syncMenuRef = useRef<HTMLDivElement>(null);
+  const scrubberRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -103,18 +119,72 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   const handleScrub = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
+    if (!scrubberRef.current || duration <= 0) return;
+    const rect = scrubberRef.current.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const ratio = Math.max(0, Math.min(1, clickX / rect.width));
     onSeek(ratio * duration);
+  };
+
+  const handleScrubberMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!scrubberRef.current || duration <= 0) return;
+    const rect = scrubberRef.current.getBoundingClientRect();
+    const hoverX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const ratio = hoverX / rect.width;
+    setScrubHoverTime(ratio * duration);
+    setScrubHoverX(hoverX);
+  };
+
+  const handleScrubberMouseLeave = () => {
+    setScrubHoverTime(null);
+  };
+
+  // Rewind & Fast Forward 10 seconds
+  const handleRewind10 = () => {
+    if (onRewind10) {
+      onRewind10();
+    } else {
+      onSeek(Math.max(0, currentTime - 10));
+    }
+  };
+
+  const handleForward10 = () => {
+    if (onForward10) {
+      onForward10();
+    } else {
+      onSeek(Math.min(duration, currentTime + 10));
+    }
+  };
+
+  // Picture in picture handler
+  const handleTogglePiP = async () => {
+    if (onTogglePiP) {
+      onTogglePiP();
+      return;
+    }
+    try {
+      const videoEl = document.querySelector('video');
+      if (videoEl && document.pictureInPictureEnabled) {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else {
+          await videoEl.requestPictureInPicture();
+        }
+      }
+    } catch {
+      // Ignore PiP permissions error
+    }
   };
 
   return (
     <footer className="player-controls-root" aria-label="Player Controls Bar">
       {/* Top Scrub Timeline Bar */}
       <div
+        ref={scrubberRef}
         className="timeline-scrubber"
         onClick={handleScrub}
+        onMouseMove={handleScrubberMouseMove}
+        onMouseLeave={handleScrubberMouseLeave}
         role="slider"
         aria-label="Seek timeline"
         aria-valuenow={currentTime}
@@ -126,6 +196,16 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
           else if (e.key === 'ArrowLeft') onSeek(currentTime - 5);
         }}
       >
+        {/* Scrubber Hover Time Preview Tooltip */}
+        {scrubHoverTime !== null && (
+          <div
+            className="scrubber-hover-tooltip"
+            style={{ left: `${scrubHoverX}px` }}
+          >
+            {formatDuration(scrubHoverTime)}
+          </div>
+        )}
+
         <div className="timeline-track">
           <div
             className="timeline-progress"
@@ -140,7 +220,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
 
       {/* Main Controls Row */}
       <div className="controls-row">
-        {/* Left Section: Back button & Title */}
+        {/* Left Section: Back button, Info button, & Title */}
         <div className="controls-left">
           <button
             type="button"
@@ -151,6 +231,18 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
           >
             <ArrowLeft size={18} />
           </button>
+
+          {onToggleInfo && (
+            <button
+              type="button"
+              className={`ctrl-btn ctrl-btn-info ${isInfoOpen ? 'active' : ''}`}
+              onClick={onToggleInfo}
+              title={isInfoOpen ? 'Hide Track Info & Bio (I)' : 'Show Track Info & Bio (I)'}
+              aria-label="Toggle Editorial Track Info"
+            >
+              <Info size={17} />
+            </button>
+          )}
 
           <div className="track-info">
             <h4 className="track-title" title={title}>
@@ -172,12 +264,48 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
           </div>
         </div>
 
-        {/* Center Section: Play/Pause and Seek Time */}
+        {/* Center Section: Rewind 10, Play/Pause, Fast Forward 10, Timecode */}
         <div className="controls-center">
+          {/* Rewind 10 Seconds */}
+          <button
+            type="button"
+            className="ctrl-btn ctrl-btn-step"
+            onClick={handleRewind10}
+            title="Rewind 10 seconds (J / ←)"
+            aria-label="Rewind 10 seconds"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" />
+              <text
+                x="12"
+                y="14.5"
+                textAnchor="middle"
+                fontSize="7"
+                fontWeight="700"
+                fill="currentColor"
+                stroke="none"
+                fontFamily="var(--font-mono, monospace)"
+              >
+                10
+              </text>
+            </svg>
+          </button>
+
+          {/* Play / Pause Circular Button */}
           <button
             type="button"
             className="ctrl-btn-play"
             onClick={paused ? onPlay : onPause}
+            title={paused ? 'Play (Space / K)' : 'Pause (Space / K)'}
             aria-label={paused ? 'Play' : 'Pause'}
           >
             {paused ? (
@@ -187,14 +315,49 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
             )}
           </button>
 
-          <div className="time-display">
+          {/* Fast Forward 10 Seconds */}
+          <button
+            type="button"
+            className="ctrl-btn ctrl-btn-step"
+            onClick={handleForward10}
+            title="Fast forward 10 seconds (L / →)"
+            aria-label="Fast forward 10 seconds"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 4V1l4 4-4 4V6a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z" />
+              <text
+                x="12"
+                y="14.5"
+                textAnchor="middle"
+                fontSize="7"
+                fontWeight="700"
+                fill="currentColor"
+                stroke="none"
+                fontFamily="var(--font-mono, monospace)"
+              >
+                10
+              </text>
+            </svg>
+          </button>
+
+          {/* Time Display */}
+          <div className="time-display" aria-label="Playback time">
             <span>{formatDuration(currentTime)}</span>
             <span className="time-sep">/</span>
             <span>{formatDuration(duration)}</span>
           </div>
         </div>
 
-        {/* Right Section: Volume, Sync Manager, Artist, Search, Upload, Typography, Blur, Fullscreen */}
+        {/* Right Section: Volume, Sync, Artist, Search, Upload, Typography, Blur, PiP, Fullscreen */}
         <div className="controls-right">
           {/* Volume Control */}
           <div className="volume-group">
@@ -202,9 +365,16 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
               type="button"
               className="ctrl-btn"
               onClick={onToggleMute}
+              title={muted ? 'Unmute (M)' : 'Mute (M)'}
               aria-label={muted ? 'Unmute' : 'Mute'}
             >
-              {muted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              {muted || volume === 0 ? (
+                <VolumeX size={18} />
+              ) : volume < 50 ? (
+                <Volume1 size={18} />
+              ) : (
+                <Volume2 size={18} />
+              )}
             </button>
             <input
               type="range"
@@ -448,7 +618,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
             type="button"
             className={`ctrl-btn ${!lyricsVisible ? 'active' : ''}`}
             onClick={onToggleLyricsVisible}
-            title={lyricsVisible ? 'Hide lyrics overlay' : 'Show lyrics overlay'}
+            title={lyricsVisible ? 'Hide lyrics overlay (L)' : 'Show lyrics overlay (L)'}
             aria-label="Toggle lyrics overlay visibility"
           >
             {lyricsVisible ? <Eye size={17} /> : <EyeOff size={17} />}
@@ -500,7 +670,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
             )}
           </div>
 
-          {/* Background Blur & Atmosphere Slider (Available for all sources) */}
+          {/* Background Blur & Atmosphere Slider */}
           <div className="dropdown-wrapper">
             <button
               type="button"
@@ -607,12 +777,41 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
             )}
           </div>
 
+          {/* Picture-in-Picture Mini-Player */}
+          <button
+            type="button"
+            className="ctrl-btn"
+            onClick={handleTogglePiP}
+            title="Picture-in-Picture Mini-Player"
+            aria-label="Picture-in-Picture"
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="3" />
+              <rect
+                x="12"
+                y="11"
+                width="8"
+                height="7"
+                rx="1.5"
+                fill="currentColor"
+                fillOpacity="0.35"
+              />
+            </svg>
+          </button>
+
           {/* Fullscreen Toggle */}
           <button
             type="button"
             className="ctrl-btn"
             onClick={onToggleFullScreen}
-            title={isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            title={isFullScreen ? 'Exit Fullscreen (F)' : 'Enter Fullscreen (F)'}
             aria-label="Toggle Fullscreen"
           >
             {isFullScreen ? <Minimize2 size={17} /> : <Maximize2 size={17} />}

@@ -31,6 +31,7 @@ interface YouTubePlayerViewProps {
   trackArtist?: string;
   onOpenArtist?: () => void;
   progress?: number;
+  withEditorialPanel?: boolean;
 }
 
 export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<YouTubePlayerViewProps>(({
@@ -57,6 +58,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<Yo
   trackArtist,
   onOpenArtist,
   progress = 0,
+  withEditorialPanel = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const adapterRef = useRef<YouTubeAdapter | null>(null);
@@ -136,7 +138,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<Yo
       <div
         className={`yt-fullscreen-lyrics-overlay ${
           lyricsVisible && !isEnded ? 'lyrics-visible' : 'lyrics-hidden'
-        }`}
+        } ${withEditorialPanel ? 'with-editorial-panel' : ''}`}
       >
         <LyricsView
           lyrics={lyrics}

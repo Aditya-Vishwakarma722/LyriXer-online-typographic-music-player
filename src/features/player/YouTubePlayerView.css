@@ -139,6 +139,14 @@
   transform: scale(1);
 }
 
+.yt-fullscreen-lyrics-overlay.with-editorial-panel {
+  padding-left: clamp(360px, 40vw, 620px);
+  padding-right: clamp(20px, 4vw, 60px);
+  transition: padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .yt-fullscreen-lyrics-overlay.lyrics-hidden {
   opacity: 0;
   transform: scale(0.98);

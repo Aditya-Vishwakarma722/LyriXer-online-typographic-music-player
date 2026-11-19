@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { YouTubePlayerView } from './YouTubePlayerView';
 import { LocalPlayerView } from './LocalPlayerView';
 import { PlayerControls } from './PlayerControls';
-import { CinematicPauseOverlay } from './CinematicPauseOverlay';
+import { EditorialMusicInfo } from './EditorialMusicInfo';
 import { LrclibSearchModal } from './LrclibSearchModal';
 import { PlayerIntroModal } from './PlayerIntroModal';
 import { LyricsProvider } from '../../services/lyrics/LyricsProvider';
@@ -11,7 +11,7 @@ import { cleanTrackTitle } from '../../utils/youtube';
 import type { VideoPlayerAdapter, VideoPlayerState, VideoPlayerListener } from '../../services/video/types';
 import type { VideoSource, UserPreferences } from '../../types/session';
 import type { LyricTrack } from '../../services/lyrics/lrcParser';
-import { Search, Upload, X, CheckCircle2, UserRound, Clock, HelpCircle } from 'lucide-react';
+import { Search, Upload, X, CheckCircle2, UserRound, Clock, HelpCircle, Info } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import './PlayerShell.css';
@@ -123,12 +123,31 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     (playerState.duration > 5 && playerState.currentTime >= playerState.duration - 0.6) ||
     isSongEnded;
 
-  // Cinematic pause screen overlay condition (matches streaming cinema UI when playback is paused)
-  const isPauseOverlayVisible =
-    playerState.paused &&
+  // Editorial Music Info Panel State (combines Image 1 and Image 2 into one authentic player)
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isInfoDismissedWhilePaused, setIsInfoDismissedWhilePaused] = useState(false);
+
+  const prevPausedRef = useRef(playerState.paused);
+  useEffect(() => {
+    if (playerState.paused && !prevPausedRef.current) {
+      setIsInfoDismissedWhilePaused(false);
+    }
+    prevPausedRef.current = playerState.paused;
+  }, [playerState.paused]);
+
+  const isEditorialInfoVisible =
+    ((playerState.paused && !isInfoDismissedWhilePaused) || isInfoOpen) &&
     !isPlaybackEnded &&
     playerState.status !== 'loading' &&
     !showIntroModal;
+
+  const handleToggleInfo = useCallback(() => {
+    if (playerState.paused) {
+      setIsInfoDismissedWhilePaused((prev) => !prev);
+    } else {
+      setIsInfoOpen((prev) => !prev);
+    }
+  }, [playerState.paused]);
 
   /**
    * Applies manual timing offset adjustments (Fine Adjust Delay/Rush, Brackets [ ], etc.)
@@ -385,6 +404,22 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     }, 3500);
   };
 
+  // Picture-in-picture handling
+  const handleTogglePiP = async () => {
+    try {
+      const videoEl = document.querySelector('video');
+      if (videoEl && document.pictureInPictureEnabled) {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else {
+          await videoEl.requestPictureInPicture();
+        }
+      }
+    } catch {
+      // Ignore PiP permissions error
+    }
+  };
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -392,22 +427,31 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
-      if (e.code === 'Space') {
+      if (e.code === 'Space' || e.code === 'KeyK') {
         e.preventDefault();
         if (playerState.paused) adapter?.play();
         else adapter?.pause();
+      } else if (e.code === 'KeyJ') {
+        e.preventDefault();
+        adapter?.seekTo(Math.max(0, playerState.currentTime - 10));
       } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
         adapter?.seekTo(Math.max(0, playerState.currentTime - 5));
       } else if (e.code === 'ArrowRight') {
         e.preventDefault();
         adapter?.seekTo(Math.min(playerState.duration, playerState.currentTime + 5));
+      } else if (e.code === 'KeyI') {
+        e.preventDefault();
+        handleToggleInfo();
       } else if (e.code === 'ArrowUp') {
         e.preventDefault();
         adapter?.setVolume(Math.min(100, playerState.volume + 5));
       } else if (e.code === 'ArrowDown') {
         e.preventDefault();
         adapter?.setVolume(Math.max(0, playerState.volume - 5));
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        adapter?.setMuted(!playerState.muted);
       } else if (e.code === 'KeyL') {
         e.preventDefault();
         setLyricsVisible((prev) => !prev);
@@ -475,7 +519,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       />
 
       {/* Floating Top Header Overlay */}
-      <header className={`player-top-header ${controlsVisible && !isPauseOverlayVisible ? 'visible' : 'hidden'}`}>
+      <header className={`player-top-header ${controlsVisible ? 'visible' : 'hidden'}`}>
         <div className="header-brand">
           <BrandLogo size="sm" onClick={onExit} />
 
@@ -495,6 +539,17 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         </div>
 
         <div className="header-actions">
+          {/* Info toggle button */}
+          <button
+            type="button"
+            className={`header-btn header-info-btn ${isEditorialInfoVisible ? 'active' : ''}`}
+            onClick={handleToggleInfo}
+            title={isEditorialInfoVisible ? 'Hide Track Info & Bio (I)' : 'Show Track Info & Bio (I)'}
+          >
+            <Info size={14} />
+            <span>Info</span>
+          </button>
+
           {onOpenArtist && (
             <button
               type="button"
@@ -567,7 +622,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           fontSizeScale={preferences.fontSize}
           blurLevel={preferences.blurLevel}
           overlayOpacity={preferences.overlayOpacity}
-          lyricsVisible={lyricsVisible && !isPauseOverlayVisible}
+          lyricsVisible={lyricsVisible}
+          withEditorialPanel={isEditorialInfoVisible}
           onAdapterReady={handleAdapterReady}
           listener={listener}
           onSeekTo={(sec) => adapter?.seekTo(sec)}
@@ -592,7 +648,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           fontSizeScale={preferences.fontSize}
           blurLevel={preferences.blurLevel}
           overlayOpacity={preferences.overlayOpacity}
-          lyricsVisible={lyricsVisible && !isPauseOverlayVisible}
+          lyricsVisible={lyricsVisible}
+          withEditorialPanel={isEditorialInfoVisible}
           onAdapterReady={handleAdapterReady}
           listener={listener}
           onSeekTo={(sec) => adapter?.seekTo(sec)}
@@ -606,33 +663,22 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         />
       )}
 
-      {/* Cinematic Pause Screen Overlay (Matches Streaming UI When Paused) */}
-      <CinematicPauseOverlay
-        isVisible={isPauseOverlayVisible}
-        currentTime={playerState.currentTime}
-        duration={playerState.duration || source.duration || 0}
-        volume={playerState.volume}
-        muted={playerState.muted}
+      {/* Editorial Music Info Stack (Shows artist bio, synopsis, badges, quote, and quick actions from Image 1) */}
+      <EditorialMusicInfo
+        isVisible={isEditorialInfoVisible && (controlsVisible || playerState.paused)}
+        isPaused={playerState.paused}
         trackTitle={trackInfo.title}
         artistName={effectiveArtist}
         lyrics={lyrics}
         activeLyricIndex={activeIndex}
-        lyricsVisible={lyricsVisible}
-        isFullScreen={isFullScreen}
-        onResume={() => adapter?.play()}
-        onSeek={(sec) => adapter?.seekTo(sec)}
-        onVolumeChange={(vol) => adapter?.setVolume(vol)}
-        onToggleMute={() => adapter?.setMuted(!playerState.muted)}
-        onToggleLyrics={() => setLyricsVisible((prev) => !prev)}
-        onOpenLrclibSearch={() => setIsSearchModalOpen(true)}
-        onOpenSettings={() => setShowIntroModal(true)}
-        onToggleFullScreen={handleToggleFullScreen}
+        duration={playerState.duration || source.duration || 0}
+        onResumeOrPause={() => (playerState.paused ? adapter?.play() : adapter?.pause())}
         onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
-        onExit={onExit}
+        onClose={handleToggleInfo}
       />
 
-      {/* Floating Bottom Player Controls */}
-      <div className={`controls-wrapper ${controlsVisible && !isPauseOverlayVisible ? 'visible' : 'hidden'}`}>
+      {/* Unified Master Bottom Player Controls */}
+      <div className={`controls-wrapper ${controlsVisible ? 'visible' : 'hidden'}`}>
         <PlayerControls
           playerState={playerState}
           title={trackInfo.title}
@@ -642,11 +688,15 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           preferences={preferences}
           isFullScreen={isFullScreen}
           lyricsVisible={lyricsVisible}
+          isInfoOpen={isEditorialInfoVisible}
           onPlay={() => adapter?.play()}
           onPause={() => adapter?.pause()}
           onSeek={(sec) => adapter?.seekTo(sec)}
+          onRewind10={() => adapter?.seekTo(Math.max(0, playerState.currentTime - 10))}
+          onForward10={() => adapter?.seekTo(Math.min(playerState.duration || source.duration || 0, playerState.currentTime + 10))}
           onVolumeChange={(vol) => adapter?.setVolume(vol)}
           onToggleMute={() => adapter?.setMuted(!playerState.muted)}
+          onToggleInfo={handleToggleInfo}
           onAutoSync={() => handleAutoSync(false)}
           onAlignVocalsToNow={() => handleAutoSync(true)}
           onNudgeOffset={handleNudgeOffset}
@@ -657,6 +707,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
           onToggleLyricsVisible={() => setLyricsVisible(!lyricsVisible)}
           onToggleFullScreen={handleToggleFullScreen}
+          onTogglePiP={handleTogglePiP}
           onExitPlayer={onExit}
           onUpdatePreferences={onUpdatePreferences}
         />

@@ -27,6 +27,7 @@ interface LocalPlayerViewProps {
   duration?: number;
   isEnded?: boolean;
   progress?: number;
+  withEditorialPanel?: boolean;
 }
 
 export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
@@ -50,6 +51,7 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
   duration = 0,
   isEnded = false,
   progress = 0,
+  withEditorialPanel = false,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const adapterRef = useRef<HTML5VideoAdapter | null>(null);
@@ -104,7 +106,7 @@ export const LocalPlayerView: React.FC<LocalPlayerViewProps> = ({
       <div
         className={`local-lyrics-container ${
           lyricsVisible ? 'lyrics-visible' : 'lyrics-hidden'
-        }`}
+        } ${withEditorialPanel ? 'with-editorial-panel' : ''}`}
       >
         <LyricsView
           lyrics={lyrics}
