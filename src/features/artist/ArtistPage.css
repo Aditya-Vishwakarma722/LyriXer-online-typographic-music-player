@@ -1,7 +1,7 @@
 /* ==========================================================================
    ArtistPage.css
    Authentic Minimalist Cybernetic Artist Dossier & Discography
-   Ref: "Hybrid Human: Web concept" (ref_16, ref_18) - Asymmetrical, Spacious
+   Left-Side Monograph & Discography Ledger with Full-Screen Album Wall Backdrop
    ========================================================================== */
 
 .artist-page-root {
@@ -16,7 +16,9 @@
   z-index: 10;
 }
 
-/* 1. Atmospheric Photo Backdrop */
+/* ==========================================================================
+   1. Cinematic Full-Screen Background (Album Covers Wall + Master Portrait)
+   ========================================================================== */
 .artist-bg-viewport {
   position: fixed;
   inset: 0;
@@ -32,18 +34,94 @@
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
-  filter: grayscale(100%) contrast(1.15) brightness(0.5);
+  filter: grayscale(100%) contrast(1.15) brightness(0.48);
   transform: translateZ(0);
 }
 
+/* Discography Album Wall Backdrop (Right and Center Stage) */
+.artist-album-wall-backdrop {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  bottom: 0;
+  width: 55vw;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-auto-rows: min-content;
+  gap: 20px;
+  padding: 40px 48px 80px 24px;
+  pointer-events: none;
+  opacity: 0.35;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 1) 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 1) 100%);
+}
+
+.artist-album-tile {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #080A0E;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.7);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.artist-album-tile.is-spotlighted {
+  border-color: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 28px rgba(0, 242, 254, 0.45);
+  transform: scale(1.05) translateY(-3px);
+  opacity: 1;
+  z-index: 5;
+}
+
+.artist-album-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.06) brightness(0.88);
+}
+
+.artist-album-tile-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, transparent 0%, rgba(5, 6, 8, 0.95) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tile-year {
+  font-family: var(--font-code, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--cyber-cyan, #00F2FE);
+}
+
+.tile-name {
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Atmospheric Gradients for pristine left-side readability */
 .artist-gradient-left {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse at 25% 30%,
-    rgba(5, 6, 8, 0.7) 0%,
-    rgba(5, 6, 8, 0.96) 80%,
-    #050608 100%
+  background: linear-gradient(
+    90deg,
+    rgba(5, 6, 8, 0.98) 0%,
+    rgba(5, 6, 8, 0.94) 42%,
+    rgba(5, 6, 8, 0.65) 66%,
+    rgba(5, 6, 8, 0.2) 88%,
+    transparent 100%
   );
   pointer-events: none;
 }
@@ -53,12 +131,26 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 240px;
+  height: 260px;
   background: linear-gradient(180deg, transparent 0%, #050608 100%);
   pointer-events: none;
 }
 
-/* 2. Top HUD Navigation Bar */
+.artist-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 75% 35%,
+    transparent 40%,
+    rgba(5, 6, 8, 0.45) 80%,
+    #050608 100%
+  );
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   2. Top Minimal HUD Navigation Bar
+   ========================================================================== */
 .artist-top-bar {
   position: sticky;
   top: 0;
@@ -66,7 +158,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 40px;
+  padding: 14px 40px;
   background: rgba(8, 10, 14, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -105,6 +197,64 @@
   background: rgba(0, 242, 254, 0.06);
 }
 
+.artist-top-right-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.artist-sync-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cyber-cyan, #00F2FE);
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  padding: 4px 10px;
+  clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));
+  animation: toastGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes toastGlow {
+  0% { box-shadow: 0 0 4px rgba(0, 242, 254, 0.2); }
+  100% { box-shadow: 0 0 12px rgba(0, 242, 254, 0.5); }
+}
+
+.sync-pulse-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 6px var(--cyber-cyan, #00F2FE);
+  animation: cyanBlink 1.2s infinite;
+}
+
+.artist-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #64748B);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));
+  transition: all var(--transition-fast);
+}
+
+.artist-sync-btn:hover {
+  color: #FFFFFF;
+  border-color: rgba(0, 242, 254, 0.4);
+  background: rgba(0, 242, 254, 0.06);
+}
+
 .artist-hud-telemetry-tag {
   display: inline-flex;
   align-items: center;
@@ -130,44 +280,59 @@
   50% { opacity: 0.3; transform: scale(0.8); }
 }
 
-/* 3. Main Architectural Stage */
-.artist-monumental-stage {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 48px 32px 120px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
+/* 3. Kinetic Ticker Ribbon */
+.artist-kinetic-ribbon {
+  border-top: none;
+  background: rgba(10, 12, 16, 0.6);
 }
 
 /* ==========================================================================
-   SECTION A: Monumental Artist Dossier (Open, Unboxed, Asymmetrical)
+   4. Main Architectural Layout (Left Stage Songs + Right Stage Showcase)
    ========================================================================== */
+.artist-main-layout {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 36px 40px 100px 40px;
+  display: grid;
+  grid-template-columns: minmax(560px, 1fr) 300px;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Left Stage */
+.artist-stage-left {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
+/* SECTION A: Monumental Artist Dossier Hero Header */
 .artist-dossier-hero {
+  position: relative;
   width: 100%;
   padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .dossier-content-grid {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 48px;
-  align-items: center;
+  grid-template-columns: 160px 1fr;
+  gap: 28px;
+  align-items: start;
 }
 
-/* Subject Avatar Frame */
 .dossier-avatar-frame {
   position: relative;
-  width: 260px;
-  height: 260px;
-  background: #080A0E;
+  width: 160px;
+  height: 160px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-  overflow: hidden;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+  background: #080A0E;
+  padding: 4px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
 
 .dossier-avatar-img {
@@ -175,12 +340,7 @@
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
-  filter: grayscale(40%) contrast(1.1) brightness(0.9);
-  transition: transform 0.5s ease;
-}
-
-.dossier-avatar-frame:hover .dossier-avatar-img {
-  transform: scale(1.04);
+  filter: contrast(1.06) brightness(0.95);
 }
 
 .dossier-coord-chip {
@@ -189,49 +349,56 @@
   left: 8px;
   font-family: var(--font-code, monospace);
   font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  color: #050608;
-  background: var(--cyber-cyan, #00F2FE);
+  letter-spacing: 0.06em;
+  color: var(--cyber-cyan, #00F2FE);
+  background: rgba(5, 6, 8, 0.88);
   padding: 2px 6px;
-  clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 0 100%);
-  font-weight: 700;
+  border: 1px solid rgba(0, 242, 254, 0.3);
 }
 
-/* Info Pane */
 .dossier-info-pane {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .dossier-meta-lead {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-family: var(--font-code, monospace);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   color: var(--text-muted, #64748B);
   text-transform: uppercase;
 }
 
-.meta-sep {
-  color: rgba(255, 255, 255, 0.2);
+.meta-genre {
+  color: #CBD5E1;
 }
 
-.meta-genre {
+.meta-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--cyber-cyan, #00F2FE);
+  font-weight: 700;
+}
+
+.meta-sep {
+  opacity: 0.4;
 }
 
 .dossier-artist-title {
   font-family: var(--font-cyber, 'Rajdhani', sans-serif);
-  font-size: clamp(2.8rem, 5.5vw, 4.6rem);
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-size: 3.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
   text-transform: uppercase;
   color: #FFFFFF;
-  line-height: 0.98;
-  margin: 4px 0;
+  margin: 0;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
 }
 
 .dossier-telemetry-strip {
@@ -239,27 +406,31 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .telemetry-chip {
   font-family: var(--font-code, monospace);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.08em;
   color: var(--text-secondary, #94A3B8);
   text-transform: uppercase;
 }
 
+.telemetry-chip.cyan {
+  color: var(--cyber-cyan, #00F2FE);
+}
+
 .dossier-bio-text {
-  font-size: 0.92rem;
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.6;
   color: #94A3B8;
-  max-width: 820px;
+  max-width: 780px;
   margin: 0;
 }
 
 .dossier-action-row {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .dossier-channel-btn {
@@ -286,7 +457,7 @@
 }
 
 /* ==========================================================================
-   SECTION B: Category Filter Strip
+   SECTION B: 3 Filter Tabs (All Releases, Top Hits, Recently Released)
    ========================================================================== */
 .artist-catalogue-controls {
   width: 100%;
@@ -295,8 +466,8 @@
 .catalogue-category-tabs {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 14px;
+  gap: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
 }
@@ -304,48 +475,50 @@
 .cat-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-family: var(--font-code, monospace);
   font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted, #64748B);
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 14px;
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
   cursor: pointer;
-  padding: 4px 8px;
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
 .cat-tab:hover {
   color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .cat-tab.active {
-  color: var(--cyber-cyan, #00F2FE);
-  text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+  color: #050608;
+  background: var(--cyber-cyan, #00F2FE);
+  border-color: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4);
 }
 
 .cat-flame-icon {
-  color: #FF334B;
+  color: inherit;
+}
+
+.cat-sparkles-icon {
+  color: inherit;
 }
 
 /* ==========================================================================
-   SECTION C: Workspace Layout (Expansive Ledger + Compact Station)
+   SECTION C: Discography Ledger
    ========================================================================== */
-.artist-workspace-layout {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 48px;
-  align-items: start;
-}
-
-/* Ledger Column */
 .artist-ledger-column {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .ledger-table-header {
@@ -406,33 +579,44 @@
   padding: 20px 16px 0 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   margin-top: 16px;
+  flex-wrap: wrap;
 }
 
 .footer-code-tag {
   color: var(--cyber-cyan, #00F2FE);
 }
 
-/* Companion Station Column */
-.artist-station-column {
+.footer-sync-tag {
+  color: #38BDF8;
+}
+
+/* ==========================================================================
+   Right Stage: Floating Archival Studio Eras & Active Stem Showcase
+   ========================================================================== */
+.artist-stage-right {
   position: sticky;
   top: 96px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  align-self: start;
 }
 
-.artist-station-card {
+.artist-floating-eras-card {
   position: relative;
-  background: rgba(10, 12, 16, 0.6);
+  background: rgba(10, 12, 16, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 18px;
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
 }
 
-.station-card-header {
+.floating-card-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -440,11 +624,11 @@
   padding-bottom: 8px;
 }
 
-.station-icon {
+.floating-card-icon {
   color: var(--cyber-cyan, #00F2FE);
 }
 
-.station-title {
+.floating-card-title {
   font-family: var(--font-code, monospace);
   font-size: 0.68rem;
   font-weight: 700;
@@ -453,7 +637,7 @@
   text-transform: uppercase;
 }
 
-.station-live-dot {
+.floating-card-dot {
   margin-left: auto;
   width: 5px;
   height: 5px;
@@ -462,10 +646,132 @@
   box-shadow: 0 0 6px var(--cyber-cyan, #00F2FE);
 }
 
-.station-deck-wrapper {
-  width: 100%;
+.floating-eras-list {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.floating-era-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 0 100%);
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  transition: all var(--transition-fast);
+}
+
+.floating-era-item.is-selected-era {
+  border-color: rgba(0, 242, 254, 0.4);
+  background: rgba(0, 242, 254, 0.08);
+}
+
+.era-lead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.era-year {
+  color: var(--cyber-cyan, #00F2FE);
+  font-weight: 700;
+}
+
+.era-title {
+  color: #CBD5E1;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.era-count {
+  color: #64748B;
+  font-size: 0.62rem;
+}
+
+/* Active Stem Preview Highlight */
+.floating-active-stem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 242, 254, 0.04);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);
+  margin-top: 4px;
+}
+
+.stem-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stem-badge {
+  font-family: var(--font-code, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--cyber-cyan, #00F2FE);
+}
+
+.stem-time {
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  color: #94A3B8;
+}
+
+.stem-title {
+  font-family: var(--font-cyber, 'Rajdhani', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stem-meta {
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  color: #64748B;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stem-engage-btn {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  gap: 6px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #050608;
+  background: var(--cyber-cyan, #00F2FE);
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+  transition: all var(--transition-fast);
+}
+
+.stem-engage-btn:hover {
+  background: #FFFFFF;
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.5);
 }
 
 /* ==========================================================================
@@ -668,12 +974,21 @@
    Responsive Adaptations
    ========================================================================== */
 @media (max-width: 1080px) {
-  .artist-workspace-layout {
+  .artist-main-layout {
     grid-template-columns: 1fr;
     gap: 32px;
+    padding: 24px 20px 80px 20px;
   }
 
-  .artist-station-column {
+  .artist-album-wall-backdrop {
+    width: 100vw;
+    left: 0;
+    opacity: 0.18;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .artist-stage-right {
     position: static;
   }
 
@@ -683,16 +998,12 @@
   }
 
   .dossier-avatar-frame {
-    width: 180px;
-    height: 180px;
+    width: 140px;
+    height: 140px;
   }
 }
 
 @media (max-width: 640px) {
-  .artist-monumental-stage {
-    padding: 24px 16px 80px 16px;
-  }
-
   .artist-top-bar {
     padding: 12px 16px;
   }
