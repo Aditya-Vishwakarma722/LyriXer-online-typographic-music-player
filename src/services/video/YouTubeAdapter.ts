@@ -92,7 +92,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
           modestbranding: 1,
           enablejsapi: 1,
           origin: window.location.origin,
-          vq: 'hd1440', // Request 1440p high definition default
+          vq: 'highres', // Request maximum available resolution (4K 2160p, 1440p, 1080p HD)
           controls: 0, // Disable YouTube's own player controls so LyriXer custom player handles everything
           showinfo: 0,
           disablekb: 1,
@@ -120,6 +120,8 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
             this.startClock();
             setTimeout(() => this.disableYouTubeCaptions(), 500);
             setTimeout(() => this.disableYouTubeCaptions(), 1500);
+            setTimeout(() => this.enforceMaxQuality(), 400);
+            setTimeout(() => this.enforceMaxQuality(), 1200);
           },
           onStateChange: (event) => {
             if (this.isDestroyed) return;
@@ -133,6 +135,15 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
               this.startClock();
               setTimeout(() => this.disableYouTubeCaptions(), 400);
               setTimeout(() => this.disableYouTubeCaptions(), 1200);
+
+              // Continuously re-verify and enforce maximum quality as DASH streams initialize
+              [300, 800, 1600, 3200, 5000].forEach((delay) => {
+                setTimeout(() => {
+                  if (!this.isDestroyed) {
+                    this.enforceMaxQuality();
+                  }
+                }, delay);
+              });
             } else if (event.data === YTState.PAUSED) {
               this.listener.onStateChange?.({ status: 'paused', paused: true });
               this.syncTime();
@@ -140,12 +151,13 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
               this.listener.onStateChange?.({ status: 'ended', paused: true });
               this.stopClock();
             } else if (event.data === YTState.BUFFERING) {
+              this.enforceMaxQuality();
               this.listener.onStateChange?.({ status: 'loading' });
             }
           },
-          onPlaybackQualityChange: () => {
+          onPlaybackQualityChange: (event: any) => {
             if (this.isDestroyed) return;
-            this.enforceMaxQuality();
+            this.enforceMaxQuality(event?.data);
             this.disableYouTubeCaptions();
           },
           onError: (event) => {
@@ -190,24 +202,54 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
   }
 
   /**
-   * Enforces the maximum available video quality (1440p+ if supported, otherwise 1080p).
+   * Enforces the maximum available video quality (4K 2160p / 1440p / 1080p Full HD).
+   * Systematically checks available stream levels from highest down to lowest.
    */
-  private enforceMaxQuality() {
+  public enforceMaxQuality(currentQuality?: string) {
     if (!this.player) return;
     try {
+      const QUALITY_HIERARCHY = [
+        'highres', // 4K 2160p / 8K (4320p / 2880p)
+        'hd2880',
+        'hd2160',  // 4K UHD (3840x2160)
+        'hd1440',  // 2K QHD (2560x1440)
+        'hd1080',  // Full HD (1920x1080)
+        'hd720',   // HD (1280x720)
+        'large',   // 480p
+        'medium',  // 360p
+        'small',   // 240p
+        'tiny',    // 144p
+      ];
+
       const available: string[] =
         typeof this.player.getAvailableQualityLevels === 'function'
           ? this.player.getAvailableQualityLevels()
           : [];
 
-      // Check quality preference hierarchy: 1440p+ ('highres', 'hd2160', 'hd1440'), then 1080p ('hd1080')
-      const targetQuality =
-        available.find((q) => ['highres', 'hd2160', 'hd1440'].includes(q)) ||
-        available.find((q) => q === 'hd1080') ||
-        (available.length > 0 ? available[0] : 'hd1080');
+      // Determine absolute best quality tier
+      let targetQuality = 'highres';
+      if (available && available.length > 0) {
+        const bestMatch = QUALITY_HIERARCHY.find((tier) => available.includes(tier));
+        targetQuality = bestMatch || available[0];
+      }
 
-      if (typeof this.player.setPlaybackQuality === 'function') {
-        this.player.setPlaybackQuality(targetQuality);
+      const activeQuality =
+        currentQuality ||
+        (typeof this.player.getPlaybackQuality === 'function'
+          ? this.player.getPlaybackQuality()
+          : null);
+
+      if (
+        activeQuality !== targetQuality ||
+        activeQuality === 'auto' ||
+        activeQuality === 'default'
+      ) {
+        if (typeof this.player.setPlaybackQuality === 'function') {
+          this.player.setPlaybackQuality(targetQuality);
+        }
+        if (typeof this.player.setPlaybackQualityRange === 'function') {
+          this.player.setPlaybackQualityRange(targetQuality, targetQuality);
+        }
       }
     } catch {
       // Quality switch may not be permitted in initial buffering phase
@@ -293,6 +335,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
   async play(): Promise<void> {
     if (this.player && typeof this.player.playVideo === 'function') {
       this.player.playVideo();
+      this.enforceMaxQuality();
     }
   }
 
@@ -305,6 +348,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
   seekTo(seconds: number): void {
     if (this.player && typeof this.player.seekTo === 'function') {
       this.player.seekTo(seconds, true);
+      this.enforceMaxQuality();
       this.syncTime();
     }
   }

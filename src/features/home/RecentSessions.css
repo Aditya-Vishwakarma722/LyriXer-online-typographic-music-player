@@ -17,47 +17,38 @@
 /* Header */
 .recent-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.recent-title-group {
+.recent-header-left {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 16px;
 }
 
-.recent-label-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.recent-index-tag {
   font-family: var(--font-code, monospace);
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--cyber-cyan, #00F2FE);
   text-transform: uppercase;
 }
 
-.recent-label-icon {
-  color: var(--cyber-cyan, #00F2FE);
-}
-
-.recent-heading {
-  font-family: var(--font-cyber, 'Rajdhani', sans-serif);
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+.recent-status-text {
+  font-family: var(--font-code, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #64748B);
   text-transform: uppercase;
-  color: #FFFFFF;
-  margin: 0;
-  text-shadow: 0 0 16px rgba(0, 242, 254, 0.2);
 }
 
-.recent-count-badge {
+.recent-count-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;

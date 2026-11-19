@@ -22,14 +22,17 @@
   justify-content: center;
   z-index: 1;
   pointer-events: none;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Rapid restore when seeking backwards from outro */
+  transition: opacity 0.4s ease-out,
+              filter 0.4s ease-out;
 }
 
-/* Suppress video opacity and apply heavy ambient blur when entering end-screen zone */
+/* Smooth 3.5s cinematic fade-out right at the end of the video (3-4 seconds), cleanly suppressing recommendations */
 .yt-fullscreen-video-viewport.suppress-recommendations {
-  opacity: 0.12;
-  filter: blur(28px) !important;
+  opacity: 0;
+  filter: blur(24px) !important;
+  transition: opacity 3.5s cubic-bezier(0.25, 1, 0.5, 1),
+              filter 3.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .yt-fullscreen-host {
@@ -90,7 +93,7 @@
 
 /* 2b. End-Screen Anti-Recommendation Shield
    Aggressively covers and dissolves YouTube recommended video cards / suggested video overlays
-   in the last 20 seconds while the song is still playing. */
+   in the last 3-4 seconds with a smooth 3.5s fade animation. */
 .yt-end-recommendations-shield {
   position: absolute;
   inset: 0;
@@ -105,18 +108,19 @@
     /* Overall atmospheric dark gradient */
     radial-gradient(
       ellipse at 50% 50%,
-      rgba(11, 11, 13, 0.90) 0%,
+      rgba(11, 11, 13, 0.92) 0%,
       rgba(8, 8, 11, 0.98) 70%,
       #08080B 100%
     );
   backdrop-filter: blur(36px);
   -webkit-backdrop-filter: blur(36px);
   opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s ease-out;
 }
 
 .yt-end-recommendations-shield.active {
   opacity: 1;
+  transition: opacity 3.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* 3. Centered Lyrics Overlay (Floating on top of playing video) */

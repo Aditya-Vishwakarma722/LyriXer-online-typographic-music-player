@@ -4,12 +4,14 @@ console.log('====================================================');
 console.log('    LYRIXER: END-SCREEN RECOMMENDATION SUPPRESSION  ');
 console.log('====================================================');
 
-// Logic under test: determines if playback is in the YouTube end-screen card zone
+const OUTRO_FADE_SECONDS = 3.5;
+
+// Logic under test: determines if playback is in the 3-4s YouTube end-screen fade zone
 function computeNearEnd(currentTime: number, duration: number, isEnded: boolean = false): boolean {
   return Boolean(
     duration &&
-    duration >= 20 &&
-    currentTime >= Math.max(0, duration - 20) &&
+    duration > OUTRO_FADE_SECONDS &&
+    currentTime >= Math.max(0, duration - OUTRO_FADE_SECONDS) &&
     !isEnded
   );
 }
@@ -22,17 +24,17 @@ const midSong = computeNearEnd(60, duration240s, false);
 assert.equal(midSong, false, 'Should not suppress during normal mid-song playback');
 console.log('  ✓ Recommendations shield is INACTIVE (video backdrop normal)');
 
-// Test 2: Just before the 20-second end threshold (at 219s of 240s)
-console.log('\n[TEST 2] 21s before video ends (at 219s of 240s)');
-const beforeThreshold = computeNearEnd(219, duration240s, false);
-assert.equal(beforeThreshold, false, 'Should not suppress before 20s threshold');
-console.log('  ✓ Recommendations shield is INACTIVE before threshold');
+// Test 2: 10s before video ends (at 230s of 240s) - previously suppressed, now fully visible!
+console.log('\n[TEST 2] 10s before video ends (at 230s of 240s)');
+const beforeThreshold = computeNearEnd(230, duration240s, false);
+assert.equal(beforeThreshold, false, 'Video remains 100% visible before 3.5s outro threshold');
+console.log('  ✓ Recommendations shield is INACTIVE before threshold (full video visibility maintained)');
 
-// Test 3: Entering the 20-second end zone (at 220s of 240s) while song is playing
-console.log('\n[TEST 3] In 20-second outro/end zone (at 225s of 240s) while current song is playing');
-const inEndZone = computeNearEnd(225, duration240s, false);
-assert.equal(inEndZone, true, 'Must activate recommendation suppression during end zone');
-console.log('  ✓ Recommendations shield is ACTIVE: YouTube recommended videos & end cards hidden!');
+// Test 3: Entering the 3.5-second outro zone (at 237s of 240s) while song is playing
+console.log('\n[TEST 3] In 3.5-second outro fade zone (at 237s of 240s) while current song is playing');
+const inEndZone = computeNearEnd(237, duration240s, false);
+assert.equal(inEndZone, true, 'Must activate recommendation suppression during 3.5s outro fade zone');
+console.log('  ✓ Recommendations shield is ACTIVE: 3.5s smooth fade-out hides recommendations & end cards!');
 
 // Test 4: Seeking backward reverts suppression
 console.log('\n[TEST 4] User seeks back to 100s');

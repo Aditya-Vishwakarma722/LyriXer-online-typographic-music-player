@@ -79,6 +79,7 @@ function lyrixerApiPlugin(): Plugin {
     // Endpoint 1: Fetch live official music videos, collabs, and album audios from YouTube
     if (parsedUrl.pathname === '/api/artist-videos') {
       const artist = parsedUrl.searchParams.get('artist') || '';
+      const refresh = parsedUrl.searchParams.get('refresh') === 'true' || parsedUrl.searchParams.get('refresh') === '1';
       if (!artist) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ tracks: [] }));
@@ -86,7 +87,7 @@ function lyrixerApiPlugin(): Plugin {
       }
 
       const cacheKey = artist.toLowerCase().trim();
-      if (artistVideosCache.has(cacheKey)) {
+      if (!refresh && artistVideosCache.has(cacheKey)) {
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.end(JSON.stringify({ tracks: artistVideosCache.get(cacheKey) }));
@@ -163,6 +164,28 @@ function lyrixerApiPlugin(): Plugin {
               '';
             const views = formatViewCount(rawViews);
 
+            let trackYear = '';
+            const pubText =
+              v.publishedTimeText?.simpleText ||
+              v.publishedTimeText?.runs?.map((r: any) => r.text).join('') ||
+              '';
+            if (/second|minute|hour|day|week|month/i.test(pubText)) {
+              trackYear = String(new Date().getFullYear());
+            } else if (/(\d+)\s*year/i.test(pubText)) {
+              const diffMatch = pubText.match(/(\d+)\s*year/i);
+              if (diffMatch) {
+                const diff = parseInt(diffMatch[1], 10);
+                trackYear = String(Math.max(2000, new Date().getFullYear() - diff));
+              }
+            }
+            const titleYear = (title || rawTitle).match(/\b(20\d\d)\b/);
+            if (!trackYear && titleYear) {
+              trackYear = titleYear[1];
+            }
+            if (!trackYear) {
+              trackYear = String(new Date().getFullYear());
+            }
+
             allTracks.push({
               id: `${artist.toLowerCase().replace(/[^a-z0-9]/g, '')}-${v.videoId}`,
               title: title || rawTitle,
@@ -173,6 +196,7 @@ function lyrixerApiPlugin(): Plugin {
               videoId: v.videoId,
               isOfficial: true,
               trackType,
+              year: trackYear,
               views,
               thumbnailUrl: `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`,
             });

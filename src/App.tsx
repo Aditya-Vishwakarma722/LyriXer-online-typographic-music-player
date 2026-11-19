@@ -3,7 +3,6 @@ import { AtmosphericBackground } from './components/AtmosphericBackground';
 import { Navbar } from './features/home/Navbar';
 import { Hero } from './features/home/Hero';
 import { VideoInput } from './features/home/VideoInput';
-import { KineticTicker } from './components/KineticTicker';
 import { TrendingTracksSection } from './features/home/TrendingTracksSection';
 import { RecentSessions } from './features/home/RecentSessions';
 import { Footer } from './features/home/Footer';
@@ -261,9 +260,6 @@ export const App: React.FC = () => {
                 }}
               />
             </Hero>
-
-            {/* Kinetic Audio Engine Marquee Ticker */}
-            <KineticTicker />
 
             {/* Current Trending Instagram & YouTube Songs Section */}
             <TrendingTracksSection

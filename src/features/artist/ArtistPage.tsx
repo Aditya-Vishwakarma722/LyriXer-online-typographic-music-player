@@ -2,21 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
-  CheckCircle2,
   ExternalLink,
   Flame,
-  Headphones,
   Radio,
   Play,
-  Disc3,
-  Layers,
   Terminal,
 } from 'lucide-react';
 import { ArtistTrackRow } from './ArtistTrackRow';
 import { ArtistService } from '../../services/artist/artistService';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import { AcousticPrismDeck, type PrismTrackInfo } from '../../components/AcousticPrismDeck';
-import { KineticTicker } from '../../components/KineticTicker';
 import type { ArtistProfile, ArtistTrack } from '../../types/artist';
 import type { VideoSource } from '../../types/session';
 import './ArtistPage.css';
@@ -73,7 +68,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
     ArtistService.fetchArtistProfile(targetArtistName)
       .then((resolved) => {
         const elapsed = Date.now() - startTime;
-        const minBufferMs = 500;
+        const minBufferMs = 450;
         const remaining = Math.max(0, minBufferMs - elapsed);
         setTimeout(() => {
           if (!isCancelled) {
@@ -144,18 +139,9 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
       : `VERIFIED ARCHIVE // ${profile.genre.toUpperCase()}`,
   };
 
-  const tickerItems = [
-    `SUBJECT: ${profile.name.toUpperCase()}`,
-    `ARCHIVE_ID // 0x${profile.id.toUpperCase()}`,
-    `${profile.genre.toUpperCase()} MASTER DISCOGRAPHY`,
-    `${profile.tracks.length} VERIFIED MASTER RECORDINGS`,
-    `LRCLIB REAL-TIME SYNCHRONIZED LYRICS`,
-    `24-BIT / 96kHz LOSSLESS AUDIO ENGINE`,
-  ];
-
   return (
     <div className="artist-page-root" role="region" aria-label={`Artist Profile: ${profile.name}`}>
-      {/* 0. Authentic Cybernetic Minimalist Loading Screen */}
+      {/* 0. Minimalist Cybernetic Terminal Loading Buffer Screen */}
       <AnimatePresence>
         {isLoading && (
           <motion.div
@@ -163,17 +149,12 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
             className="artist-loading-screen"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } }}
+            transition={{ duration: 0.25 }}
           >
             <div className="loading-hud-chassis">
-              <span className="hud-corner-bracket corner-tl" />
-              <span className="hud-corner-bracket corner-tr" />
-              <span className="hud-corner-bracket corner-bl" />
-              <span className="hud-corner-bracket corner-br" />
-
               <div className="loading-hud-header">
-                <Terminal size={14} className="loading-terminal-icon" />
+                <Terminal size={13} className="loading-terminal-icon" />
                 <span className="loading-hud-title">SYSTEM // ARCHIVE_DECODER</span>
                 <span className="loading-live-dot" />
               </div>
@@ -199,7 +180,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
         )}
       </AnimatePresence>
 
-      {/* 1. Monochromatic Atmospheric Photo Backdrop */}
+      {/* 1. Atmospheric Photo Backdrop */}
       <div className="artist-bg-viewport" aria-hidden="true">
         <motion.img
           key={profile.heroImageUrl}
@@ -215,14 +196,14 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
             }
           }}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.18 }}
-          transition={{ duration: 1 }}
+          animate={{ opacity: 0.14 }}
+          transition={{ duration: 0.8 }}
         />
         <div className="artist-gradient-left" />
         <div className="artist-gradient-bottom" />
       </div>
 
-      {/* 2. Top HUD Navigation Bar */}
+      {/* 2. Top Minimal HUD Bar */}
       <header className="artist-top-bar">
         <div className="artist-nav-left">
           <BrandLogo size="sm" onClick={onBackToHome} className="artist-header-brand" />
@@ -268,75 +249,54 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
         </div>
       </header>
 
-      {/* 3. Kinetic Ticker Ribbon */}
-      <KineticTicker items={tickerItems} speed="normal" className="artist-kinetic-ribbon" />
-
-      {/* 4. Main Architectural Stage */}
+      {/* 3. Main Architectural Stage */}
       <div className="artist-monumental-stage">
         {/* ============================================================== */}
-        {/* SECTION A: Monumental Artist Monograph Header                  */}
+        {/* SECTION A: Monumental Artist Dossier (Ref: Hybrid Human ref_16)*/}
         {/* ============================================================== */}
-        <section className="artist-monograph-card" aria-label="Artist Dossier">
-          <span className="hud-corner-bracket corner-tl" aria-hidden="true" />
-          <span className="hud-corner-bracket corner-tr" aria-hidden="true" />
-          <span className="hud-corner-bracket corner-bl" aria-hidden="true" />
-          <span className="hud-corner-bracket corner-br" aria-hidden="true" />
-
-          <div className="monograph-top-spec">
-            <span>SYS_ID: 0x{profile.id.toUpperCase()}-VERIFIED</span>
-            <span className="spec-dot">&middot;</span>
-            <span>CATALOGUE: {profile.tracks.length} TRACKS</span>
-            <span className="spec-dot">&middot;</span>
-            <span className="spec-cyan">STATUS // ACTIVE_STREAM</span>
-          </div>
-
-          <div className="monograph-content-grid">
+        <section className="artist-dossier-hero" aria-label="Artist Dossier">
+          <div className="dossier-content-grid">
             {/* Visual Subject Card */}
-            <div className="monograph-avatar-frame">
+            <div className="dossier-avatar-frame">
               <img
                 src={profile.heroImageUrl}
                 alt={profile.name}
-                className="monograph-avatar-img"
+                className="dossier-avatar-img"
                 referrerPolicy="no-referrer"
               />
-              <div className="avatar-hud-overlay">
-                <span className="avatar-coord-tag">REC_01</span>
-                {profile.verified && (
-                  <span className="avatar-verified-badge" title="Official Verified Artist">
-                    <CheckCircle2 size={12} />
-                    <span>VERIFIED</span>
-                  </span>
-                )}
-              </div>
+              <span className="dossier-coord-chip">REC_01 // VERIFIED</span>
             </div>
 
             {/* Subject Data & Dossier */}
-            <div className="monograph-info-pane">
-              <div className="monograph-tag-row">
-                <span className="monograph-genre-chip">GENRE // {profile.genre.toUpperCase()}</span>
-                {profile.monthlyListeners && (
-                  <span className="monograph-listeners-chip">
-                    <Headphones size={12} />
-                    <span>AUDIENCE // {profile.monthlyListeners.toUpperCase()}</span>
-                  </span>
-                )}
-                <span className="monograph-audio-chip">24-BIT / 96kHz HI-RES</span>
+            <div className="dossier-info-pane">
+              <div className="dossier-meta-lead">
+                <span>SUBJECT // 0x{profile.id.toUpperCase()}</span>
+                <span className="meta-sep">&middot;</span>
+                <span className="meta-genre">GENRE // {profile.genre.toUpperCase()}</span>
               </div>
 
-              <h1 className="monograph-artist-title">{profile.name}</h1>
+              <h1 className="dossier-artist-title">{profile.name}</h1>
 
-              {profile.bio && <p className="monograph-bio-text">{profile.bio}</p>}
+              <div className="dossier-telemetry-strip">
+                {profile.monthlyListeners && (
+                  <span className="telemetry-chip">[ AUDIENCE // {profile.monthlyListeners.toUpperCase()} ]</span>
+                )}
+                <span className="telemetry-chip">[ {profile.tracks.length} MASTER_TRACKS ]</span>
+                <span className="telemetry-chip">[ 24-BIT / 96kHz HI-RES ]</span>
+              </div>
+
+              {profile.bio && <p className="dossier-bio-text">{profile.bio}</p>}
 
               {profile.youtubeChannelUrl && (
-                <div className="monograph-action-row">
+                <div className="dossier-action-row">
                   <a
                     href={profile.youtubeChannelUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="monograph-channel-btn"
+                    className="dossier-channel-btn"
                   >
                     <span>[ EXPLORE OFFICIAL YOUTUBE ARCHIVE ]</span>
-                    <ExternalLink size={12} />
+                    <ExternalLink size={11} />
                   </a>
                 </div>
               )}
@@ -345,7 +305,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
         </section>
 
         {/* ============================================================== */}
-        {/* SECTION B: Category Filter Tabs Navigation                     */}
+        {/* SECTION B: Minimal Category Filter Strip                       */}
         {/* ============================================================== */}
         <div className="artist-catalogue-controls">
           <div className="catalogue-category-tabs" role="tablist" aria-label="Catalogue Categories">
@@ -356,7 +316,6 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
               className={`cat-tab ${activeCategory === 'all' ? 'active' : ''}`}
               onClick={() => setActiveCategory('all')}
             >
-              <Layers size={13} />
               <span>[ ALL_RELEASES // {profile.tracks.length} ]</span>
             </button>
             <button
@@ -366,7 +325,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
               className={`cat-tab ${activeCategory === 'popular' ? 'active' : ''}`}
               onClick={() => setActiveCategory('popular')}
             >
-              <Flame size={13} className="cat-flame-icon" />
+              <Flame size={12} className="cat-flame-icon" />
               <span>[ TOP_HITS ]</span>
             </button>
             <button
@@ -394,14 +353,13 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
               className={`cat-tab ${activeCategory === 'audio' ? 'active' : ''}`}
               onClick={() => setActiveCategory('audio')}
             >
-              <Disc3 size={13} />
               <span>[ ALBUM_AUDIOS {audioCount > 0 ? `// ${audioCount}` : ''} ]</span>
             </button>
           </div>
         </div>
 
         {/* ============================================================== */}
-        {/* SECTION C: Discography Ledger & Acoustic Companion             */}
+        {/* SECTION C: Expansive Discography Ledger & Acoustic Companion   */}
         {/* ============================================================== */}
         <div className="artist-workspace-layout">
           {/* Main Tracklist Ledger */}
@@ -440,23 +398,17 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
             )}
 
             <footer className="artist-footer-meta">
-              <span className="footer-code-tag">// DATA_SOURCE</span>
+              <span className="footer-code-tag">// DATA_SOURCE:</span>
               <span>{profile.imageAttribution || 'Official Discography Metadata Verified by LyriXer Engine'}</span>
             </footer>
           </section>
 
-          {/* Acoustic Station Deck (Clean Companion) */}
+          {/* Compact Acoustic Companion */}
           <aside className="artist-station-column" aria-label="Acoustic Station">
-            {/* Turntable Deck */}
             <div className="artist-station-card">
-              <span className="hud-corner-bracket corner-tl" aria-hidden="true" />
-              <span className="hud-corner-bracket corner-tr" aria-hidden="true" />
-              <span className="hud-corner-bracket corner-bl" aria-hidden="true" />
-              <span className="hud-corner-bracket corner-br" aria-hidden="true" />
-
               <div className="station-card-header">
-                <Radio size={13} className="station-icon" />
-                <span className="station-title">ACOUSTIC // PRISM_STATION</span>
+                <Radio size={12} className="station-icon" />
+                <span className="station-title">PRISM_STATION</span>
                 <span className="station-live-dot" />
               </div>
 
@@ -472,38 +424,6 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                   size="sm"
                 />
               </div>
-
-              {/* Quick Telemetry Grid */}
-              <div className="station-stats-grid">
-                <div className="station-stat-item">
-                  <span className="stat-label">// RELEASES</span>
-                  <span className="stat-value">{profile.tracks.length}</span>
-                </div>
-                <div className="station-stat-item">
-                  <span className="stat-label">// OFFICIAL_MV</span>
-                  <span className="stat-value">{videoCount}</span>
-                </div>
-                <div className="station-stat-item">
-                  <span className="stat-label">// FEATURES</span>
-                  <span className="stat-value">{collabCount}</span>
-                </div>
-                <div className="station-stat-item">
-                  <span className="stat-label">// ENGINE</span>
-                  <span className="stat-value">24-BIT</span>
-                </div>
-              </div>
-
-              {displayedTracks.length > 0 && (
-                <button
-                  type="button"
-                  className="station-lead-play-btn"
-                  onClick={() => onSelectTrack(displayedTracks[0])}
-                  title={`Play lead track: ${displayedTracks[0].title}`}
-                >
-                  <Play size={12} fill="currentColor" />
-                  <span>ENGAGE #1: {displayedTracks[0].title.toUpperCase()}</span>
-                </button>
-              )}
             </div>
           </aside>
         </div>

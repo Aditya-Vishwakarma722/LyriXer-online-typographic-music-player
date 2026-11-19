@@ -53,6 +53,17 @@ export function formatViewCount(raw?: string): string {
  */
 const artistProfileCache = new Map<string, ArtistProfile>();
 
+export const ARTIST_CACHE_PREFIX = 'lyrixer_artist_cache_v2_';
+export const RELEASE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6-hour interval check for new music
+
+export interface CachedArtistRecord {
+  profile: ArtistProfile;
+  lastChecked: number;
+}
+
+export type ProfileUpdateListener = (profile: ArtistProfile, newCount: number) => void;
+export const profileUpdateListeners = new Set<ProfileUpdateListener>();
+
 /**
  * Upscales artist photography to pristine 1920x1920 or full-resolution master quality.
  */
@@ -2229,10 +2240,131 @@ export class ArtistService {
   }
 
   /**
-   * Retrieves an artist profile by ID from the catalog.
+   * Subscribes to dynamic catalog updates when new releases are detected.
    */
-  static getArtistById(artistId: string): ArtistProfile {
-    return this.getArtistByName(artistId);
+  static subscribeArtistUpdates(listener: ProfileUpdateListener): () => void {
+    profileUpdateListeners.add(listener);
+    return () => profileUpdateListeners.delete(listener);
+  }
+
+  /**
+   * Broadcasts catalog updates to all listening components.
+   */
+  static notifyProfileUpdate(profile: ArtistProfile, newCount: number): void {
+    profileUpdateListeners.forEach((listener) => {
+      try {
+        listener(profile, newCount);
+      } catch (err) {
+        console.error('Error in artist update listener:', err);
+      }
+    });
+  }
+
+  /**
+   * Reads persistent artist record from localStorage.
+   */
+  static getStoredRecord(cleanKey: string): CachedArtistRecord | null {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      const raw = localStorage.getItem(`${ARTIST_CACHE_PREFIX}${cleanKey}`);
+      if (raw) {
+        return JSON.parse(raw);
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }
+
+  /**
+   * Saves persistent artist record to localStorage & memory cache.
+   */
+  static saveStoredRecord(cleanKey: string, profile: ArtistProfile, lastChecked = Date.now()): void {
+    artistProfileCache.set(cleanKey, profile);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem(
+          `${ARTIST_CACHE_PREFIX}${cleanKey}`,
+          JSON.stringify({ profile, lastChecked })
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  /**
+   * Runs an automatic periodic update check against YouTube & online sources.
+   * Compares the current artist discography against fresh releases and merges any newly uploaded tracks.
+   */
+  static async checkForNewReleases(
+    artistName: string,
+    currentProfile: ArtistProfile,
+    force = false
+  ): Promise<{ updatedProfile: ArtistProfile; newCount: number }> {
+    if (!artistName || !currentProfile) {
+      return { updatedProfile: currentProfile, newCount: 0 };
+    }
+
+    const trimmed = artistName.trim();
+    const cleanKey = currentProfile.id || trimmed.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    // Check interval
+    const stored = this.getStoredRecord(cleanKey);
+    const now = Date.now();
+    if (!force && stored && now - stored.lastChecked < RELEASE_CHECK_INTERVAL_MS) {
+      return { updatedProfile: currentProfile, newCount: 0 };
+    }
+
+    try {
+      const vRes = await fetch(`/api/artist-videos?artist=${encodeURIComponent(trimmed)}&refresh=true`);
+      if (vRes.ok) {
+        const vData = await vRes.json();
+        if (Array.isArray(vData.tracks) && vData.tracks.length > 0) {
+          const seenVideoIds = new Set(currentProfile.tracks.map((t) => t.videoId));
+          const seenTitles = new Set(
+            currentProfile.tracks.map((t) => (t.title || '').toLowerCase().replace(/[^a-z0-9]/g, ''))
+          );
+
+          const newTracks: ArtistTrack[] = [];
+          for (const dynTrack of vData.tracks) {
+            const titleKey = (dynTrack.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (!seenVideoIds.has(dynTrack.videoId) && (titleKey.length <= 2 || !seenTitles.has(titleKey))) {
+              seenVideoIds.add(dynTrack.videoId);
+              if (titleKey.length > 2) seenTitles.add(titleKey);
+              newTracks.push({
+                ...dynTrack,
+                year: dynTrack.year || String(new Date().getFullYear()),
+              });
+            }
+          }
+
+          if (newTracks.length > 0) {
+            // New releases detected! Prepend them to the discography
+            const mergedTracks = [...newTracks, ...currentProfile.tracks];
+            const updatedProfile: ArtistProfile = {
+              ...currentProfile,
+              tracks: mergedTracks,
+              lastChecked: now,
+              lastUpdated: now,
+            };
+            this.saveStoredRecord(cleanKey, updatedProfile, now);
+            this.notifyProfileUpdate(updatedProfile, newTracks.length);
+            return { updatedProfile, newCount: newTracks.length };
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Auto-update release check error:', err);
+    }
+
+    // No new tracks found, but record the check timestamp
+    const touchedProfile: ArtistProfile = {
+      ...currentProfile,
+      lastChecked: now,
+    };
+    this.saveStoredRecord(cleanKey, touchedProfile, now);
+    return { updatedProfile: touchedProfile, newCount: 0 };
   }
 
   /**
@@ -2240,8 +2372,9 @@ export class ArtistService {
    * 1. Retrieves authentic high-resolution photograph and biography from Deezer / Wikipedia.
    * 2. Retrieves the artist's official YouTube music video catalogue.
    * 3. Falls back gracefully to curated datasets or client-side Wikipedia REST API.
+   * 4. Periodically checks for newly uploaded releases.
    */
-  static async fetchArtistProfile(artistName: string): Promise<ArtistProfile> {
+  static async fetchArtistProfile(artistName: string, forceRefresh = false): Promise<ArtistProfile> {
     if (!artistName || !artistName.trim()) {
       return CURATED_ARTISTS['juicewrld'];
     }
@@ -2249,8 +2382,20 @@ export class ArtistService {
     const trimmed = artistName.trim();
     const cleanKey = trimmed.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    // Check in-memory cache first
-    if (artistProfileCache.has(cleanKey)) {
+    // 1. Check persistent record first
+    const stored = this.getStoredRecord(cleanKey);
+    const now = Date.now();
+    if (stored && !forceRefresh) {
+      artistProfileCache.set(cleanKey, stored.profile);
+      // If older than check interval (6 hours), run update check in the background
+      if (now - stored.lastChecked > RELEASE_CHECK_INTERVAL_MS) {
+        this.checkForNewReleases(trimmed, stored.profile).catch(() => {});
+      }
+      return stored.profile;
+    }
+
+    // 2. Check in-memory cache
+    if (artistProfileCache.has(cleanKey) && !forceRefresh) {
       return artistProfileCache.get(cleanKey)!;
     }
 
@@ -2373,6 +2518,7 @@ export class ArtistService {
                   isOfficial: true,
                   trackType: isCollab ? ('collab' as const) : ('audio' as const),
                   album: r.collectionName,
+                  year: r.releaseDate ? r.releaseDate.substring(0, 4) : undefined,
                   thumbnailUrl: r.artworkUrl100?.replace('100x100bb', '600x600bb'),
                 };
               });
@@ -2398,13 +2544,15 @@ export class ArtistService {
       heroImageUrl: finalHeroUrl,
       portraitImageUrl: baseProfile?.portraitImageUrl || finalHeroUrl,
       heroImages: webHeroImages.length > 0 ? webHeroImages : baseProfile?.heroImages,
+      albumCovers: baseProfile?.albumCovers,
       imageAttribution: webAttribution,
       youtubeChannelUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(trimmed + ' official music videos')}`,
       tracks: tracks.length > 0 ? tracks : (baseProfile?.tracks || []),
+      lastChecked: now,
     };
 
-    // Cache profile for instant future access
-    artistProfileCache.set(cleanKey, finalProfile);
+    // Save to persistent storage and cache
+    this.saveStoredRecord(cleanKey, finalProfile, now);
 
     return finalProfile;
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { History, Play, FileVideo, Disc3 } from 'lucide-react';
+import { Play, FileVideo, Disc3 } from 'lucide-react';
 import { YoutubeIcon } from '../../components/ui/Icons';
 import SpotlightCard from '../../components/reactbits/SpotlightCard';
 import type { RecentSession, VideoSource } from '../../types/session';
@@ -35,20 +35,10 @@ export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSe
       <div className="recent-container">
         {/* Section Header */}
         <div className="recent-header">
-          <div className="recent-title-group">
-            <div className="recent-label-row">
-              <History size={12} className="recent-label-icon" />
-              <span className="recent-label-tag">STUDIO VAULT ARCHIVE</span>
-            </div>
-            <h2 className="recent-heading">Recent Playback Sessions</h2>
+          <div className="recent-header-left">
+            <span className="recent-index-tag">[ 02 // STUDIO_VAULT_ARCHIVE ]</span>
+            <span className="recent-status-text">CACHED_SESSIONS // {displaySessions.length} RECORDS</span>
           </div>
-
-          {displaySessions.length > 0 && (
-            <div className="recent-count-badge">
-              <Disc3 size={12} className="count-disc-icon" />
-              <span>{displaySessions.length} {displaySessions.length === 1 ? 'Record' : 'Records'} Cached</span>
-            </div>
-          )}
         </div>
 
         {/* Content: Empty State vs Cards */}

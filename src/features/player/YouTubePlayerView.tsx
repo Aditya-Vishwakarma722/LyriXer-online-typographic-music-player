@@ -65,12 +65,13 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<Yo
   const listenerRef = useRef(listener);
   const onAdapterReadyRef = useRef(onAdapterReady);
 
-  // YouTube displays end-screen recommendation cards in the last 20 seconds of playback.
-  // Suppress and hide all recommendations while the current song is still playing.
+  // Outro fade threshold: smooth 3.5s cinematic fade-out right at the end of playback (3-4 seconds),
+  // cleanly shielding YouTube end-screen cards and recommendation grids without disrupting the song.
+  const OUTRO_FADE_SECONDS = 3.5;
   const isNearEnd = Boolean(
     duration &&
-    duration >= 20 &&
-    currentTime >= Math.max(0, duration - 20) &&
+    duration > OUTRO_FADE_SECONDS &&
+    currentTime >= Math.max(0, duration - OUTRO_FADE_SECONDS) &&
     !isEnded
   );
 
