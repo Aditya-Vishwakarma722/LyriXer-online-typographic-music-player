@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { YouTubePlayerView } from './YouTubePlayerView';
 import { LocalPlayerView } from './LocalPlayerView';
 import { PlayerControls } from './PlayerControls';
+import { CinematicPauseOverlay } from './CinematicPauseOverlay';
 import { LrclibSearchModal } from './LrclibSearchModal';
 import { PlayerIntroModal } from './PlayerIntroModal';
 import { LyricsProvider } from '../../services/lyrics/LyricsProvider';
@@ -121,6 +122,13 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     playerState.status === 'ended' ||
     (playerState.duration > 5 && playerState.currentTime >= playerState.duration - 0.6) ||
     isSongEnded;
+
+  // Cinematic pause screen overlay condition (matches streaming cinema UI when playback is paused)
+  const isPauseOverlayVisible =
+    playerState.paused &&
+    !isPlaybackEnded &&
+    playerState.status !== 'loading' &&
+    !showIntroModal;
 
   /**
    * Applies manual timing offset adjustments (Fine Adjust Delay/Rush, Brackets [ ], etc.)
@@ -467,7 +475,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
       />
 
       {/* Floating Top Header Overlay */}
-      <header className={`player-top-header ${controlsVisible ? 'visible' : 'hidden'}`}>
+      <header className={`player-top-header ${controlsVisible && !isPauseOverlayVisible ? 'visible' : 'hidden'}`}>
         <div className="header-brand">
           <BrandLogo size="sm" onClick={onExit} />
 
@@ -559,7 +567,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           fontSizeScale={preferences.fontSize}
           blurLevel={preferences.blurLevel}
           overlayOpacity={preferences.overlayOpacity}
-          lyricsVisible={lyricsVisible}
+          lyricsVisible={lyricsVisible && !isPauseOverlayVisible}
           onAdapterReady={handleAdapterReady}
           listener={listener}
           onSeekTo={(sec) => adapter?.seekTo(sec)}
@@ -584,7 +592,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           fontSizeScale={preferences.fontSize}
           blurLevel={preferences.blurLevel}
           overlayOpacity={preferences.overlayOpacity}
-          lyricsVisible={lyricsVisible}
+          lyricsVisible={lyricsVisible && !isPauseOverlayVisible}
           onAdapterReady={handleAdapterReady}
           listener={listener}
           onSeekTo={(sec) => adapter?.seekTo(sec)}
@@ -598,8 +606,33 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         />
       )}
 
+      {/* Cinematic Pause Screen Overlay (Matches Streaming UI When Paused) */}
+      <CinematicPauseOverlay
+        isVisible={isPauseOverlayVisible}
+        currentTime={playerState.currentTime}
+        duration={playerState.duration || source.duration || 0}
+        volume={playerState.volume}
+        muted={playerState.muted}
+        trackTitle={trackInfo.title}
+        artistName={effectiveArtist}
+        lyrics={lyrics}
+        activeLyricIndex={activeIndex}
+        lyricsVisible={lyricsVisible}
+        isFullScreen={isFullScreen}
+        onResume={() => adapter?.play()}
+        onSeek={(sec) => adapter?.seekTo(sec)}
+        onVolumeChange={(vol) => adapter?.setVolume(vol)}
+        onToggleMute={() => adapter?.setMuted(!playerState.muted)}
+        onToggleLyrics={() => setLyricsVisible((prev) => !prev)}
+        onOpenLrclibSearch={() => setIsSearchModalOpen(true)}
+        onOpenSettings={() => setShowIntroModal(true)}
+        onToggleFullScreen={handleToggleFullScreen}
+        onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
+        onExit={onExit}
+      />
+
       {/* Floating Bottom Player Controls */}
-      <div className={`controls-wrapper ${controlsVisible ? 'visible' : 'hidden'}`}>
+      <div className={`controls-wrapper ${controlsVisible && !isPauseOverlayVisible ? 'visible' : 'hidden'}`}>
         <PlayerControls
           playerState={playerState}
           title={trackInfo.title}

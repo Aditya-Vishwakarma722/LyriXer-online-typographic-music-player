@@ -1,0 +1,517 @@
+/* ============================================================== */
+/* Cinematic Pause Overlay (Matches Reference Screenshot)          */
+/* ============================================================== */
+.cinematic-pause-root {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+/* Atmospheric Cinematic Vignette Shading */
+.pause-vignette-left {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgba(6, 6, 10, 0.94) 0%,
+    rgba(6, 6, 10, 0.82) 30%,
+    rgba(6, 6, 10, 0.45) 55%,
+    rgba(6, 6, 10, 0.1) 80%,
+    transparent 100%
+  );
+}
+
+.pause-vignette-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    0deg,
+    rgba(6, 6, 10, 0.98) 0%,
+    rgba(6, 6, 10, 0.75) 30%,
+    rgba(6, 6, 10, 0.25) 65%,
+    transparent 100%
+  );
+}
+
+.pause-vignette-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24%;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 6, 10, 0.8) 0%,
+    rgba(6, 6, 10, 0.2) 60%,
+    transparent 100%
+  );
+}
+
+/* ============================================================== */
+/* Top Header Sub-monograph (Centered like Screenshot)            */
+/* ============================================================== */
+.pause-top-monograph {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px 0;
+  width: 100%;
+}
+
+.top-monograph-title {
+  font-size: clamp(0.85rem, 1.1vw, 0.98rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.pause-exit-btn {
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.pause-exit-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: scale(1.08);
+}
+
+/* ============================================================== */
+/* Left Editorial Informational Stack                             */
+/* ============================================================== */
+.pause-editorial-stack {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding-left: clamp(28px, 5.5vw, 72px);
+  padding-right: 24px;
+  max-width: clamp(380px, 45vw, 640px);
+  margin-top: auto;
+  margin-bottom: auto;
+  cursor: default;
+}
+
+/* Eyebrow Label */
+.pause-eyebrow {
+  margin-bottom: 8px;
+}
+
+.pause-eyebrow span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Main Title */
+.pause-main-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(2rem, 3.8vw, 3.3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.9);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Subtitle / Season / Album Line */
+.pause-meta-row {
+  margin-bottom: 12px;
+}
+
+.pause-subtitle {
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Badges Row */
+.pause-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pause-badge-box {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pause-badge-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.pause-badge-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.rating-star {
+  color: #FBBF24;
+  font-size: 0.9rem;
+}
+
+.pause-badge-synced {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #DDD6FE;
+  background: rgba(167, 139, 250, 0.2);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  padding: 2px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+/* Chapter / Current Lyric Header */
+.pause-chapter-header {
+  margin-bottom: 8px;
+}
+
+.pause-chapter-title {
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Detailed Synopsis Paragraph */
+.pause-synopsis {
+  font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 22px 0;
+  max-width: 520px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Action Buttons */
+.pause-action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.pause-resume-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: #FFFFFF;
+  color: #09090D;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.pause-resume-btn:hover {
+  background: #E2E8F0;
+  transform: scale(1.04);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.35);
+}
+
+.pause-artist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  background: rgba(167, 139, 250, 0.15);
+  color: #DDD6FE;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.pause-artist-btn:hover {
+  background: rgba(167, 139, 250, 0.28);
+  border-color: rgba(167, 139, 250, 0.6);
+  color: #FFFFFF;
+  transform: scale(1.04);
+}
+
+/* ============================================================== */
+/* Bottom Timeline Scrubber & Controls (Matches Screenshot)       */
+/* ============================================================== */
+.pause-bottom-bar {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  padding: 0 clamp(24px, 4.5vw, 56px) clamp(20px, 3vh, 36px);
+  cursor: default;
+}
+
+/* Scrubber Timeline */
+.pause-timeline-scrubber {
+  position: relative;
+  width: 100%;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.pause-timeline-track {
+  width: 100%;
+  height: 3.5px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.24);
+  position: relative;
+  overflow: hidden;
+  transition: height 0.15s ease;
+}
+
+.pause-timeline-scrubber:hover .pause-timeline-track {
+  height: 6px;
+}
+
+.pause-timeline-progress {
+  height: 100%;
+  background: #A855F7;
+  border-radius: 2px;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.8);
+  transition: width 0.05s linear;
+}
+
+.pause-scrub-tooltip {
+  position: absolute;
+  top: -30px;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 20, 0.95);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  color: #FFFFFF;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Controls Buttons Row */
+.pause-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pause-controls-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+}
+
+.pause-controls-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 28px);
+}
+
+/* Icon Buttons (Matches Screenshot Style) */
+.pause-icon-btn {
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: transform 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+  opacity: 0.92;
+}
+
+.pause-icon-btn:hover {
+  transform: scale(1.12);
+  opacity: 1;
+  color: #C084FC;
+}
+
+.pause-icon-btn:active {
+  transform: scale(0.96);
+}
+
+.pause-icon-btn.active-accent {
+  color: #A855F7;
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.7));
+}
+
+.pause-seek-10 {
+  opacity: 0.95;
+}
+
+/* Volume Container & Flyout Slider */
+.pause-volume-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pause-volume-slider-wrap {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  margin-left: 0;
+}
+
+.pause-volume-slider-wrap.visible,
+.pause-volume-container:hover .pause-volume-slider-wrap {
+  width: 80px;
+  opacity: 1;
+  margin-left: 8px;
+}
+
+.pause-volume-slider {
+  width: 100%;
+  height: 4px;
+  accent-color: #A855F7;
+  cursor: pointer;
+}
+
+/* Timecode Display */
+.pause-timecode {
+  font-family: var(--font-mono, monospace);
+  font-size: clamp(0.92rem, 1.25vw, 1.12rem);
+  font-weight: 500;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.04em;
+  margin-left: 4px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+
+.time-divider {
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 2px;
+}
+
+.time-duration {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive Rules */
+@media (max-width: 768px) {
+  .pause-editorial-stack {
+    max-width: 90%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .pause-main-title {
+    font-size: 1.85rem;
+  }
+
+  .pause-synopsis {
+    display: none;
+  }
+
+  .pause-controls-left {
+    gap: 12px;
+  }
+
+  .pause-controls-right {
+    gap: 12px;
+  }
+
+  .pause-timecode {
+    font-size: 0.82rem;
+  }
+}
