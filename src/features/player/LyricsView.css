@@ -43,7 +43,7 @@
 }
 
 .kinetic-hero-text {
-  font-family: var(--font-display);
+  font-family: 'Plus Jakarta Sans', var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: calc(clamp(3.5rem, 8vw, 7.5rem) * var(--lyric-font-scale, 1));
   font-weight: 850;
   line-height: 1.08;
