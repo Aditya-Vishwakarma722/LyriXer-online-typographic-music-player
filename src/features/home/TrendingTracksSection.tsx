@@ -262,23 +262,47 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
   return (
     <section className="trending-section" aria-label="Current Trending Instagram and YouTube Songs">
       <div className="trending-container">
+        {/* Top Cybernetic HUD Telemetry Ribbon */}
+        <div className="cyber-telemetry-ribbon" aria-hidden="true">
+          <div className="ribbon-node">
+            <span className="node-dot pulse-cyan" />
+            <span>SYS_NODE // 0x8F-ALPHA</span>
+          </div>
+          <div className="ribbon-divider" />
+          <div className="ribbon-node">
+            <span>STREAM // VIRAL_FEED_ONLINE</span>
+          </div>
+          <div className="ribbon-divider" />
+          <div className="ribbon-node">
+            <span>RADAR // IG_REELS + YT_SHORTS</span>
+          </div>
+          <div className="ribbon-divider" />
+          <div className="ribbon-node telemetry-coord">
+            <span>LAT_LON // 37.7749&deg; N, 122.4194&deg; W</span>
+          </div>
+          <div className="ribbon-bracket">[ + ]</div>
+        </div>
+
         {/* Section Header */}
         <div className="trending-header">
           <div className="trending-title-group">
             <div className="trending-label-row">
-              <Flame size={14} className="trending-fire-icon" />
-              <span>VIRAL SOUND ENGINE</span>
+              <span className="hud-code-prefix">// VIRAL_DATA</span>
+              <Flame size={13} className="trending-fire-icon" />
+              <span>REAL-TIME TELEMETRY ENGINE</span>
               <span className="trending-live-dot" />
-              <span className="trending-live-text">REAL-TIME CHARTS</span>
+              <span className="trending-live-text">[ ACTIVE_BUFFER: 100% ]</span>
             </div>
-            <h2 className="trending-heading">Trending on Instagram & YouTube</h2>
+            <h2 className="trending-heading">
+              Trending on Instagram &amp; YouTube
+            </h2>
             <p className="trending-subheading">
-              Current viral sounds, Reels choreography anthems, and YouTube trending sensations.
-              Select any track to ignite 24-bit real-time synchronized lyrics.
+              Global viral sounds, high-velocity Reels choreography anthems, and YouTube trending sensations.
+              Select any transmission to ignite 24-bit real-time synchronized lyrics.
             </p>
           </div>
 
-          {/* Platform Category Tabs */}
+          {/* Platform Category Tabs (Cybernetic Chamfered Tabs) */}
           <div className="trending-filter-tabs" role="tablist" aria-label="Platform Filters">
             <button
               type="button"
@@ -288,7 +312,7 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
               onClick={() => setPlatformFilter('all')}
             >
               <Sparkles size={13} />
-              <span>All Viral ({TRENDING_TRACKS_DATABASE.length})</span>
+              <span>[ ALL_SIGNALS // {TRENDING_TRACKS_DATABASE.length} ]</span>
             </button>
 
             <button
@@ -299,7 +323,7 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
               onClick={() => setPlatformFilter('instagram')}
             >
               <div className="instagram-gradient-dot" />
-              <span>Instagram Reels</span>
+              <span>[ // INSTAGRAM_REELS ]</span>
             </button>
 
             <button
@@ -310,7 +334,7 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
               onClick={() => setPlatformFilter('youtube')}
             >
               <Video size={13} className="youtube-tab-icon" />
-              <span>YouTube Hits</span>
+              <span>[ // YOUTUBE_SHORTS ]</span>
             </button>
           </div>
         </div>
@@ -322,96 +346,131 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="trending-spotlight-card"
+            className="trending-spotlight-card cyber-chamfer-box"
           >
-            <div className="spotlight-media-pane">
-              <img
-                src={spotlightTrack.thumbnailUrl}
-                alt={`${spotlightTrack.title} by ${spotlightTrack.artist}`}
-                className="spotlight-thumb-image"
-                loading="lazy"
-              />
-              <div className="spotlight-media-scrim" />
+            {/* HUD Corner Accents */}
+            <span className="hud-corner-bracket corner-tl" aria-hidden="true" />
+            <span className="hud-corner-bracket corner-tr" aria-hidden="true" />
+            <span className="hud-corner-bracket corner-bl" aria-hidden="true" />
+            <span className="hud-corner-bracket corner-br" aria-hidden="true" />
 
-              <div className="spotlight-rank-badge">
-                <span className="rank-hash">#</span>
-                <span className="rank-num">0{spotlightTrack.rank}</span>
-                <span className="rank-label">TOP VIRAL</span>
-              </div>
-
-              <div className="spotlight-sound-indicator">
-                <span className="sound-wave-bar bar-1" />
-                <span className="sound-wave-bar bar-2" />
-                <span className="sound-wave-bar bar-3" />
-                <span className="sound-wave-bar bar-4" />
-              </div>
+            {/* Hardware Top Spec Bar */}
+            <div className="spotlight-hud-spec-bar" aria-hidden="true">
+              <span className="spec-item"><span className="spec-label">SYS_ID:</span> #01-VIRAL-PRIME</span>
+              <span className="spec-dot">&middot;</span>
+              <span className="spec-item"><span className="spec-label">VELOCITY:</span> 98.4%</span>
+              <span className="spec-dot">&middot;</span>
+              <span className="spec-item"><span className="spec-label">AUDIO:</span> 24-BIT / SPATIAL_SYNC</span>
+              <span className="spec-spacer" />
+              <span className="spec-code">[ TRANSMISSION // ACTIVE ]</span>
             </div>
 
-            <div className="spotlight-content-pane">
-              <div className="spotlight-meta-top">
-                <span className="spotlight-viral-pill">
-                  <Flame size={12} className="pill-flame-icon" />
-                  {spotlightTrack.badge}
-                </span>
+            <div className="spotlight-body-layout">
+              <div className="spotlight-media-pane">
+                <img
+                  src={spotlightTrack.thumbnailUrl}
+                  alt={`${spotlightTrack.title} by ${spotlightTrack.artist}`}
+                  className="spotlight-thumb-image"
+                  loading="lazy"
+                />
+                <div className="spotlight-media-scrim" />
+                <div className="spotlight-scanline-grid" aria-hidden="true" />
 
-                <div className="spotlight-platform-tags">
-                  {(spotlightTrack.platform === 'instagram' || spotlightTrack.platform === 'both') && (
-                    <span className="platform-tag instagram">
-                      <span className="tag-ig-gradient" />
-                      {spotlightTrack.reelsCount || 'Reels Viral'}
-                    </span>
-                  )}
-                  {(spotlightTrack.platform === 'youtube' || spotlightTrack.platform === 'both') && (
-                    <span className="platform-tag youtube">
-                      <Video size={11} />
-                      {spotlightTrack.viewsCount || 'YouTube Trending'}
-                    </span>
-                  )}
+                <div className="spotlight-rank-badge">
+                  <span className="rank-hash">#</span>
+                  <span className="rank-num">0{spotlightTrack.rank}</span>
+                  <span className="rank-label">TOP_TRANSMISSION</span>
+                </div>
+
+                <div className="spotlight-sound-indicator">
+                  <span className="sound-wave-bar bar-1" />
+                  <span className="sound-wave-bar bar-2" />
+                  <span className="sound-wave-bar bar-3" />
+                  <span className="sound-wave-bar bar-4" />
                 </div>
               </div>
 
-              <h3 className="spotlight-track-title">{spotlightTrack.title}</h3>
+              <div className="spotlight-content-pane">
+                <div className="spotlight-meta-top">
+                  <span className="spotlight-viral-pill">
+                    <Flame size={12} className="pill-flame-icon" />
+                    <span>[ {spotlightTrack.badge} ]</span>
+                  </span>
 
-              <div className="spotlight-artist-row">
-                <span className="spotlight-artist-name">{spotlightTrack.artist}</span>
-                {onOpenArtist && (
+                  <div className="spotlight-platform-tags">
+                    {(spotlightTrack.platform === 'instagram' || spotlightTrack.platform === 'both') && (
+                      <span className="platform-tag instagram">
+                        <span className="tag-ig-gradient" />
+                        <span>// IG: {spotlightTrack.reelsCount || 'Reels Viral'}</span>
+                      </span>
+                    )}
+                    {(spotlightTrack.platform === 'youtube' || spotlightTrack.platform === 'both') && (
+                      <span className="platform-tag youtube">
+                        <Video size={11} />
+                        <span>// YT: {spotlightTrack.viewsCount || 'YouTube Trending'}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <h3 className="spotlight-track-title">{spotlightTrack.title}</h3>
+
+                <div className="spotlight-artist-row">
+                  <span className="spotlight-artist-name">{spotlightTrack.artist}</span>
+                  {onOpenArtist && (
+                    <button
+                      type="button"
+                      className="spotlight-artist-link"
+                      onClick={() => onOpenArtist(spotlightTrack.artist.split('&')[0].split('ft.')[0].trim())}
+                      title={`View ${spotlightTrack.artist} discography`}
+                    >
+                      <Compass size={11} />
+                      <span>[ VIEW_ARTIST // &rarr; ]</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Telemetry Velocity Bar */}
+                <div className="spotlight-telemetry-gauge">
+                  <div className="gauge-label-row">
+                    <span className="gauge-title">STREAM_VELOCITY</span>
+                    <span className="gauge-value">98.4% [ PEAK ]</span>
+                  </div>
+                  <div className="gauge-bar-track">
+                    <div className="gauge-bar-fill" style={{ width: '98.4%' }} />
+                    <div className="gauge-bar-scanline" />
+                  </div>
+                </div>
+
+                <div className="spotlight-lyrics-quote-box">
+                  <span className="quote-tag">// LYRIC_STREAM_SAMPLE</span>
+                  <p className="spotlight-lyrics-quote">
+                    "{spotlightTrack.lyricsSnippet}"
+                  </p>
+                </div>
+
+                <div className="spotlight-tags-list">
+                  {spotlightTrack.tags.map((tag) => (
+                    <span key={tag} className="spotlight-tag-item">
+                      #{tag.toUpperCase().replace(/\s+/g, '_')}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="spotlight-actions-bar">
                   <button
                     type="button"
-                    className="spotlight-artist-link"
-                    onClick={() => onOpenArtist(spotlightTrack.artist.split('&')[0].split('ft.')[0].trim())}
-                    title={`View ${spotlightTrack.artist} discography`}
+                    className="spotlight-play-btn cyber-btn-primary"
+                    onClick={() => handlePlayTrack(spotlightTrack)}
                   >
-                    <Compass size={11} />
-                    <span>View Artist</span>
+                    <Play size={16} fill="currentColor" />
+                    <span>LAUNCH IN EDIT SUITE [ + ]</span>
                   </button>
-                )}
-              </div>
 
-              <p className="spotlight-lyrics-quote">
-                "{spotlightTrack.lyricsSnippet}"
-              </p>
-
-              <div className="spotlight-tags-list">
-                {spotlightTrack.tags.map((tag) => (
-                  <span key={tag} className="spotlight-tag-item">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="spotlight-actions-bar">
-                <button
-                  type="button"
-                  className="spotlight-play-btn"
-                  onClick={() => handlePlayTrack(spotlightTrack)}
-                >
-                  <Play size={16} fill="currentColor" />
-                  <span>Audition in LyriXer</span>
-                </button>
-
-                <div className="spotlight-engine-stat">
-                  <Activity size={13} className="engine-stat-icon" />
-                  <span>24-bit Spatial Sync Ready</span>
+                  <div className="spotlight-engine-stat">
+                    <Activity size={13} className="engine-stat-icon" />
+                    <span>LRCLIB // 24-BIT SPATIAL READY</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -432,10 +491,22 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.4, delay: index * 0.04 }}
-                  className="trending-card"
+                  className="trending-card cyber-chamfer-box"
                   onMouseEnter={() => setHoveredTrackId(track.id)}
                   onMouseLeave={() => setHoveredTrackId(null)}
                 >
+                  {/* Card Corner HUD Accents */}
+                  <span className="card-hud-corner tl" aria-hidden="true" />
+                  <span className="card-hud-corner tr" aria-hidden="true" />
+                  <span className="card-hud-corner bl" aria-hidden="true" />
+                  <span className="card-hud-corner br" aria-hidden="true" />
+
+                  {/* Card Top System Tag */}
+                  <div className="card-top-system-tag" aria-hidden="true">
+                    <span className="card-sys-id">// DATA_0{track.rank}</span>
+                    <span className="card-genre-tag">[ {track.genre.toUpperCase()} ]</span>
+                  </div>
+
                   {/* Card Thumbnail Stage */}
                   <div className="card-media-stage">
                     <img
@@ -445,6 +516,7 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
                       loading="lazy"
                     />
                     <div className="card-thumb-scrim" />
+                    <div className="card-scanline-mesh" aria-hidden="true" />
 
                     {/* Rank Badge */}
                     <div className="card-rank-tag">
@@ -501,15 +573,15 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
                     <p className="card-lyric-snippet">"{track.lyricsSnippet}"</p>
 
                     <div className="card-footer-row">
-                      <span className="card-genre">{track.genre}</span>
+                      <span className="card-genre">// {track.genre}</span>
                       
                       <button
                         type="button"
-                        className="card-audition-btn"
+                        className="card-audition-btn cyber-btn-secondary"
                         onClick={() => handlePlayTrack(track)}
                       >
                         <Play size={12} fill="currentColor" />
-                        <span>Play Synced</span>
+                        <span>AUDITION [ + ]</span>
                       </button>
                     </div>
                   </div>

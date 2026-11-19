@@ -14,7 +14,7 @@ html {
 html, body {
   width: 100%;
   min-height: 100%;
-  background-color: var(--bg-base);
+  background-color: var(--cyber-black, #08090C);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -23,6 +23,21 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
+}
+
+/* Cybernetic HUD Blueprint Background Matrix */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    radial-gradient(rgba(0, 242, 254, 0.07) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 36px 36px, 144px 144px, 144px 144px;
+  opacity: 0.75;
 }
 
 /* Custom Scrollbar */

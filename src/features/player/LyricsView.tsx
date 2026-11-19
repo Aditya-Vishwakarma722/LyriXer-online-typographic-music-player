@@ -309,23 +309,26 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
                         wordProgress = (activeLineProgress - tw.start) / (tw.end - tw.start);
                       }
 
+                      // Spotify-style word highlight:
+                      // Words that have been sung are crisp white, current word smoothly lights up
+                      const isSung = wordProgress >= 1;
+                      const isCurrent = wordProgress > 0 && wordProgress < 1;
+                      const fillOpacity = isSung ? 1 : isCurrent ? Math.min(1, 0.45 + wordProgress * 0.55) : 0;
+
                       return (
                         <React.Fragment key={`${line.id}-w-${wIdx}`}>
-                          <span className="lyric-word-wrap">
+                          <span className={`lyric-word-wrap ${isSung ? 'is-sung' : isCurrent ? 'is-current' : 'is-upcoming'}`}>
                             {/* Base un-sung word: dimmer grey */}
                             <span className="word-base" aria-hidden="true">
                               {tw.word}
                             </span>
 
-                            {/* Current singing words: sharp white fill, clipped by wordProgress */}
-                            {wordProgress > 0 && (
+                            {/* Current singing words: sharp white fill with zero clip-path box artifacts */}
+                            {fillOpacity > 0 && (
                               <span
                                 className="word-fill"
                                 style={{
-                                  clipPath:
-                                    wordProgress >= 1
-                                      ? 'none'
-                                      : `inset(-20% ${((1 - wordProgress) * 100).toFixed(1)}% -20% 0)`,
+                                  opacity: fillOpacity,
                                 }}
                               >
                                 {tw.word}

@@ -58,6 +58,27 @@
   --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-brand: 'Syne', 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-cyber: 'Rajdhani', 'Plus Jakarta Sans', sans-serif;
+  --font-code: 'Fira Code', 'JetBrains Mono', monospace;
+
+  /* Cybernetic Biomechatronic HUD Theme (Ref: Hybrid Human Web Concept) */
+  --cyber-black: #08090C;
+  --cyber-dark: #0B0D12;
+  --cyber-plate: #11141B;
+  --cyber-plate-hover: #171B24;
+  --cyber-cyan: #00F2FE;
+  --cyber-cyan-dim: #0284C7;
+  --cyber-cyan-glow: rgba(0, 242, 254, 0.28);
+  --cyber-cyan-glow-intense: rgba(0, 242, 254, 0.55);
+  --cyber-violet: #818CF8;
+  --cyber-violet-glow: rgba(129, 140, 248, 0.3);
+  --cyber-amber: #F59E0B;
+  --cyber-amber-glow: rgba(245, 158, 11, 0.35);
+  --cyber-border: rgba(255, 255, 255, 0.08);
+  --cyber-border-active: rgba(0, 242, 254, 0.45);
+  --cyber-grid-line: rgba(255, 255, 255, 0.035);
+  --cyber-clip-chamfer: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  --cyber-clip-tab: polygon(0 0, 140px 0, 156px 14px, 100% 14px, 100% 100%, 0 100%);
 
   /* Transitions */
   --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);

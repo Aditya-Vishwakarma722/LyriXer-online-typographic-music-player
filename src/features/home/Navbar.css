@@ -13,17 +13,17 @@
               border-color var(--transition-normal),
               box-shadow var(--transition-normal),
               height var(--transition-normal);
-  background: rgba(10, 10, 14, 0.72);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 9, 12, 0.85);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.15);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 .navbar-scrolled {
   height: 64px;
-  background: rgba(8, 8, 12, 0.94);
-  border-bottom-color: rgba(167, 139, 250, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 24px rgba(167, 139, 250, 0.08);
+  background: rgba(8, 9, 12, 0.96);
+  border-bottom-color: rgba(0, 242, 254, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 242, 254, 0.12);
 }
 
 .navbar-content {
@@ -59,18 +59,18 @@
   align-items: center;
   gap: 8px;
   padding: 5px 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-full);
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.4);
+  background: rgba(14, 17, 23, 0.85);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 242, 254, 0.1);
 }
 
 .beacon-indicator-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #34D399;
-  box-shadow: 0 0 8px #34D399;
+  background: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 8px var(--cyber-cyan, #00F2FE);
   animation: beaconPulse 2s ease-in-out infinite;
 }
 
@@ -80,15 +80,15 @@
 }
 
 .beacon-radio-icon {
-  color: var(--accent-violet-light);
+  color: var(--cyber-cyan, #00F2FE);
 }
 
 .beacon-chip-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-code, monospace);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #DDD9E8;
+  letter-spacing: 0.12em;
+  color: #E2E8F0;
   text-transform: uppercase;
 }
 
@@ -102,7 +102,7 @@
 
 .beacon-mini-eq .eq-bar {
   width: 2px;
-  background: #A78BFA;
+  background: var(--cyber-cyan, #00F2FE);
   border-radius: 1px;
   animation: eqMiniBounce 1s ease-in-out infinite alternate;
 }
@@ -128,33 +128,36 @@
   align-items: center;
   gap: 7px;
   padding: 7px 16px;
-  border-radius: var(--radius-full);
-  font-size: 0.8125rem;
+  font-family: var(--font-code, monospace);
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(14, 17, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
   transition: all var(--transition-fast);
   cursor: pointer;
 }
 
 .navbar-link:hover {
   color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 242, 254, 0.12);
+  border-color: rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
   transform: translateY(-1px);
 }
 
 .navbar-link.active {
-  color: #FFFFFF;
-  background: rgba(167, 139, 250, 0.16);
-  border-color: rgba(167, 139, 250, 0.4);
-  box-shadow: 0 0 16px rgba(167, 139, 250, 0.2);
+  color: var(--cyber-cyan, #00F2FE);
+  background: rgba(0, 242, 254, 0.18);
+  border-color: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
 }
 
 .navbar-link-icon {
-  color: var(--accent-violet-light);
+  color: var(--cyber-cyan, #00F2FE);
   transition: color var(--transition-fast);
 }
 

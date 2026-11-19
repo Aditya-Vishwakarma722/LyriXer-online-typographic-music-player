@@ -224,8 +224,8 @@
   letter-spacing: inherit;
   color: rgba(255, 255, 255, 0.40);
   -webkit-text-fill-color: rgba(255, 255, 255, 0.40);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  transition: color 0.2s ease;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 /* Base text on unfocused lines: soft legible light grey with subtle contour shadow */
@@ -235,8 +235,8 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
-/* Sung word fill (left side of active line): pure sharp white glyphs without shadows
-   on the clipping layer, guaranteeing zero clipped bounding-box or tint artifacts! */
+/* Sung word fill (left side of active line): pure sharp white glyphs without box clipping,
+   guaranteeing zero clipped bounding-box or tint artifacts! */
 .preset-focus-stack .word-fill {
   position: absolute;
   inset: 0;
@@ -252,22 +252,24 @@
   white-space: pre;
   color: #FFFFFF;
   -webkit-text-fill-color: #FFFFFF;
-  text-shadow: none;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95),
+               0 0 20px rgba(255, 255, 255, 0.5),
+               0 0 35px rgba(167, 139, 250, 0.45),
+               0 0 70px rgba(124, 58, 237, 0.25);
   pointer-events: none;
-  will-change: clip-path;
-  transition: clip-path 0.08s linear;
+  transition: opacity 0.15s ease-out;
 }
 
-/* Active line: centered in middle, crystal sharp in focus, unified Deep Glow and shadow on the unclipped container */
+/* Active line: centered in middle, crystal sharp in focus, no drop-shadow on parent container to prevent rectangular box artifacts */
 .preset-focus-stack .lyric-line-item.lyric-active {
   opacity: 1 !important;
-  filter: blur(0px) drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5)) !important;
+  filter: none !important;
   transform: scale(1.04) !important;
   z-index: 10;
 }
 
 .preset-focus-stack .lyric-line-item.lyric-active .lyric-text-container {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5),
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95),
                0 0 20px rgba(255, 255, 255, 0.5),
                0 0 35px rgba(167, 139, 250, 0.45),
                0 0 70px rgba(124, 58, 237, 0.25);
