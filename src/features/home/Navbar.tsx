@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Info, Mic2, Home, Radio } from 'lucide-react';
+import { SlidersHorizontal, Info, Mic2, Home } from 'lucide-react';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import './Navbar.css';
 
@@ -31,29 +31,13 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
   return (
     <header className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-content">
-        {/* Redesigned Cybernetic LyriXer Brandmark */}
+        {/* Cybernetic LyriXer Brandmark */}
         <div className="navbar-brand-wrap">
           <BrandLogo
             size="md"
             onClick={onOpenHome}
-            showBadge={true}
-            badgeText="SPATIAL_V2"
             className="navbar-brand-interactive"
           />
-        </div>
-
-        {/* Center Live Acoustic Engine Beacon */}
-        <div className="navbar-center-beacon" aria-hidden="true">
-          <div className="beacon-chip">
-            <span className="beacon-indicator-dot" />
-            <Radio size={12} className="beacon-radio-icon" />
-            <span className="beacon-chip-label">24-BIT / 96kHz SPATIAL AUDIO</span>
-            <div className="beacon-mini-eq">
-              <span className="eq-bar bar-1" />
-              <span className="eq-bar bar-2" />
-              <span className="eq-bar bar-3" />
-            </div>
-          </div>
         </div>
 
         {/* Elevated Navigation Controls */}

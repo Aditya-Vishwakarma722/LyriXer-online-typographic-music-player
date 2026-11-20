@@ -100,11 +100,10 @@
   font-family: var(--font-logo, 'Orbitron', 'Rajdhani', sans-serif);
   font-size: 1.35rem;
   font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: #FFFFFF;
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   line-height: 1;
 }
 
@@ -227,7 +226,7 @@
 }
 .brand-logo-root.size-sm .brand-wordmark-text {
   font-size: 1.1rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.03em;
 }
 
 .brand-logo-root.size-md {
@@ -248,5 +247,5 @@
 }
 .brand-logo-root.size-lg .brand-wordmark-text {
   font-size: 1.85rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.05em;
 }

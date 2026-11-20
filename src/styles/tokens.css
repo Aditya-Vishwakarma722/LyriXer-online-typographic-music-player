@@ -86,9 +86,8 @@
   --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-brand: 'Orbitron', 'Rajdhani', -apple-system, sans-serif;
   --font-logo: 'Orbitron', 'Rajdhani', -apple-system, sans-serif;
-  --font-cyber: 'Orbitron', 'Rajdhani', -apple-system, sans-serif;
-  --font-tech: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-cyber: 'Rajdhani', 'Inter', sans-serif;
   --font-code: 'Fira Code', 'JetBrains Mono', monospace;
 
   /* Transitions */

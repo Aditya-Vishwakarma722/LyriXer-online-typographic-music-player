@@ -140,12 +140,12 @@ export const BrandLogo: React.FC<BrandLogoProps> = React.memo<BrandLogoProps>(({
       {/* Brand Typographic Wordmark in Orbitron Cybernetic Display */}
       <div className="brand-wordmark-wrap">
         <span className="brand-wordmark-text">
-          <span className="wordmark-lyri">LYRI</span>
+          <span className="wordmark-lyri">Lyri</span>
           <span className="wordmark-x-wrap">
             <span className="wordmark-x">X</span>
             <span className="wordmark-x-glow" aria-hidden="true">X</span>
           </span>
-          <span className="wordmark-er">ER</span>
+          <span className="wordmark-er">er</span>
         </span>
         {showSubtitle && (
           <span className="brand-wordmark-sub">SPATIAL VOCAL ENGINE</span>
