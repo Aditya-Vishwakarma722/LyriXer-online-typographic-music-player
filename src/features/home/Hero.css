@@ -51,11 +51,11 @@
 
 /* Monumental Architectural Headline */
 .hero-monumental-headline {
-  font-family: var(--font-cyber, 'Rajdhani', sans-serif);
+  font-family: var(--font-cyber, 'Orbitron', 'Rajdhani', sans-serif);
   font-size: clamp(2.8rem, 6.5vw, 5.5rem);
   font-weight: 800;
   line-height: 0.98;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   color: #FFFFFF;
   text-transform: uppercase;
   margin: 0 0 24px 0;
@@ -66,22 +66,29 @@
 
 .headline-row {
   display: block;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 60%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 16px rgba(0, 0, 0, 0.8));
 }
 
 .headline-row.headline-dim {
-  color: #94A3B8;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(56, 189, 248, 0.85) 55%, rgba(0, 242, 254, 0.95) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   letter-spacing: 0.12em;
+  filter: drop-shadow(0 0 24px rgba(0, 242, 254, 0.28));
 }
 
 /* Minimalist Editorial Sub-statement */
 .hero-editorial-copy {
-  font-family: var(--font-sans);
+  font-family: var(--font-tech, 'Space Grotesk', 'Plus Jakarta Sans', sans-serif);
   font-size: clamp(0.95rem, 1.25vw, 1.15rem);
   line-height: 1.6;
-  color: #64748B;
+  color: #94A3B8;
   max-width: 640px;
   margin: 0 auto clamp(32px, 5vh, 48px) auto;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
 }
 
 /* Floating Input Console Wrapper */

@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import './Footer.css';
 
 interface FooterProps {
@@ -13,7 +14,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAbout, onOpenSettings }) =
     <footer className="footer-container">
       <div className="footer-content">
         <div className="footer-left">
-          <span className="footer-brand">LyriXer</span>
+          <BrandLogo size="sm" />
           <span className="footer-separator">•</span>
           <span className="footer-tagline">
             Immersive music-video & synchronized-lyrics platform.

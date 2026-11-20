@@ -1,10 +1,11 @@
 .brand-logo-root {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
   user-select: none;
   text-decoration: none;
   cursor: pointer;
+  outline: none;
   transition: transform var(--transition-fast);
 }
 
@@ -12,136 +13,240 @@
   transform: translateY(-1px);
 }
 
-/* Soundmark Box */
+/* 1. Tactical Cyber Acoustic Soundmark Box */
 .brand-glyph-box {
   position: relative;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-  background: rgba(10, 12, 16, 0.85);
-  border: 1px solid rgba(0, 242, 254, 0.35);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6),
-              0 0 16px rgba(0, 242, 254, 0.18);
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+  background: radial-gradient(circle at 50% 50%, rgba(14, 18, 25, 0.95) 0%, rgba(8, 10, 14, 0.98) 100%);
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75),
+              inset 0 0 12px rgba(0, 242, 254, 0.12),
+              0 0 16px rgba(0, 242, 254, 0.15);
   transition: all var(--transition-fast);
   overflow: visible;
+  flex-shrink: 0;
 }
 
 .brand-logo-root:hover .brand-glyph-box {
-  border-color: rgba(0, 242, 254, 0.65);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7),
-              0 0 24px rgba(0, 242, 254, 0.35);
-  transform: scale(1.04);
+  border-color: rgba(0, 242, 254, 0.85);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.85),
+              inset 0 0 16px rgba(0, 242, 254, 0.25),
+              0 0 28px rgba(0, 242, 254, 0.45);
+  transform: scale(1.05);
 }
 
 .brand-glyph-svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   position: relative;
   z-index: 2;
   transition: transform var(--transition-normal);
 }
 
 .brand-logo-root:hover .brand-glyph-svg {
-  transform: rotate(15deg);
+  transform: rotate(8deg);
 }
 
+/* Ambient Backlight Laser Bloom */
 .brand-glyph-ambient {
   position: absolute;
   inset: -6px;
-  background: radial-gradient(circle, rgba(0, 242, 254, 0.35) 0%, transparent 70%);
-  filter: blur(8px);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.45) 0%, rgba(2, 132, 199, 0.15) 50%, transparent 70%);
+  filter: blur(10px);
   opacity: 0.6;
   pointer-events: none;
   z-index: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .brand-logo-root:hover .brand-glyph-ambient {
   opacity: 1;
+  transform: scale(1.15);
 }
 
-/* Typographic Wordmark in Syne / Rajdhani */
+/* Soundmark Internal Vectors */
+.glyph-outer-oct {
+  transition: stroke var(--transition-fast);
+}
+
+.brand-logo-root:hover .glyph-hud-tick {
+  stroke: #FFFFFF;
+  filter: drop-shadow(0 0 3px #00F2FE);
+}
+
+.glyph-laser-cross {
+  transition: stroke-width var(--transition-fast);
+}
+
+.brand-logo-root:hover .glyph-laser-cross {
+  stroke-width: 2.2;
+}
+
+/* 2. Typographic Wordmark in Orbitron Cybernetic Display */
+.brand-wordmark-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1;
+}
+
 .brand-wordmark-text {
-  font-family: var(--font-brand, 'Rajdhani', sans-serif);
+  font-family: var(--font-logo, 'Orbitron', 'Rajdhani', sans-serif);
   font-size: 1.35rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: #FFFFFF;
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   line-height: 1;
 }
 
 .wordmark-lyri {
-  color: #FFFFFF;
-  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 55%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+}
+
+.wordmark-x-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1px;
 }
 
 .wordmark-x {
+  position: relative;
+  z-index: 2;
   color: var(--cyber-cyan, #00F2FE);
-  font-weight: 800;
-  text-shadow: 0 0 16px rgba(0, 242, 254, 0.6), 0 0 30px rgba(0, 242, 254, 0.3);
-  margin: 0 0.5px;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.85),
+               0 0 22px rgba(0, 242, 254, 0.5),
+               0 0 36px rgba(0, 242, 254, 0.3);
   display: inline-block;
   transform: translateY(-0.5px);
-  transition: transform var(--transition-fast), text-shadow var(--transition-fast);
+  transition: all var(--transition-fast);
+}
+
+.wordmark-x-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #00F2FE;
+  filter: blur(4px);
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity var(--transition-fast);
 }
 
 .brand-logo-root:hover .wordmark-x {
+  color: #FFFFFF;
+  text-shadow: 0 0 12px #FFFFFF,
+               0 0 24px #00F2FE,
+               0 0 45px rgba(0, 242, 254, 0.9);
   transform: translateY(-1px) scale(1.08);
-  text-shadow: 0 0 20px #FFFFFF, 0 0 36px rgba(0, 242, 254, 0.8);
+}
+
+.brand-logo-root:hover .wordmark-x-glow {
+  opacity: 1;
 }
 
 .wordmark-er {
-  color: #F3F0F9;
-  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 55%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
 }
 
-/* Pro Tag */
-.brand-pro-tag {
-  font-family: var(--font-mono);
+.brand-wordmark-sub {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--cyber-cyan, #00F2FE);
+  opacity: 0.8;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+/* 3. Cybernetic Telemetry / Spec Badge */
+.brand-tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-code, var(--font-mono, monospace));
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--cyber-cyan, #00F2FE);
-  background: rgba(0, 242, 254, 0.12);
-  border: 1px solid rgba(0, 242, 254, 0.28);
-  padding: 2px 6px;
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.32);
+  padding: 3px 8px;
   border-radius: 0;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
   text-transform: uppercase;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+  white-space: nowrap;
 }
 
-/* Sizing */
+.tech-badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyber-cyan, #00F2FE);
+  box-shadow: 0 0 6px var(--cyber-cyan, #00F2FE);
+  animation: techDotPulse 2s ease-in-out infinite;
+}
+
+@keyframes techDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* 4. Sizing Scales */
 .brand-logo-root.size-sm {
-  gap: 8px;
+  gap: 9px;
 }
 .brand-logo-root.size-sm .brand-glyph-box {
   width: 28px;
   height: 28px;
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
 }
 .brand-logo-root.size-sm .brand-glyph-svg {
   width: 18px;
   height: 18px;
 }
 .brand-logo-root.size-sm .brand-wordmark-text {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+}
+
+.brand-logo-root.size-md {
+  gap: 13px;
 }
 
 .brand-logo-root.size-lg {
   gap: 16px;
 }
 .brand-logo-root.size-lg .brand-glyph-box {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
 }
 .brand-logo-root.size-lg .brand-glyph-svg {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 }
 .brand-logo-root.size-lg .brand-wordmark-text {
-  font-size: 1.75rem;
+  font-size: 1.85rem;
+  letter-spacing: 0.16em;
 }

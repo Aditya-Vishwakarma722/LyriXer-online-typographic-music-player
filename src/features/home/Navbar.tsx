@@ -31,11 +31,13 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
   return (
     <header className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-content">
-        {/* Redesigned LyriXer Brandmark */}
+        {/* Redesigned Cybernetic LyriXer Brandmark */}
         <div className="navbar-brand-wrap">
           <BrandLogo
             size="md"
             onClick={onOpenHome}
+            showBadge={true}
+            badgeText="SPATIAL_V2"
             className="navbar-brand-interactive"
           />
         </div>
