@@ -14,6 +14,7 @@ interface EditorialMusicInfoProps {
   lyrics: LyricTrack | null;
   activeLyricIndex: number;
   duration: number;
+  playbackQuality?: string;
   onResumeOrPause: () => void;
   onOpenArtist?: () => void;
   onClose?: () => void;
@@ -27,6 +28,7 @@ export const EditorialMusicInfo: React.FC<EditorialMusicInfoProps> = ({
   lyrics,
   activeLyricIndex,
   duration,
+  playbackQuality,
   onResumeOrPause,
   onOpenArtist,
   onClose,
@@ -68,8 +70,19 @@ export const EditorialMusicInfo: React.FC<EditorialMusicInfoProps> = ({
     return lyrics.lines[activeLyricIndex].text.trim();
   }, [lyrics, activeLyricIndex]);
 
-  // Badges calculation
-  const resolutionBadge = duration > 0 ? '4K UHD' : '1080P HD';
+  // Badges calculation: locked between min 1080p and max 2160p
+  const resolutionBadge = useMemo(() => {
+    if (playbackQuality === 'hd2160' || playbackQuality === 'highres') {
+      return '4K UHD (2160P)';
+    }
+    if (playbackQuality === 'hd1440') {
+      return '2K QHD (1440P)';
+    }
+    if (playbackQuality === 'hd1080') {
+      return '1080P FULL HD';
+    }
+    return duration > 0 ? '1080P - 2160P HD' : '1080P FULL HD';
+  }, [playbackQuality, duration]);
   const durationShort = useMemo(() => {
     if (duration <= 0) return '0s';
     const mins = Math.floor(duration / 60);

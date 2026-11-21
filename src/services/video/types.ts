@@ -15,6 +15,7 @@ export interface VideoPlayerState {
   muted: boolean;
   status: PlayerStatus;
   errorMessage?: string;
+  playbackQuality?: string;
 }
 
 export interface VideoPlayerListener {

@@ -250,6 +250,18 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
             </h4>
             <div className="track-meta">
               <span className="source-pill">{sourceKind.toUpperCase()}</span>
+              {sourceKind === 'youtube' && (
+                <span
+                  className="quality-pill"
+                  title="Locked HD Range: Minimum 1080p, Maximum 2160p (4K UHD)"
+                >
+                  {playerState.playbackQuality === 'hd2160' || playerState.playbackQuality === 'highres'
+                    ? '4K 2160P'
+                    : playerState.playbackQuality === 'hd1440'
+                    ? '2K 1440P'
+                    : '1080P HD'}
+                </span>
+              )}
               {manualOffset !== 0 && (
                 <button
                   type="button"

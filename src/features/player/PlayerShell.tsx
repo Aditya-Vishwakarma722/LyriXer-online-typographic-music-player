@@ -672,6 +672,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         lyrics={lyrics}
         activeLyricIndex={activeIndex}
         duration={playerState.duration || source.duration || 0}
+        playbackQuality={playerState.playbackQuality}
         onResumeOrPause={() => (playerState.paused ? adapter?.play() : adapter?.pause())}
         onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
         onClose={handleToggleInfo}

@@ -92,7 +92,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
           modestbranding: 1,
           enablejsapi: 1,
           origin: window.location.origin,
-          vq: 'highres', // Request maximum available resolution (4K 2160p, 1440p, 1080p HD)
+          vq: 'hd2160', // Request 2160p (4K UHD) as upper ceiling, strictly minimum 1080p HD
           controls: 0, // Disable YouTube's own player controls so LyriXer custom player handles everything
           showinfo: 0,
           disablekb: 1,
@@ -108,7 +108,7 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
             this.disableYouTubeCaptions(event.target);
             const duration = event.target.getDuration() || 0;
             this.listener.onDurationChange?.(duration);
-            this.enforceMaxQuality();
+            this.enforceQualityRange();
             this.emitVideoMetadata(event.target);
             this.listener.onStateChange?.({
               status: 'ready',
@@ -120,8 +120,8 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
             this.startClock();
             setTimeout(() => this.disableYouTubeCaptions(), 500);
             setTimeout(() => this.disableYouTubeCaptions(), 1500);
-            setTimeout(() => this.enforceMaxQuality(), 400);
-            setTimeout(() => this.enforceMaxQuality(), 1200);
+            setTimeout(() => this.enforceQualityRange(), 400);
+            setTimeout(() => this.enforceQualityRange(), 1200);
           },
           onStateChange: (event) => {
             if (this.isDestroyed) return;
@@ -129,18 +129,18 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
 
             if (event.data === YTState.PLAYING) {
               this.disableYouTubeCaptions(event.target);
-              this.enforceMaxQuality();
+              this.enforceQualityRange();
               this.emitVideoMetadata(event.target);
               this.listener.onStateChange?.({ status: 'playing', paused: false });
               this.startClock();
               setTimeout(() => this.disableYouTubeCaptions(), 400);
               setTimeout(() => this.disableYouTubeCaptions(), 1200);
 
-              // Continuously re-verify and enforce maximum quality as DASH streams initialize
+              // Continuously re-verify and lock quality between min 1080p and max 2160p as streams initialize
               [300, 800, 1600, 3200, 5000].forEach((delay) => {
                 setTimeout(() => {
                   if (!this.isDestroyed) {
-                    this.enforceMaxQuality();
+                    this.enforceQualityRange();
                   }
                 }, delay);
               });
@@ -151,13 +151,14 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
               this.listener.onStateChange?.({ status: 'ended', paused: true });
               this.stopClock();
             } else if (event.data === YTState.BUFFERING) {
-              this.enforceMaxQuality();
+              this.enforceQualityRange();
               this.listener.onStateChange?.({ status: 'loading' });
             }
           },
           onPlaybackQualityChange: (event: any) => {
             if (this.isDestroyed) return;
-            this.enforceMaxQuality(event?.data);
+            // Intercept quality change: reject sub-1080p drops and enforce 1080p - 2160p range
+            this.enforceQualityRange(event?.data);
             this.disableYouTubeCaptions();
           },
           onError: (event) => {
@@ -202,35 +203,36 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
   }
 
   /**
-   * Enforces the maximum available video quality (4K 2160p / 1440p / 1080p Full HD).
-   * Systematically checks available stream levels from highest down to lowest.
+   * Enforces strict video playback quality locked between:
+   * - Minimum: 1080p ('hd1080' Full HD)
+   * - Maximum: 2160p ('hd2160' / 4K UHD)
+   *
+   * Systematically checks available stream levels, locks suggested range,
+   * and prevents YouTube's ABR from silently degrading quality below 1080p.
    */
-  public enforceMaxQuality(currentQuality?: string) {
+  public enforceQualityRange(currentQuality?: string) {
     if (!this.player) return;
     try {
-      const QUALITY_HIERARCHY = [
-        'highres', // 4K 2160p / 8K (4320p / 2880p)
-        'hd2880',
-        'hd2160',  // 4K UHD (3840x2160)
-        'hd1440',  // 2K QHD (2560x1440)
-        'hd1080',  // Full HD (1920x1080)
-        'hd720',   // HD (1280x720)
-        'large',   // 480p
-        'medium',  // 360p
-        'small',   // 240p
-        'tiny',    // 144p
-      ];
-
       const available: string[] =
         typeof this.player.getAvailableQualityLevels === 'function'
           ? this.player.getAvailableQualityLevels()
           : [];
 
-      // Determine absolute best quality tier
-      let targetQuality = 'highres';
+      // Quality tier priorities capped at 2160p (4K UHD) down to 1080p floor
+      let targetQuality = 'hd2160';
+
       if (available && available.length > 0) {
-        const bestMatch = QUALITY_HIERARCHY.find((tier) => available.includes(tier));
-        targetQuality = bestMatch || available[0];
+        // Find best match in order: 2160p (4K) -> 1440p (2K) -> 1080p (Full HD)
+        if (available.includes('hd2160') || available.includes('highres')) {
+          targetQuality = 'hd2160';
+        } else if (available.includes('hd1440')) {
+          targetQuality = 'hd1440';
+        } else if (available.includes('hd1080')) {
+          targetQuality = 'hd1080';
+        } else {
+          // If video was only uploaded in lower resolutions (legacy 720p/480p), select maximum available
+          targetQuality = available[0];
+        }
       }
 
       const activeQuality =
@@ -239,21 +241,47 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
           ? this.player.getPlaybackQuality()
           : null);
 
+      const isSub1080p =
+        activeQuality &&
+        ['hd720', 'large', 'medium', 'small', 'tiny', 'auto', 'default'].includes(activeQuality) &&
+        available.some((tier) => ['hd2160', 'highres', 'hd1440', 'hd1080'].includes(tier));
+
+      const isOver2160p =
+        activeQuality && ['hd2880', 'highres'].includes(activeQuality) && available.includes('hd2160');
+
       if (
+        !activeQuality ||
         activeQuality !== targetQuality ||
-        activeQuality === 'auto' ||
-        activeQuality === 'default'
+        isSub1080p ||
+        isOver2160p
       ) {
         if (typeof this.player.setPlaybackQuality === 'function') {
           this.player.setPlaybackQuality(targetQuality);
         }
         if (typeof this.player.setPlaybackQualityRange === 'function') {
-          this.player.setPlaybackQualityRange(targetQuality, targetQuality);
+          // Lock suggested range strictly: min 1080p, max 2160p
+          const minQuality = available.includes('hd1080') ? 'hd1080' : targetQuality;
+          const maxQuality = available.includes('hd2160') ? 'hd2160' : (targetQuality === 'hd1440' ? 'hd1440' : targetQuality);
+          this.player.setPlaybackQualityRange(minQuality, maxQuality);
         }
       }
+
+      const resolved =
+        (typeof this.player.getPlaybackQuality === 'function'
+          ? this.player.getPlaybackQuality()
+          : null) || targetQuality;
+
+      this.listener.onStateChange?.({ playbackQuality: resolved });
     } catch {
       // Quality switch may not be permitted in initial buffering phase
     }
+  }
+
+  /**
+   * Alias for enforceQualityRange
+   */
+  public enforceMaxQuality(currentQuality?: string) {
+    this.enforceQualityRange(currentQuality);
   }
 
   private emitVideoMetadata(player: any) {
@@ -312,6 +340,11 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
           // During the first 5 seconds, keep suppressing YouTube captions
           if (time < 5 && Math.random() < 0.1) {
             this.disableYouTubeCaptions();
+          }
+
+          // Periodic quality watchdog: verify that playback has not dropped below 1080p
+          if (time > 2 && Math.floor(time) % 3 === 0 && Math.random() < 0.15) {
+            this.enforceQualityRange();
           }
 
           // Pre-emptively intercept video end right before YouTube renders its recommendation grid
