@@ -418,22 +418,6 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     }, 3500);
   };
 
-  // Picture-in-picture handling
-  const handleTogglePiP = async () => {
-    try {
-      const videoEl = document.querySelector('video');
-      if (videoEl && document.pictureInPictureEnabled) {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else {
-          await videoEl.requestPictureInPicture();
-        }
-      }
-    } catch {
-      // Ignore PiP permissions error
-    }
-  };
-
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -722,7 +706,6 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
           onToggleLyricsVisible={() => setLyricsVisible(!lyricsVisible)}
           onToggleFullScreen={handleToggleFullScreen}
-          onTogglePiP={handleTogglePiP}
           onExitPlayer={onExit}
           onUpdatePreferences={onUpdatePreferences}
         />

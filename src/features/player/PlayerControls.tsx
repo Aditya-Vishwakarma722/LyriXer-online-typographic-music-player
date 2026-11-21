@@ -55,7 +55,6 @@ interface PlayerControlsProps {
   onOpenArtist?: () => void;
   onToggleLyricsVisible: () => void;
   onToggleFullScreen: () => void;
-  onTogglePiP?: () => void;
   onExitPlayer: () => void;
   onUpdatePreferences: (updates: Partial<UserPreferences>) => void;
 }
@@ -88,7 +87,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
   onOpenArtist,
   onToggleLyricsVisible,
   onToggleFullScreen,
-  onTogglePiP,
   onExitPlayer,
   onUpdatePreferences,
 }) => {
@@ -153,26 +151,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
       onForward10();
     } else {
       onSeek(Math.min(duration, currentTime + 10));
-    }
-  };
-
-  // Picture in picture handler
-  const handleTogglePiP = async () => {
-    if (onTogglePiP) {
-      onTogglePiP();
-      return;
-    }
-    try {
-      const videoEl = document.querySelector('video');
-      if (videoEl && document.pictureInPictureEnabled) {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else {
-          await videoEl.requestPictureInPicture();
-        }
-      }
-    } catch {
-      // Ignore PiP permissions error
     }
   };
 
@@ -369,7 +347,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
           </div>
         </div>
 
-        {/* Right Section: Volume, Sync, Artist, Search, Upload, Typography, Blur, PiP, Fullscreen */}
+        {/* Right Section: Volume, Sync, Artist, Search, Upload, Typography, Blur, Fullscreen */}
         <div className="controls-right">
           {/* Volume Control */}
           <div className="volume-group">
@@ -788,35 +766,6 @@ export const PlayerControls: React.FC<PlayerControlsProps> = React.memo<PlayerCo
               </div>
             )}
           </div>
-
-          {/* Picture-in-Picture Mini-Player */}
-          <button
-            type="button"
-            className="ctrl-btn"
-            onClick={handleTogglePiP}
-            title="Picture-in-Picture Mini-Player"
-            aria-label="Picture-in-Picture"
-          >
-            <svg
-              width="17"
-              height="17"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <rect x="2" y="4" width="20" height="16" rx="3" />
-              <rect
-                x="12"
-                y="11"
-                width="8"
-                height="7"
-                rx="1.5"
-                fill="currentColor"
-                fillOpacity="0.35"
-              />
-            </svg>
-          </button>
 
           {/* Fullscreen Toggle */}
           <button
