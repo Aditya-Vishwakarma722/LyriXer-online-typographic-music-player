@@ -96,6 +96,7 @@ export const RecentSessions: React.FC<RecentSessionsProps> = React.memo<RecentSe
                         alt={session.title}
                         className="thumbnail-img"
                         loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="thumbnail-fallback">

@@ -65,6 +65,8 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
   private isDestroyed = false;
   private lastEmittedTitle = '';
   private lastEmittedAuthor = '';
+  private lastQualityCheckTime = 0;
+  private lastCaptionCheckTime = 0;
 
   constructor(
     container: HTMLElement | string,
@@ -337,13 +339,16 @@ export class YouTubeAdapter implements VideoPlayerAdapter {
         if (typeof time === 'number' && !isNaN(time)) {
           this.listener.onTimeUpdate?.(time);
 
-          // During the first 5 seconds, keep suppressing YouTube captions
-          if (time < 5 && Math.random() < 0.1) {
+          const now = performance.now();
+          // During the first 5 seconds, keep suppressing YouTube captions at a stable rate
+          if (time < 5 && now - this.lastCaptionCheckTime > 1200) {
+            this.lastCaptionCheckTime = now;
             this.disableYouTubeCaptions();
           }
 
-          // Periodic quality watchdog: verify that playback has not dropped below 1080p
-          if (time > 2 && Math.floor(time) % 3 === 0 && Math.random() < 0.15) {
+          // Periodic quality watchdog: verify that playback has not dropped below 1080p (every 3s max)
+          if (time > 2 && now - this.lastQualityCheckTime > 3000) {
+            this.lastQualityCheckTime = now;
             this.enforceQualityRange();
           }
 

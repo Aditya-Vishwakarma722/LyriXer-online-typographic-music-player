@@ -92,6 +92,7 @@ export const ArtistTrackRow: React.FC<ArtistTrackRowProps> = ({
             alt={track.title}
             className="track-thumb-img"
             loading="lazy"
+            decoding="async"
             referrerPolicy="no-referrer"
             onError={handleImgError}
             onLoad={handleImgLoad}

@@ -37,26 +37,51 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
     let animationFrameId: number;
+    let isVisible = true;
+    let isTabActive = !document.hidden;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const handleResize = () => {
-      if (!canvas) return;
-      width = window.innerWidth;
-      height = window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
+    let waveGradients: CanvasGradient[] = [];
+
+    const rebuildGradients = () => {
+      waveGradients = waves.map((wave, idx) => {
+        const baseY = height * wave.baseYPercent;
+        const grad = ctx.createLinearGradient(0, baseY - wave.amplitude, width, baseY + wave.amplitude);
+        grad.addColorStop(0, wave.colorStart);
+        grad.addColorStop(0.5, idx % 2 === 0 ? 'rgba(0, 242, 254, 0.25)' : 'rgba(56, 189, 248, 0.2)');
+        grad.addColorStop(1, wave.colorEnd);
+        return grad;
+      });
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    let resizeRaf: number | null = null;
+    const handleResize = () => {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        if (!canvas) return;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        rebuildGradients();
+      });
+    };
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    window.addEventListener('resize', handleResize, { passive: true });
 
     // Mouse tracking for fluid wave ripple
     const mouse = { x: -9999, y: -9999, targetX: -9999, targetY: -9999, radius: 220 };
@@ -124,30 +149,33 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
       },
     ];
 
+    rebuildGradients();
+
     let time = 0;
+    let isRunning = false;
 
     const render = () => {
+      if (!isVisible || !isTabActive) {
+        isRunning = false;
+        return;
+      }
+
       // Smooth mouse lerp
       mouse.x += (mouse.targetX - mouse.x) * 0.08;
       mouse.y += (mouse.targetY - mouse.y) * 0.08;
 
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Draw Flowing Harmonic Wave Ribbons
+      // 1. Draw Flowing Harmonic Wave Ribbons with cached gradients
       waves.forEach((wave, idx) => {
         const baseY = height * wave.baseYPercent;
         ctx.beginPath();
 
-        const grad = ctx.createLinearGradient(0, baseY - wave.amplitude, width, baseY + wave.amplitude);
-        grad.addColorStop(0, wave.colorStart);
-        grad.addColorStop(0.5, idx % 2 === 0 ? 'rgba(0, 242, 254, 0.25)' : 'rgba(56, 189, 248, 0.2)');
-        grad.addColorStop(1, wave.colorEnd);
-
-        ctx.strokeStyle = grad;
+        ctx.strokeStyle = waveGradients[idx] || wave.colorStart;
         ctx.lineWidth = wave.lineWidth;
         ctx.lineCap = 'round';
 
-        const step = 14;
+        const step = 16;
         let first = true;
 
         for (let x = 0; x <= width + step; x += step) {
@@ -207,10 +235,50 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
       animationFrameId = requestAnimationFrame(render);
     };
 
-    animationFrameId = requestAnimationFrame(render);
+    const startLoop = () => {
+      if (!isRunning && isVisible && isTabActive) {
+        isRunning = true;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    const stopLoop = () => {
+      if (isRunning) {
+        cancelAnimationFrame(animationFrameId);
+        isRunning = false;
+      }
+    };
+
+    // Pause canvas rAF when tab is not active / in background
+    const handleVisibilityChange = () => {
+      isTabActive = !document.hidden;
+      if (isTabActive) {
+        startLoop();
+      } else {
+        stopLoop();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
+
+    // Pause canvas rAF when scrolled away
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      isVisible = entry ? entry.isIntersecting : true;
+      if (isVisible) {
+        startLoop();
+      } else {
+        stopLoop();
+      }
+    });
+    observer.observe(canvas);
+
+    startLoop();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stopLoop();
+      observer.disconnect();
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);

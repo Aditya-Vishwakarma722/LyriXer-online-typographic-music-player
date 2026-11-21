@@ -519,6 +519,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 
 .ledger-table-header {

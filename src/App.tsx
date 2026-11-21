@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { AtmosphericBackground } from './components/AtmosphericBackground';
 import { Navbar } from './features/home/Navbar';
 import { Hero } from './features/home/Hero';
@@ -6,15 +6,37 @@ import { VideoInput } from './features/home/VideoInput';
 import { TrendingTracksSection } from './features/home/TrendingTracksSection';
 import { RecentSessions } from './features/home/RecentSessions';
 import { Footer } from './features/home/Footer';
-import { AboutModal } from './features/home/AboutModal';
-import { SettingsModal } from './features/home/SettingsModal';
-import { PlayerShell } from './features/player/PlayerShell';
-import { ArtistPage } from './features/artist/ArtistPage';
-import { ArtistsHub } from './features/artist/ArtistsHub';
 import type { UserPreferences, VideoSource, RecentSession } from './types/session';
 import type { ArtistTrack } from './types/artist';
 import { ArrowRight } from 'lucide-react';
 import './App.css';
+
+// Lazy-loaded heavy views & dialogs for sub-second initial homepage payload
+const PlayerShell = lazy(() => import('./features/player/PlayerShell').then(m => ({ default: m.PlayerShell })));
+const ArtistPage = lazy(() => import('./features/artist/ArtistPage').then(m => ({ default: m.ArtistPage })));
+const ArtistsHub = lazy(() => import('./features/artist/ArtistsHub').then(m => ({ default: m.ArtistsHub })));
+const AboutModal = lazy(() => import('./features/home/AboutModal').then(m => ({ default: m.AboutModal })));
+const SettingsModal = lazy(() => import('./features/home/SettingsModal').then(m => ({ default: m.SettingsModal })));
+
+const ViewLoadingFallback = () => (
+  <div
+    style={{
+      minHeight: '100vh',
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: 'var(--font-code, monospace)',
+      fontSize: '0.74rem',
+      letterSpacing: '0.14em',
+      color: 'var(--cyber-cyan, #00F2FE)',
+      backgroundColor: '#050608',
+      zIndex: 100,
+    }}
+  >
+    [ INITIALIZING_VIEW // STREAMING_ASSETS ]
+  </div>
+);
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   typographyPreset: 'kinetic',
@@ -90,7 +112,7 @@ export const App: React.FC = () => {
   const [activeSession, setActiveSession] = useState<VideoSource | null>(null);
 
   // Synchronize preferences to localStorage and DOM theme
-  const handleUpdatePreferences = (updates: Partial<UserPreferences>) => {
+  const handleUpdatePreferences = useCallback((updates: Partial<UserPreferences>) => {
     setPreferences((prev) => {
       const updated = {
         ...prev,
@@ -106,7 +128,7 @@ export const App: React.FC = () => {
       }
       return updated;
     });
-  };
+  }, []);
 
   useEffect(() => {
     // Apply theme dynamic tokens if customized
@@ -121,7 +143,7 @@ export const App: React.FC = () => {
     root.style.setProperty('--bg-blur', `${preferences.blurLevel ?? 0}px`);
   }, [preferences.theme, preferences.blurLevel]);
 
-  const handleStartSession = (source: VideoSource) => {
+  const handleStartSession = useCallback((source: VideoSource) => {
     setActiveSession(source);
     setCurrentView('player');
 
@@ -147,9 +169,9 @@ export const App: React.FC = () => {
       }
       return updated;
     });
-  };
+  }, []);
 
-  const handleSelectArtistTrack = (track: ArtistTrack) => {
+  const handleSelectArtistTrack = useCallback((track: ArtistTrack) => {
     setPreviousView('artist');
     const source: VideoSource = {
       kind: 'youtube',
@@ -160,167 +182,171 @@ export const App: React.FC = () => {
       duration: track.duration,
     };
     handleStartSession(source);
-  };
+  }, [handleStartSession]);
 
-  const handleOpenArtist = (artistName?: string) => {
-    setPreviousView(currentView);
+  const handleOpenArtist = useCallback((artistName?: string) => {
+    setPreviousView((prev) => prev);
     if (artistName && artistName.trim()) {
       setSelectedArtistName(artistName.trim());
     }
     setCurrentView('artist');
-  };
+  }, []);
 
-  const handleExitPlayer = () => {
+  const handleExitPlayer = useCallback(() => {
     setCurrentView(previousView === 'player' ? 'home' : previousView);
-  };
+  }, [previousView]);
 
   return (
     <div className={`app-shell theme-${preferences.theme}`}>
-      {/* View 1: Immersive Player View */}
-      {currentView === 'player' && activeSession ? (
-        <PlayerShell
-          source={activeSession}
-          preferences={preferences}
-          onExit={handleExitPlayer}
-          onUpdatePreferences={handleUpdatePreferences}
-          onOpenArtist={handleOpenArtist}
-        />
-      ) : currentView === 'artist' ? (
-        /* View 2: Full-Screen Cinematic Editorial Artist Profile Page */
-        <ArtistPage
-          initialArtistName={selectedArtistName}
-          activeSession={activeSession}
-          onSelectTrack={handleSelectArtistTrack}
-          onBackToHome={() => setCurrentView('home')}
-          onBackToArtists={previousView === 'artists-hub' ? () => setCurrentView('artists-hub') : undefined}
-          onBackToPlayer={previousView === 'player' ? () => setCurrentView('player') : undefined}
-          onOpenPlayer={() => setCurrentView('player')}
-        />
-      ) : currentView === 'artists-hub' ? (
-        /* View 3: Dedicated Immersive Artists Discovery Hub */
-        <>
-          <AtmosphericBackground
-            style={preferences.backgroundStyle}
-            enableParticles={preferences.enableParticles}
-            enablePulse={preferences.haloMotion}
+      <Suspense fallback={<ViewLoadingFallback />}>
+        {/* View 1: Immersive Player View */}
+        {currentView === 'player' && activeSession ? (
+          <PlayerShell
+            source={activeSession}
+            preferences={preferences}
+            onExit={handleExitPlayer}
+            onUpdatePreferences={handleUpdatePreferences}
+            onOpenArtist={handleOpenArtist}
           />
-
-          <Navbar
-            onOpenAbout={() => setIsAboutOpen(true)}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onOpenHome={() => setCurrentView('home')}
-            onOpenArtists={() => setCurrentView('artists-hub')}
-            activeView="artists"
-          />
-
-          <ArtistsHub
-            onSelectArtist={(artistName) => {
-              handleOpenArtist(artistName);
-            }}
-            onBackToHome={() => setCurrentView('home')}
+        ) : currentView === 'artist' ? (
+          /* View 2: Full-Screen Cinematic Editorial Artist Profile Page */
+          <ArtistPage
+            initialArtistName={selectedArtistName}
             activeSession={activeSession}
-            onResumePlayer={() => setCurrentView('player')}
+            onSelectTrack={handleSelectArtistTrack}
+            onBackToHome={() => setCurrentView('home')}
+            onBackToArtists={previousView === 'artists-hub' ? () => setCurrentView('artists-hub') : undefined}
+            onBackToPlayer={previousView === 'player' ? () => setCurrentView('player') : undefined}
+            onOpenPlayer={() => setCurrentView('player')}
           />
-        </>
-      ) : (
-        /* View 4: Clean Atmospheric Homepage UI */
-        <>
-          {/* Authentic Classy Atmospheric Background (Concentric Halo + React Bits Waves & Particles) */}
-          <AtmosphericBackground
-            style={preferences.backgroundStyle}
-            enableParticles={preferences.enableParticles}
-            enablePulse={preferences.haloMotion}
-          />
+        ) : currentView === 'artists-hub' ? (
+          /* View 3: Dedicated Immersive Artists Discovery Hub */
+          <>
+            <AtmosphericBackground
+              style={preferences.backgroundStyle}
+              enableParticles={preferences.enableParticles}
+              enablePulse={preferences.haloMotion}
+            />
 
-          {/* Sparse Navigation */}
-          <Navbar
-            onOpenAbout={() => setIsAboutOpen(true)}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onOpenArtists={() => {
-              setPreviousView('home');
-              setCurrentView('artists-hub');
-            }}
-            onOpenHome={() => setCurrentView('home')}
-            activeView="home"
-          />
+            <Navbar
+              onOpenAbout={() => setIsAboutOpen(true)}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              onOpenHome={() => setCurrentView('home')}
+              onOpenArtists={() => setCurrentView('artists-hub')}
+              activeView="artists"
+            />
 
-          {/* Main Page Layout - Exotic Asymmetric Composition */}
-          <main className="main-viewport">
-            {/* Asymmetric Dual-Wing Editorial Stage with Interactive Holographic Turntable & Input Console */}
-            <Hero
-              onQuickSpin={(src) => {
-                setPreviousView('home');
-                handleStartSession(src);
+            <ArtistsHub
+              onSelectArtist={(artistName) => {
+                handleOpenArtist(artistName);
               }}
-            >
-              <VideoInput
+              onBackToHome={() => setCurrentView('home')}
+              activeSession={activeSession}
+              onResumePlayer={() => setCurrentView('player')}
+            />
+          </>
+        ) : (
+          /* View 4: Clean Atmospheric Homepage UI */
+          <>
+            {/* Authentic Classy Atmospheric Background (Concentric Halo + React Bits Waves & Particles) */}
+            <AtmosphericBackground
+              style={preferences.backgroundStyle}
+              enableParticles={preferences.enableParticles}
+              enablePulse={preferences.haloMotion}
+            />
+
+            {/* Sparse Navigation */}
+            <Navbar
+              onOpenAbout={() => setIsAboutOpen(true)}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              onOpenArtists={() => {
+                setPreviousView('home');
+                setCurrentView('artists-hub');
+              }}
+              onOpenHome={() => setCurrentView('home')}
+              activeView="home"
+            />
+
+            {/* Main Page Layout - Dynamic Minimalist Cybernetic Composition */}
+            <main className="main-viewport">
+              <Hero
+                onQuickSpin={(src) => {
+                  setPreviousView('home');
+                  handleStartSession(src);
+                }}
+              >
+                <VideoInput
+                  onStartSession={(src) => {
+                    setPreviousView('home');
+                    handleStartSession(src);
+                  }}
+                />
+              </Hero>
+
+              {/* Current Trending Instagram & YouTube Songs Section */}
+              <TrendingTracksSection
                 onStartSession={(src) => {
                   setPreviousView('home');
                   handleStartSession(src);
                 }}
+                onOpenArtist={(artistName) => {
+                  handleOpenArtist(artistName);
+                }}
               />
-            </Hero>
 
-            {/* Current Trending Instagram & YouTube Songs Section */}
-            <TrendingTracksSection
-              onStartSession={(src) => {
-                setPreviousView('home');
-                handleStartSession(src);
-              }}
-              onOpenArtist={(artistName) => {
-                handleOpenArtist(artistName);
-              }}
+              {/* Studio Archives & Recent Sessions Shelf */}
+              <RecentSessions
+                sessions={recentSessions}
+                onSelectSession={(src) => {
+                  setPreviousView('home');
+                  handleStartSession(src);
+                }}
+              />
+            </main>
+
+            {/* Minimal Footer */}
+            <Footer
+              onOpenAbout={() => setIsAboutOpen(true)}
+              onOpenSettings={() => setIsSettingsOpen(true)}
             />
 
-            {/* Studio Archives & Recent Sessions Shelf */}
-            <RecentSessions
-              sessions={recentSessions}
-              onSelectSession={(src) => {
-                setPreviousView('home');
-                handleStartSession(src);
-              }}
-            />
-          </main>
-
-          {/* Minimal Footer */}
-          <Footer
-            onOpenAbout={() => setIsAboutOpen(true)}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-          />
-
-          {/* Floating Active Player Pill (Preserves existing listening session on Home) */}
-          {activeSession && (
-            <div className="home-active-dock">
-              <div className="home-dock-info">
-                <span className="dock-status-dot" />
-                <div className="dock-text">
-                  <span className="dock-title">{activeSession.title}</span>
-                  <span className="dock-subtitle">Playing now &middot; LRCLIB synchronized</span>
+            {/* Floating Active Player Pill (Preserves existing listening session on Home) */}
+            {activeSession && (
+              <div className="home-active-dock">
+                <div className="home-dock-info">
+                  <span className="dock-status-dot" />
+                  <div className="dock-text">
+                    <span className="dock-title">{activeSession.title}</span>
+                    <span className="dock-subtitle">Playing now &middot; LRCLIB synchronized</span>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  className="home-dock-btn"
+                  onClick={() => setCurrentView('player')}
+                  title="Resume immersive player"
+                >
+                  <span>Return to Player</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
-              <button
-                type="button"
-                className="home-dock-btn"
-                onClick={() => setCurrentView('player')}
-                title="Resume immersive player"
-              >
-                <span>Return to Player</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </Suspense>
 
-      {/* Dialog Modals */}
-      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
-
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        preferences={preferences}
-        onUpdatePreferences={handleUpdatePreferences}
-      />
+      {/* Dialog Modals with lazy loading */}
+      <Suspense fallback={null}>
+        {isAboutOpen && <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />}
+        {isSettingsOpen && (
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            preferences={preferences}
+            onUpdatePreferences={handleUpdatePreferences}
+          />
+        )}
+      </Suspense>
     </div>
   );
 };

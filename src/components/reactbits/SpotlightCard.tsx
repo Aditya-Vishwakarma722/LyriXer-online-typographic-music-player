@@ -173,13 +173,21 @@ const SpotlightCard = ({
       noise.style.opacity = String(state.presence * s.grain);
     };
 
+    let cachedRect: DOMRect | null = null;
+    const invalidateRect = () => {
+      cachedRect = null;
+    };
+
     const tick = (now: number) => {
       raf = 0;
       if (!alive) return;
       const s = settingsRef.current;
       const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
       last = now;
-      const rect = root.getBoundingClientRect();
+      if (!cachedRect) {
+        cachedRect = root.getBoundingClientRect();
+      }
+      const rect = cachedRect;
       let tx = state.x;
       let ty = state.y;
       let target = 0;
@@ -232,10 +240,16 @@ const SpotlightCard = ({
       pointer.x = event.clientX;
       pointer.y = event.clientY;
       pointer.active = true;
-      if (state.presence > 0 || settingsRef.current.proximity > 0 || root.contains(event.target as Node | null)) wake();
+      wake();
     };
-    const onOut = (event: PointerEvent) => {
-      if (event.relatedTarget) return;
+    const onEnter = (event: PointerEvent) => {
+      invalidateRect();
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      pointer.active = true;
+      wake();
+    };
+    const onLeave = () => {
       pointer.active = false;
       wake();
     };
@@ -254,6 +268,7 @@ const SpotlightCard = ({
     };
     const onFocusIn = (event: FocusEvent) => {
       if (!(event.target instanceof Element) || !event.target.matches(':focus-visible')) return;
+      invalidateRect();
       focus = event.target;
       wake();
     };
@@ -263,20 +278,26 @@ const SpotlightCard = ({
       wake();
     };
     const onScroll = () => {
+      invalidateRect();
       if (pointer.active || state.presence > 0) wake();
     };
 
     const observer = new IntersectionObserver(entries => {
       state.visible = entries.some(entry => entry.isIntersecting);
-      if (state.visible) wake();
+      if (state.visible) {
+        invalidateRect();
+        wake();
+      }
     });
     observer.observe(root);
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
+    root.addEventListener('pointerenter', onEnter, { passive: true });
+    root.addEventListener('pointermove', onMove, { passive: true });
+    root.addEventListener('pointerleave', onLeave, { passive: true });
+    window.addEventListener('pointerup', onUp, { passive: true });
+    window.addEventListener('pointercancel', onUp, { passive: true });
     window.addEventListener('scroll', onScroll, { capture: true, passive: true });
-    document.addEventListener('pointerout', onOut);
-    root.addEventListener('pointerdown', onDown);
+    window.addEventListener('resize', invalidateRect, { passive: true });
+    root.addEventListener('pointerdown', onDown, { passive: true });
     root.addEventListener('focusin', onFocusIn);
     root.addEventListener('focusout', onFocusOut);
     wake();
@@ -285,11 +306,13 @@ const SpotlightCard = ({
       alive = false;
       cancelAnimationFrame(raf);
       observer.disconnect();
-      window.removeEventListener('pointermove', onMove);
+      root.removeEventListener('pointerenter', onEnter);
+      root.removeEventListener('pointermove', onMove);
+      root.removeEventListener('pointerleave', onLeave);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
       window.removeEventListener('scroll', onScroll, { capture: true });
-      document.removeEventListener('pointerout', onOut);
+      window.removeEventListener('resize', invalidateRect);
       root.removeEventListener('pointerdown', onDown);
       root.removeEventListener('focusin', onFocusIn);
       root.removeEventListener('focusout', onFocusOut);

@@ -5,6 +5,8 @@
   max-width: 1240px;
   margin: 0 auto 90px auto;
   padding: 0 32px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 380px;
 }
 
 .recent-container {

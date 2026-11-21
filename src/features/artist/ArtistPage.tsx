@@ -371,6 +371,7 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                   alt={item.title || item.album}
                   className="artist-album-tile-img"
                   loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     (e.currentTarget as HTMLElement).style.display = 'none';
@@ -474,6 +475,8 @@ export const ArtistPage: React.FC<ArtistPageProps> = ({
                   src={profile.heroImageUrl}
                   alt={profile.name}
                   className="dossier-avatar-img"
+                  loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                 />
                 <span className="dossier-coord-chip">REC_01 // VERIFIED</span>

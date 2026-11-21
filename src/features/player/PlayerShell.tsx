@@ -346,8 +346,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     adapterRef.current?.play();
   };
 
-  // Listener callbacks from adapter
-  const listener: VideoPlayerListener = {
+  // Listener callbacks from adapter with stable identity
+  const listener = React.useMemo<VideoPlayerListener>(() => ({
     onTimeUpdate: (currentTime) => {
       setPlayerState((prev) => ({ ...prev, currentTime }));
     },
@@ -370,7 +370,21 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         fetchLyrics(title, artist);
       }
     },
-  };
+  }), [autoAlignTimeline, fetchLyrics]);
+
+  const handleUploadLrcClick = useCallback(() => {
+    lrcFileInputRef.current?.click();
+  }, []);
+
+  const handleOpenSearchModal = useCallback(() => {
+    setIsSearchModalOpen(true);
+  }, []);
+
+  const handleOpenArtistCallback = useCallback(() => {
+    if (onOpenArtist) {
+      onOpenArtist(effectiveArtistRef.current);
+    }
+  }, [onOpenArtist]);
 
   // Fullscreen handling
   const handleToggleFullScreen = () => {
@@ -627,8 +641,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onAdapterReady={handleAdapterReady}
           listener={listener}
           onSeekTo={(sec) => adapter?.seekTo(sec)}
-          onUploadLrcClick={() => lrcFileInputRef.current?.click()}
-          onSearchLrclibClick={() => setIsSearchModalOpen(true)}
+          onUploadLrcClick={handleUploadLrcClick}
+          onSearchLrclibClick={handleOpenSearchModal}
           onAutoSync={handleAutoSync}
           currentTime={effectiveTime}
           duration={playerState.duration || source.duration || 0}
@@ -636,7 +650,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           progress={progress}
           trackTitle={trackInfo.title}
           trackArtist={effectiveArtist}
-          onOpenArtist={onOpenArtist ? () => onOpenArtist(effectiveArtist) : undefined}
+          onOpenArtist={onOpenArtist ? handleOpenArtistCallback : undefined}
         />
       ) : (
         <LocalPlayerView
@@ -653,8 +667,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
           onAdapterReady={handleAdapterReady}
           listener={listener}
           onSeekTo={(sec) => adapter?.seekTo(sec)}
-          onUploadLrcClick={() => lrcFileInputRef.current?.click()}
-          onSearchLrclibClick={() => setIsSearchModalOpen(true)}
+          onUploadLrcClick={handleUploadLrcClick}
+          onSearchLrclibClick={handleOpenSearchModal}
           onAutoSync={handleAutoSync}
           currentTime={effectiveTime}
           duration={playerState.duration || source.duration || 0}

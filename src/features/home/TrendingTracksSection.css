@@ -11,6 +11,8 @@
   max-width: 1360px;
   margin: 0 auto clamp(80px, 12vh, 140px) auto;
   padding: 0 32px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 650px;
 }
 
 .trending-container {

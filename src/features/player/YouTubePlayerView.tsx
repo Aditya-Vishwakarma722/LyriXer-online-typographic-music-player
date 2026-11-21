@@ -75,10 +75,8 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<Yo
     !isEnded
   );
 
-  useEffect(() => {
-    listenerRef.current = listener;
-    onAdapterReadyRef.current = onAdapterReady;
-  });
+  listenerRef.current = listener;
+  onAdapterReadyRef.current = onAdapterReady;
 
   useEffect(() => {
     if (!containerRef.current) return;

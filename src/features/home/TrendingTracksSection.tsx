@@ -113,6 +113,8 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
                   src={primarySpotlight.thumbnailUrl}
                   alt={primarySpotlight.title}
                   className="panoramic-thumb-img"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="panoramic-scrim" />
               </div>
@@ -178,6 +180,7 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
                     alt={track.title}
                     className="tall-thumb-img"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="tall-scrim" />
                 </div>
