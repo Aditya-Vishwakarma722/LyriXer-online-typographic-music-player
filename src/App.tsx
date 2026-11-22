@@ -301,6 +301,9 @@ export const App: React.FC = () => {
                   setPreviousView('home');
                   handleStartSession(src);
                 }}
+                onOpenArtist={(artistName) => {
+                  handleOpenArtist(artistName);
+                }}
               />
             </main>
 
