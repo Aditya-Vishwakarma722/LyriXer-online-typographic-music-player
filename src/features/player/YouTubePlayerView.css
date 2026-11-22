@@ -27,27 +27,26 @@
               filter 0.4s ease-out;
 }
 
-/* Smooth 3.5s cinematic fade-out right at the end of the video (3-4 seconds), cleanly suppressing recommendations */
+/* Smooth 2.5s cinematic fade-out right at the end of the video, cleanly transitioning to Track Completed */
 .yt-fullscreen-video-viewport.suppress-recommendations {
   opacity: 0;
-  filter: blur(24px) !important;
-  transition: opacity 3.5s cubic-bezier(0.25, 1, 0.5, 1),
-              filter 3.5s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: opacity 2.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .yt-fullscreen-host {
-  width: 100vw;
-  height: 56.25vw; /* 16:9 aspect ratio standard */
-  min-height: 100vh;
-  min-width: 177.78vh; /* 16:9 aspect ratio standard */
+  /* Exact original resolution & 16:9 aspect ratio, strictly contained within the viewport.
+     No artificial zoom, overscan, or stretching. Natural black bars (letterbox/pillarbox) preserved. */
   position: absolute;
   top: 50%;
   left: 50%;
-  /* Overscan 1.32x to physically push YouTube top title bar, channel avatar,
-     share/watch later icons, more videos button, and watermark completely outside the viewport */
-  transform: translate(-50%, -50%) scale(1.32);
-  transform-origin: center center;
+  transform: translate(-50%, -50%);
+  width: min(100vw, 177.78vh);
+  height: min(100vh, 56.25vw);
+  max-width: 100vw;
+  max-height: 100vh;
+  aspect-ratio: 16 / 9;
   pointer-events: none;
+  background-color: #000000;
 }
 
 .yt-fullscreen-host iframe {
@@ -58,27 +57,10 @@
   display: block !important;
 }
 
-/* Top & bottom edge shields to guarantee zero YouTube UI or boundary artifacts ever peek through */
-.yt-fullscreen-edge-shield-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 72px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
-  pointer-events: none;
-  z-index: 3;
-}
-
+/* Edge shields disabled so original video is 100% crisp without artificial top/bottom darkening */
+.yt-fullscreen-edge-shield-top,
 .yt-fullscreen-edge-shield-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 72px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
-  pointer-events: none;
-  z-index: 3;
+  display: none !important;
 }
 
 /* 2. Atmospheric Dim Contrast Overlay (Controlled cleanly via overlayOpacity) */
@@ -92,35 +74,32 @@
 }
 
 /* 2b. End-Screen Anti-Recommendation Shield
-   Aggressively covers and dissolves YouTube recommended video cards / suggested video overlays
-   in the last 3-4 seconds with a smooth 3.5s fade animation. */
+   Aggressively covers and blocks YouTube end cards and suggested video overlays in the last 20 seconds.
+   Solid blackout on left and right zones (where YouTube end cards appear), while keeping the center
+   singer and lyrics completely visible and unobstructed. Aligned exactly with the 16:9 video bounds. */
 .yt-end-recommendations-shield {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100vw, 177.78vh);
+  height: min(100vh, 56.25vw);
+  max-width: 100vw;
+  max-height: 100vh;
+  aspect-ratio: 16 / 9;
   z-index: 8;
   pointer-events: none;
-  background:
-    /* Deep quadrant blackouts targeting YouTube end-card layout zones */
-    radial-gradient(circle at 18% 22%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
-    radial-gradient(circle at 82% 22%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
-    radial-gradient(circle at 18% 78%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
-    radial-gradient(circle at 82% 78%, rgba(8, 8, 11, 0.98) 0%, rgba(8, 8, 11, 0) 55%),
-    /* Overall atmospheric dark gradient */
-    radial-gradient(
-      ellipse at 50% 50%,
-      rgba(11, 11, 13, 0.92) 0%,
-      rgba(8, 8, 11, 0.98) 70%,
-      #08080B 100%
-    );
-  backdrop-filter: blur(36px);
-  -webkit-backdrop-filter: blur(36px);
   opacity: 0;
-  transition: opacity 0.4s ease-out;
+  transition: opacity 0.5s ease-out;
+  background:
+    /* Left blackout: 100% masks left-side end cards (e.g. Marshmello, My Fault) */
+    linear-gradient(90deg, #000000 0%, #000000 32%, rgba(0, 0, 0, 0.95) 38%, rgba(0, 0, 0, 0) 48%),
+    /* Right blackout: 100% masks right-side end cards, playlists, and channel icons */
+    linear-gradient(270deg, #000000 0%, #000000 32%, rgba(0, 0, 0, 0.95) 38%, rgba(0, 0, 0, 0) 48%);
 }
 
 .yt-end-recommendations-shield.active {
   opacity: 1;
-  transition: opacity 3.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* 3. Centered Lyrics Overlay (Floating on top of playing video) */

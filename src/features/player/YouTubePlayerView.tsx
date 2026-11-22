@@ -65,13 +65,23 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<Yo
   const listenerRef = useRef(listener);
   const onAdapterReadyRef = useRef(onAdapterReady);
 
-  // Outro fade threshold: smooth 3.5s cinematic fade-out right at the end of playback (3-4 seconds),
-  // cleanly shielding YouTube end-screen cards and recommendation grids without disrupting the song.
-  const OUTRO_FADE_SECONDS = 3.5;
+  // YouTube end-screen cards (configured by uploaders in YouTube Studio) appear within the final 20 seconds of playback.
+  // We activate the anti-recommendation shield during this 20-second window to completely mask end cards
+  // on the left and right quadrants while keeping the center singer and lyrics unobstructed.
+  const END_SCREEN_WINDOW_SECONDS = 20;
   const isNearEnd = Boolean(
     duration &&
-    duration > OUTRO_FADE_SECONDS &&
-    currentTime >= Math.max(0, duration - OUTRO_FADE_SECONDS) &&
+    duration > END_SCREEN_WINDOW_SECONDS &&
+    currentTime >= Math.max(0, duration - END_SCREEN_WINDOW_SECONDS) &&
+    !isEnded
+  );
+
+  // During the final 2.5 seconds, smoothly dissolve the video into complete black for the Track Completed screen
+  const FINAL_FADE_SECONDS = 2.5;
+  const isFinalFade = Boolean(
+    duration &&
+    duration > FINAL_FADE_SECONDS &&
+    currentTime >= Math.max(0, duration - FINAL_FADE_SECONDS) &&
     !isEnded
   );
 
@@ -106,7 +116,7 @@ export const YouTubePlayerView: React.FC<YouTubePlayerViewProps> = React.memo<Yo
     <div className="yt-fullscreen-player-root">
       {/* 1. Full-Viewport YouTube Video Backdrop */}
       <div
-        className={`yt-fullscreen-video-viewport ${isNearEnd ? 'suppress-recommendations' : ''}`}
+        className={`yt-fullscreen-video-viewport ${isFinalFade ? 'suppress-recommendations' : ''}`}
         style={{
           filter: blurLevel > 0 ? `blur(${blurLevel}px)` : 'none',
         }}
