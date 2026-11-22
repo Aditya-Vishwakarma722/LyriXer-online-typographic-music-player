@@ -118,20 +118,24 @@
 }
 
 .lyrics-focus-stack-track {
+  position: relative;
   width: 100%;
-  max-width: 980px;
+  max-width: 1080px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 26px;
+  justify-content: flex-start;
+  gap: 28px;
   text-align: center;
-  padding: 0 28px;
+  padding: 0 32px;
+  margin: 0 auto;
   will-change: transform;
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.5s ease;
 }
 
-.lyrics-focus-stack-track.no-transition {
+.lyrics-focus-stack-track.no-transition,
+.lyrics-focus-stack-track.user-scrolling {
   transition: none !important;
 }
 
@@ -151,20 +155,22 @@
 }
 
 .preset-focus-stack {
-  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: 'Plus Jakarta Sans', var(--font-sans, 'Inter'), -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .preset-focus-stack .lyric-line-item {
   width: 100%;
-  max-width: 920px;
+  max-width: 960px;
+  margin: 0 auto;
   cursor: pointer;
-  padding: 8px 20px;
-  border-radius: 12px;
+  padding: 10px 24px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   will-change: transform, opacity, filter;
   transform-origin: center center;
   transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
@@ -184,17 +190,18 @@
    Ensures words NEVER wrap, reflow, or drop down when a line comes into focus! */
 .preset-focus-stack .lyric-text,
 .preset-focus-stack .lyric-text-container {
-  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
-  font-size: calc(clamp(2.4rem, 3.6vw, 3.1rem) * var(--lyric-font-scale, 1));
+  font-family: 'Plus Jakarta Sans', var(--font-sans, 'Inter'), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: calc(clamp(2.0rem, 3.4vw, 3.2rem) * var(--lyric-font-scale, 1));
   font-weight: 800;
-  line-height: 1.34;
+  line-height: 1.32;
   letter-spacing: -0.02em;
   text-wrap: balance;
   text-align: center;
   display: inline-block;
-  min-height: 1.34em;
+  min-height: 1.32em;
   position: relative;
   max-width: 100%;
+  margin: 0 auto;
   text-shadow: none;
   transition: color 0.3s ease;
 }
@@ -204,12 +211,20 @@
   position: relative;
   display: inline-block;
   vertical-align: baseline;
-  white-space: pre;
+  white-space: nowrap;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
   line-height: inherit;
   letter-spacing: inherit;
+}
+
+/* Plain non-active line text */
+.preset-focus-stack .lyric-line-plain {
+  white-space: normal;
+  text-wrap: balance;
+  text-align: center;
+  display: inline-block;
 }
 
 /* Base un-sung word: crisp, pure translucent grey-white with subtle clean contour shadow */
@@ -224,15 +239,15 @@
   letter-spacing: inherit;
   color: rgba(255, 255, 255, 0.40);
   -webkit-text-fill-color: rgba(255, 255, 255, 0.40);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 /* Base text on unfocused lines: soft legible light grey with subtle contour shadow */
 .preset-focus-stack .lyric-line-item:not(.lyric-active) .word-base {
-  color: #E2E2E8;
-  -webkit-text-fill-color: #E2E2E8;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  color: #CBD5E1;
+  -webkit-text-fill-color: #CBD5E1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 /* Sung word fill (left side of active line): pure sharp white glyphs without box clipping,
@@ -249,13 +264,13 @@
   font-weight: inherit;
   line-height: inherit;
   letter-spacing: inherit;
-  white-space: pre;
+  white-space: nowrap;
   color: #FFFFFF;
   -webkit-text-fill-color: #FFFFFF;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95),
                0 0 20px rgba(255, 255, 255, 0.5),
-               0 0 35px rgba(167, 139, 250, 0.45),
-               0 0 70px rgba(124, 58, 237, 0.25);
+               0 0 35px rgba(0, 242, 254, 0.35),
+               0 0 60px rgba(0, 242, 254, 0.18);
   pointer-events: none;
   transition: opacity 0.15s ease-out;
 }
@@ -264,15 +279,15 @@
 .preset-focus-stack .lyric-line-item.lyric-active {
   opacity: 1 !important;
   filter: none !important;
-  transform: scale(1.04) !important;
+  transform: scale(1.05) !important;
   z-index: 10;
 }
 
 .preset-focus-stack .lyric-line-item.lyric-active .lyric-text-container {
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95),
                0 0 20px rgba(255, 255, 255, 0.5),
-               0 0 35px rgba(167, 139, 250, 0.45),
-               0 0 70px rgba(124, 58, 237, 0.25);
+               0 0 35px rgba(0, 242, 254, 0.35),
+               0 0 60px rgba(0, 242, 254, 0.18);
 }
 
 /* Non-focus lines (both upcoming lines and lines that got passed):
@@ -282,31 +297,31 @@
   filter: blur(5px);
   opacity: 0.18;
   transform: scale(0.95);
-  color: #E2E2E8;
+  color: #CBD5E1;
 }
 
 /* Progressive depth blur: lines further away recede gracefully with very low opacity */
 .preset-focus-stack .lyric-line-item.dist-1:not(.lyric-active) {
-  filter: blur(4px);
+  filter: blur(3.5px);
   opacity: 0.28;
   transform: scale(0.97);
 }
 
 .preset-focus-stack .lyric-line-item.dist-2:not(.lyric-active) {
-  filter: blur(6px);
-  opacity: 0.15;
+  filter: blur(5.5px);
+  opacity: 0.16;
   transform: scale(0.94);
 }
 
 .preset-focus-stack .lyric-line-item.dist-3:not(.lyric-active) {
-  filter: blur(8px);
+  filter: blur(7.5px);
   opacity: 0.08;
   transform: scale(0.91);
 }
 
 .preset-focus-stack .lyric-line-item.dist-4:not(.lyric-active),
 .preset-focus-stack .lyric-line-item.dist-far:not(.lyric-active) {
-  filter: blur(10px);
+  filter: blur(9.5px);
   opacity: 0.03;
   transform: scale(0.88);
 }
@@ -314,7 +329,7 @@
 /* Hover state on any non-active line: clears blur on hover for easy reading/seeking */
 .preset-focus-stack .lyric-line-item:hover {
   filter: blur(0px) !important;
-  opacity: 0.85 !important;
+  opacity: 0.92 !important;
   transform: scale(1.02) !important;
   color: #FFFFFF !important;
   background: rgba(255, 255, 255, 0.06);
@@ -347,25 +362,28 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.8125rem;
+  font-family: var(--font-code, monospace);
+  font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0.08em;
   color: #FFFFFF;
-  background: rgba(24, 24, 27, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(8, 10, 14, 0.92);
+  border: 1px solid rgba(0, 242, 254, 0.35);
   padding: 8px 18px;
-  border-radius: 999px;
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
   backdrop-filter: blur(16px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(167, 139, 250, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(0, 242, 254, 0.2);
   cursor: pointer;
   z-index: 30;
   transition: all 0.2s ease;
 }
 
 .lyrics-sync-to-current-pill:hover {
-  background: var(--accent-violet, #7C3AED);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--cyber-cyan, #00F2FE);
+  color: #050608;
+  border-color: var(--cyber-cyan, #00F2FE);
   transform: translateX(-50%) translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 24px rgba(167, 139, 250, 0.5);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 242, 254, 0.4);
 }
 
 .sync-pill-icon {

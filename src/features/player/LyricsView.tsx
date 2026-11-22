@@ -43,6 +43,7 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
   const [translateY, setTranslateY] = useState(0);
   const [wheelOffset, setWheelOffset] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const wheelTimeoutRef = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
@@ -75,13 +76,32 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
     updateCenterPosition();
   }, [updateCenterPosition, fontSizeScale, lyrics]);
 
-  // Responsive window resize listener
+  // Responsive window & container resize listener + font readiness check
   useEffect(() => {
     const handleResize = () => {
       updateCenterPosition();
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && stageRef.current) {
+      ro = new ResizeObserver(() => {
+        updateCenterPosition();
+      });
+      ro.observe(stageRef.current);
+      if (trackRef.current) ro.observe(trackRef.current);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        updateCenterPosition();
+      });
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (ro) ro.disconnect();
+    };
   }, [updateCenterPosition]);
 
   // Initial smooth mount
@@ -95,12 +115,14 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
 
   // Automatically reset any user wheel offset when the next line begins
   useEffect(() => {
+    setIsUserScrolling(false);
     setWheelOffset(0);
   }, [activeIndex]);
 
   // Allow manual scroll/wheel inspection with smooth auto-snap return
   const handleWheel = (e: React.WheelEvent) => {
     if (typographyPreset !== 'focus-stack') return;
+    setIsUserScrolling(true);
     setWheelOffset((prev) => {
       const next = prev - e.deltaY;
       return Math.max(-900, Math.min(900, next));
@@ -110,6 +132,7 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
       window.clearTimeout(wheelTimeoutRef.current);
     }
     wheelTimeoutRef.current = window.setTimeout(() => {
+      setIsUserScrolling(false);
       setWheelOffset(0);
     }, 2800);
   };
@@ -125,12 +148,14 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
     const delta = currentY - touchStartY.current;
     touchStartY.current = currentY;
 
+    setIsUserScrolling(true);
     setWheelOffset((prev) => Math.max(-900, Math.min(900, prev + delta)));
 
     if (wheelTimeoutRef.current) {
       window.clearTimeout(wheelTimeoutRef.current);
     }
     wheelTimeoutRef.current = window.setTimeout(() => {
+      setIsUserScrolling(false);
       setWheelOffset(0);
     }, 2800);
   };
@@ -247,8 +272,8 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
       <div
         ref={trackRef}
         className={`lyrics-focus-stack-track ${isInitialLoad ? 'no-transition' : ''} ${
-          isPreVocal ? 'pre-vocal-hidden' : ''
-        } ${isVanishEnded ? 'song-ended-hidden' : ''}`}
+          isUserScrolling ? 'user-scrolling' : ''
+        } ${isPreVocal ? 'pre-vocal-hidden' : ''} ${isVanishEnded ? 'song-ended-hidden' : ''}`}
         style={{
           transform: `translate3d(0, ${translateY + wheelOffset}px, 0)`,
         }}
@@ -341,9 +366,7 @@ export const LyricsView: React.FC<LyricsViewProps> = React.memo<LyricsViewProps>
                       );
                     })
                   ) : (
-                    <span className="lyric-word-wrap">
-                      <span className="word-base">{line.text}</span>
-                    </span>
+                    <span className="word-base lyric-line-plain">{line.text}</span>
                   )}
                 </span>
               ) : (
