@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal } from '../../components/ui/Modal';
 import { Sparkles } from 'lucide-react';
+import { GithubIcon } from '../../components/ui/Icons';
 import './AboutModal.css';
 
 interface AboutModalProps {
@@ -89,7 +90,19 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             <span className="about-status-dot" />
             <span>LyriXer Core · Crafted for music lovers</span>
           </div>
-          <span className="about-colophon-version">v1.0.0</span>
+          <div className="about-colophon-right">
+            <a
+              href="https://github.com/Aditya-Vishwakarma722/LyriXer-online-typographic-music-player"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="about-github-link"
+              aria-label="GitHub Repository"
+            >
+              <GithubIcon size={13} />
+              <span>GitHub</span>
+            </a>
+            <span className="about-colophon-version">v1.0.0</span>
+          </div>
         </div>
       </div>
     </Modal>

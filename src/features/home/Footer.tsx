@@ -29,7 +29,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAbout, onOpenSettings }) =
             Settings
           </button>
           <a
-            href="https://github.com"
+            href="https://github.com/Aditya-Vishwakarma722/LyriXer-online-typographic-music-player"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"

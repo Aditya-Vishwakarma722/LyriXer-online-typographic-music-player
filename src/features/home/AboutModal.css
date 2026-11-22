@@ -127,6 +127,36 @@
   gap: 8px;
 }
 
+.about-colophon-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.about-github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cyber-cyan, #00F2FE);
+  text-decoration: none;
+  font-family: var(--font-code, monospace);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 3px 8px;
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.about-github-link:hover {
+  background: rgba(0, 242, 254, 0.18);
+  border-color: var(--cyber-cyan, #00F2FE);
+  color: #FFFFFF;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.25);
+}
+
 .about-status-dot {
   width: 6px;
   height: 6px;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SlidersHorizontal, Info, Mic2, Home } from 'lucide-react';
 import { BrandLogo } from '../../components/ui/BrandLogo';
+import { GithubIcon } from '../../components/ui/Icons';
 import './Navbar.css';
 
 interface NavbarProps {
@@ -85,6 +86,17 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
             <SlidersHorizontal size={14} className="navbar-link-icon" />
             <span>Settings</span>
           </button>
+
+          <a
+            href="https://github.com/Aditya-Vishwakarma722/LyriXer-online-typographic-music-player"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="navbar-link"
+            aria-label="GitHub Repository"
+          >
+            <GithubIcon size={14} className="navbar-link-icon" />
+            <span>GitHub</span>
+          </a>
         </nav>
       </div>
     </header>

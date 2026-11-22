@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://github.com/Aditya-Vishwakarma722/LyriXer-online-typographic-music-player",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aditya-Vishwakarma722/LyriXer-online-typographic-music-player.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
