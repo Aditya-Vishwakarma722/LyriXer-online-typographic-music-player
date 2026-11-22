@@ -19,64 +19,149 @@
 }
 
 /* ============================================================== */
-/* Minimalist Cybernetic Ambient Backlight (Zero Purple Blobs)    */
+/* Authentic Cybernetic Sound Nebula / Ambient Chromatic Aurora   */
 /* ============================================================== */
 .aurora-mesh-container {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
   pointer-events: none !important;
   z-index: 1;
-  opacity: 0.6;
+  opacity: 0.75;
+  filter: blur(80px);
+  -webkit-filter: blur(80px);
+  transform: translateZ(0);
 }
 
 .aurora-glow-node {
   position: absolute;
   border-radius: 50%;
   pointer-events: none !important;
+  will-change: transform, opacity;
 }
 
-/* Discreet Laser Cyan Ambient Glow at Top Focus */
+/* Node 1: Laser Cyan Ambient Crown */
 .node-primary {
-  top: 5%;
+  top: 4%;
   left: 50%;
   transform: translateX(-50%);
-  width: 900px;
-  height: 480px;
-  background: radial-gradient(ellipse at 50% 30%, rgba(0, 242, 254, 0.06) 0%, rgba(2, 132, 199, 0.02) 45%, transparent 70%);
-  filter: blur(60px);
+  width: 960px;
+  height: 520px;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(0, 242, 254, 0.16) 0%,
+    rgba(2, 132, 199, 0.05) 50%,
+    transparent 75%
+  );
+  animation: floatNebulaPrimary 22s ease-in-out infinite alternate;
 }
 
-.node-secondary,
-.node-tertiary,
-.node-quaternary {
-  display: none !important;
+/* Node 2: Radiant Electric Violet Acoustic Bloom */
+.node-secondary {
+  top: 36%;
+  right: 8%;
+  width: 680px;
+  height: 680px;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.13) 0%,
+    rgba(124, 58, 237, 0.04) 50%,
+    transparent 72%
+  );
+  animation: floatNebulaSecondary 28s ease-in-out infinite alternate;
+}
+
+/* Node 3: Deep Midnight Indigo Ambient Anchor */
+.node-tertiary {
+  bottom: 6%;
+  left: 12%;
+  width: 720px;
+  height: 720px;
+  background: radial-gradient(
+    circle,
+    rgba(67, 56, 202, 0.11) 0%,
+    rgba(56, 189, 248, 0.03) 50%,
+    transparent 70%
+  );
+  animation: floatNebulaTertiary 25s ease-in-out infinite alternate;
+}
+
+@keyframes floatNebulaPrimary {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-46%) scale(1.08) translateY(20px);
+  }
+  100% {
+    transform: translateX(-54%) scale(0.96) translateY(-15px);
+  }
+}
+
+@keyframes floatNebulaSecondary {
+  0% {
+    transform: translate(0, 0) scale(0.95);
+  }
+  50% {
+    transform: translate(-40px, -30px) scale(1.08);
+  }
+  100% {
+    transform: translate(30px, -50px) scale(1.02);
+  }
+}
+
+@keyframes floatNebulaTertiary {
+  0% {
+    transform: translate(0, 0) scale(1.04);
+  }
+  50% {
+    transform: translate(35px, -30px) scale(0.94);
+  }
+  100% {
+    transform: translate(-35px, -20px) scale(1.06);
+  }
 }
 
 /* ============================================================== */
-/* Soundscape Canvas & Halo - Clean Minimalist State              */
+/* Concentric Halo Acoustic Rings Layer                           */
 /* ============================================================== */
 .halo-layer {
   position: absolute;
   inset: 0;
   pointer-events: none !important;
   z-index: 2;
-  opacity: 0.15;
+  opacity: 0.22;
 }
 
-.soundscape-canvas-layer {
+/* ============================================================== */
+/* React Bits Threads: High-Tech Waveform Strings Layer           */
+/* ============================================================== */
+.threads-layer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none !important;
   z-index: 3;
-  opacity: 0.12;
+  opacity: 0.85;
 }
 
 /* ============================================================== */
-/* Atmospheric Vignette - Deep obsidian depth and crisp contrast   */
+/* Stardust Audio Particles & Harmonic Echoes                     */
+/* ============================================================== */
+.soundscape-canvas-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none !important;
+  z-index: 4;
+  opacity: 0.35;
+}
+
+/* ============================================================== */
+/* Deep Obsidian Perimeter Vignette - Crisp Contrast Guarantee    */
 /* ============================================================== */
 .atmospheric-vignette {
   position: absolute;
@@ -84,15 +169,18 @@
   z-index: 5;
   pointer-events: none !important;
   background: radial-gradient(
-    ellipse at 50% 45%,
-    transparent 45%,
-    rgba(5, 6, 8, 0.65) 80%,
-    rgba(5, 6, 8, 0.95) 100%
+    ellipse at 50% 48%,
+    transparent 35%,
+    rgba(5, 6, 8, 0.45) 70%,
+    rgba(5, 6, 8, 0.90) 96%
   );
 }
 
 @media (max-width: 768px) {
   .aurora-mesh-container {
     opacity: 0.65;
+  }
+  .threads-layer {
+    opacity: 0.70;
   }
 }

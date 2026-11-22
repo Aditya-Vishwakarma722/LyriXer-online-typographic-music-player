@@ -1,4 +1,5 @@
 import React from 'react';
+import Threads from './reactbits/Threads';
 import { HaloBackground } from './HaloBackground';
 import { AcousticSoundscapeCanvas } from './AcousticSoundscapeCanvas';
 import './AtmosphericBackground.css';
@@ -10,19 +11,19 @@ export interface AtmosphericBackgroundProps {
 }
 
 export const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = React.memo<AtmosphericBackgroundProps>(({
+  enableParticles = true,
   enablePulse = true,
 }) => {
   return (
     <div className="atmospheric-bg-root" aria-hidden="true">
-      {/* 1. Deep Obsidian Base Layer */}
+      {/* 1. Deep Obsidian Base Layer (Guaranteed Zero Grey / Full Contrast) */}
       <div className="base-canvas-layer" />
 
-      {/* 2. Authentic Animated Chromatic Sound Nebula / Fluid Aurora Mesh */}
+      {/* 2. Cybernetic Sound Nebula / Ambient Chromatic Aurora Light */}
       <div className="aurora-mesh-container">
         <div className="aurora-glow-node node-primary" />
         <div className="aurora-glow-node node-secondary" />
         <div className="aurora-glow-node node-tertiary" />
-        <div className="aurora-glow-node node-quaternary" />
       </div>
 
       {/* 3. Signature Concentric Resonant Halo Rings */}
@@ -30,12 +31,36 @@ export const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = React
         <HaloBackground enablePulse={enablePulse} />
       </div>
 
-      {/* 4. Fluid Harmonic Sound Waves & Stardust Audio Particles */}
-      <div className="soundscape-canvas-layer">
-        <AcousticSoundscapeCanvas />
+      {/* 4. React Bits Threads: High-Tech Waveform Strings & Acoustic Resonance */}
+      <div className="threads-layer">
+        <Threads
+          color="#00F2FE"
+          accentColor="#8B5CF6"
+          amplitude={1.35}
+          distance={0.32}
+          enableMouseInteraction={true}
+          lineCount={64}
+          thickness={0.9}
+          softness={1.2}
+          speed={0.42}
+          waves={1.5}
+          split={0.04}
+          fray={0.45}
+          angle={22}
+          parting={0.38}
+          brightness={1.3}
+          opacity={0.7}
+        />
       </div>
 
-      {/* 5. Deep Obsidian Perimeter Vignette */}
+      {/* 5. Harmonic Stardust Audio Particles */}
+      {enableParticles && (
+        <div className="soundscape-canvas-layer">
+          <AcousticSoundscapeCanvas />
+        </div>
+      )}
+
+      {/* 6. Deep Obsidian Perimeter Vignette for Crisp Contrast */}
       <div className="atmospheric-vignette" />
     </div>
   );
