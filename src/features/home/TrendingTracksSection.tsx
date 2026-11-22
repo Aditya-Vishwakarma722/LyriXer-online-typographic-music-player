@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Play,
+  RefreshCw,
 } from 'lucide-react';
 import {
   TrendingFeedService,
@@ -24,11 +25,24 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
   const [platformFilter, setPlatformFilter] = useState<TrendingPlatformFilter>('all');
   const [feedData, setFeedData] = useState(() => TrendingFeedService.getDailyTrendingFeed());
   const [showAll, setShowAll] = useState(false);
+  const [isCycling, setIsCycling] = useState(false);
 
   useEffect(() => {
     const daily = TrendingFeedService.getDailyTrendingFeed();
     setFeedData(daily);
   }, []);
+
+  const handleCycleRadar = () => {
+    setIsCycling(true);
+    const next = TrendingFeedService.cycleRadarNext(feedData.cycleOffset ?? 0);
+    setFeedData({
+      tracks: next.tracks,
+      lastUpdatedDateString: next.lastUpdatedDateString,
+      isFreshToday: true,
+      cycleOffset: next.cycleOffset,
+    });
+    setTimeout(() => setIsCycling(false), 450);
+  };
 
   const filteredTracks = useMemo(() => {
     const all = feedData.tracks;
@@ -62,6 +76,16 @@ export const TrendingTracksSection: React.FC<TrendingTracksSectionProps> = React
           <div className="trending-header-left">
             <span className="trending-index-tag">[ 01 // TRENDING_SIGNALS ]</span>
             <span className="trending-status-text">RADAR_24H // {feedData.lastUpdatedDateString}</span>
+            <button
+              type="button"
+              className="trending-cycle-btn"
+              onClick={handleCycleRadar}
+              title="Cycle fresh trending radar signals"
+              aria-label="Cycle fresh trending radar signals"
+            >
+              <RefreshCw size={11} className={`cycle-icon ${isCycling ? 'spin' : ''}`} />
+              <span>CYCLE_RADAR</span>
+            </button>
           </div>
 
           {/* Minimal Platform Filter Links */}

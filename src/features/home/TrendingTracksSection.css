@@ -36,7 +36,8 @@
 .trending-header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .trending-index-tag {
@@ -54,6 +55,48 @@
   letter-spacing: 0.08em;
   color: var(--text-muted, #64748B);
   text-transform: uppercase;
+}
+
+.trending-cycle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.28);
+  color: var(--cyber-cyan, #00F2FE);
+  font-family: var(--font-code, monospace);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs, 2px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.trending-cycle-btn:hover {
+  background: rgba(0, 242, 254, 0.18);
+  border-color: rgba(0, 242, 254, 0.55);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.25);
+  transform: translateY(-1px);
+}
+
+.cycle-icon {
+  display: inline-block;
+  transition: transform 0.4s ease;
+}
+
+.cycle-icon.spin {
+  animation: radarSpin 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes radarSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
 }
 
 .trending-filter-strip {

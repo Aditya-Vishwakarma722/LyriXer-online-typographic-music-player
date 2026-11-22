@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "npx tsx src/tests/test_timeline_matcher.ts && npx tsx src/tests/test_end_screen_suppression.ts && npx tsx src/tests/test_focus_stack_scroll.ts && npx tsx src/tests/test_vocal_filter_and_glow.ts && npx tsx src/tests/test_artist_filters_and_update.ts && npx tsx src/tests/test_video_quality_lock.ts"
+    "test": "npx tsx src/tests/test_timeline_matcher.ts && npx tsx src/tests/test_end_screen_suppression.ts && npx tsx src/tests/test_focus_stack_scroll.ts && npx tsx src/tests/test_vocal_filter_and_glow.ts && npx tsx src/tests/test_artist_filters_and_update.ts && npx tsx src/tests/test_video_quality_lock.ts && npx tsx src/tests/test_trending_feed_rotation.ts"
   },
   "dependencies": {
     "lucide-react": "^1.70.0",
