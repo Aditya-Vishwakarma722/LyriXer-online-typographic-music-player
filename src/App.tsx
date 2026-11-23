@@ -93,12 +93,53 @@ export const App: React.FC = () => {
     }
   });
 
-  // Recent Sessions State
+  // Recent Sessions State (with auto-sanitization to prevent stale ad/unofficial thumbnails)
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_RECENT);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed: RecentSession[] = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          let hasFix = false;
+          const sanitized = parsed.map((s) => {
+            // Replace erroneous Apple Ring tech video with official Charli xcx Apple lyric video
+            if (
+              s.sourceId === 'vFegfSP3t48' ||
+              (s.title && s.title.toLowerCase().includes('apple') && s.artist && s.artist.toLowerCase().includes('charli'))
+            ) {
+              hasFix = true;
+              return {
+                ...s,
+                sourceId: 'CPWxExGk7PM',
+                thumbnailUrl: 'https://i.ytimg.com/vi/CPWxExGk7PM/hqdefault.jpg',
+                title: 'Charli xcx - Apple',
+                artist: 'Charli xcx',
+                duration: 151,
+              };
+            }
+            // Replace unofficial lyric video with official Tate McRae VEVO video
+            if (s.sourceId === 'egMRYiesYnI') {
+              hasFix = true;
+              return {
+                ...s,
+                sourceId: 'cr4wnsLI_Xw',
+                thumbnailUrl: 'https://i.ytimg.com/vi/cr4wnsLI_Xw/hqdefault.jpg',
+                title: 'Tate McRae - 2 hands',
+                artist: 'Tate McRae',
+                duration: 172,
+              };
+            }
+            return s;
+          });
+          if (hasFix) {
+            try {
+              localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(sanitized));
+            } catch {
+              // ignore
+            }
+          }
+          return sanitized;
+        }
       }
     } catch {
       // ignore

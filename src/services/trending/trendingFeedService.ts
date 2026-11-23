@@ -125,8 +125,8 @@ export const MASTER_TRENDING_TRACKS: TrendingTrackItem[] = [
     id: 'trending-apple',
     title: 'Apple',
     artist: 'Charli xcx',
-    videoId: 'vFegfSP3t48',
-    thumbnailUrl: 'https://i.ytimg.com/vi/vFegfSP3t48/hqdefault.jpg',
+    videoId: 'CPWxExGk7PM',
+    thumbnailUrl: 'https://i.ytimg.com/vi/CPWxExGk7PM/hqdefault.jpg',
     duration: 151,
     platform: 'instagram',
     reelsCount: '14.2M Reels',
@@ -176,8 +176,8 @@ export const MASTER_TRENDING_TRACKS: TrendingTrackItem[] = [
     id: 'trending-two-hands',
     title: '2 hands',
     artist: 'Tate McRae',
-    videoId: 'egMRYiesYnI',
-    thumbnailUrl: 'https://i.ytimg.com/vi/egMRYiesYnI/hqdefault.jpg',
+    videoId: 'cr4wnsLI_Xw',
+    thumbnailUrl: 'https://i.ytimg.com/vi/cr4wnsLI_Xw/hqdefault.jpg',
     duration: 172,
     platform: 'both',
     reelsCount: '5.1M Reels',
@@ -327,7 +327,7 @@ export const MASTER_TRENDING_TRACKS: TrendingTrackItem[] = [
   },
 ];
 
-const CACHE_STORAGE_KEY = 'lyrixer_trending_feed_v4';
+const CACHE_STORAGE_KEY = 'lyrixer_trending_feed_v5';
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface CachedTrendingFeed {
