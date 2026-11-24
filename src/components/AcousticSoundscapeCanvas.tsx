@@ -96,8 +96,9 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mouseleave', handleMouseLeave, { passive: true });
 
-    // Initialize 36 stardust particles
-    const particleCount = 36;
+    // Initialize stardust particles (scaled down on mobile for ultra-smooth 60/120fps scrolling)
+    const isMobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+    const particleCount = isMobile ? 12 : 32;
     const particles: Particle[] = [];
     for (let i = 0; i < particleCount; i++) {
       const baseAlpha = 0.25 + Math.random() * 0.45;
@@ -153,9 +154,21 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
 
     let time = 0;
     let isRunning = false;
+    let isScrolling = false;
+    let scrollTimeout: number | null = null;
+
+    const handleScroll = () => {
+      isScrolling = true;
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        isScrolling = false;
+        startLoop();
+      }, 120);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     const render = () => {
-      if (!isVisible || !isTabActive) {
+      if (!isVisible || !isTabActive || isScrolling) {
         isRunning = false;
         return;
       }
@@ -167,6 +180,7 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
       ctx.clearRect(0, 0, width, height);
 
       // 1. Draw Flowing Harmonic Wave Ribbons with cached gradients
+      const step = isMobile ? 32 : 16;
       waves.forEach((wave, idx) => {
         const baseY = height * wave.baseYPercent;
         ctx.beginPath();
@@ -175,7 +189,6 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
         ctx.lineWidth = wave.lineWidth;
         ctx.lineCap = 'round';
 
-        const step = 16;
         let first = true;
 
         for (let x = 0; x <= width + step; x += step) {
@@ -277,7 +290,9 @@ export const AcousticSoundscapeCanvas: React.FC = React.memo(() => {
     return () => {
       stopLoop();
       observer.disconnect();
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
       if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);

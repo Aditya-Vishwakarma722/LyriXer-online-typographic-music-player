@@ -22,8 +22,24 @@ export const Navbar: React.FC<NavbarProps> = React.memo<NavbarProps>(({
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    let lastScrolled = window.scrollY > 20;
+    if (lastScrolled) {
+      setScrolled(true);
+    }
+    let ticking = false;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const isScrolled = window.scrollY > 20;
+          if (isScrolled !== lastScrolled) {
+            lastScrolled = isScrolled;
+            setScrolled(isScrolled);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);

@@ -641,6 +641,8 @@
   justify-content: space-between;
   padding: 18px 16px;
   text-align: left;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition:
     transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),

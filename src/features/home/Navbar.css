@@ -98,14 +98,26 @@
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .navbar-container {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(8, 9, 12, 0.94);
+  }
+}
+
 @media (max-width: 600px) {
   .navbar-content {
     padding: 0 16px;
+    gap: 10px;
+  }
+  .navbar-nav {
+    gap: 6px;
   }
   .navbar-link span {
     display: none;
   }
   .navbar-link {
-    padding: 8px;
+    padding: 7px;
   }
 }

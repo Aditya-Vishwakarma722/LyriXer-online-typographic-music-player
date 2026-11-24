@@ -18,6 +18,9 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transform: translateZ(0);
+  backface-visibility: hidden;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
   transition: border-color var(--transition-normal),
               box-shadow var(--transition-normal),
@@ -451,9 +454,20 @@
 
 /* Responsive Breakpoints */
 @media (max-width: 640px) {
+  .input-glass-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
   .url-form {
     flex-direction: column;
     padding: 6px;
+    gap: 8px;
+  }
+
+  .url-input-main-row {
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
   }
 

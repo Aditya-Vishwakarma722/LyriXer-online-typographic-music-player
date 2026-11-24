@@ -14,6 +14,11 @@ export const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = React
   enableParticles = true,
   enablePulse = true,
 }) => {
+  // Mobile / touch profiling for ultra-smooth 60/120fps scrolling on handheld devices
+  const isMobile =
+    typeof window !== 'undefined' &&
+    (window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches);
+
   return (
     <div className="atmospheric-bg-root" aria-hidden="true">
       {/* 1. Deep Obsidian Base Layer (Guaranteed Zero Grey / Full Contrast) */}
@@ -38,8 +43,8 @@ export const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = React
           accentColor="#8B5CF6"
           amplitude={1.35}
           distance={0.32}
-          enableMouseInteraction={true}
-          lineCount={64}
+          enableMouseInteraction={!isMobile}
+          lineCount={isMobile ? 18 : 46}
           thickness={0.9}
           softness={1.2}
           speed={0.42}

@@ -489,9 +489,21 @@ const Threads = ({
       }
     };
 
+    let isScrolling = false;
+    let scrollTimeout: number | null = null;
+    const onScroll = () => {
+      isScrolling = true;
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        isScrolling = false;
+        last = 0;
+        wake();
+      }, 120);
+    };
+
     const frame = (now: number) => {
       raf = 0;
-      if (!alive || !visible || document.hidden) return;
+      if (!alive || !visible || document.hidden || isScrolling) return;
       const s = settingsRef.current;
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
       last = now;
@@ -560,6 +572,7 @@ const Threads = ({
     });
     intersection.observe(container);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     document.documentElement.addEventListener('pointerleave', onPointerLeave);
     document.addEventListener('visibilitychange', onVisibility);
     resize();
@@ -572,10 +585,12 @@ const Threads = ({
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
       wakeRef.current = null;
       resizeObserver.disconnect();
       intersection.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('scroll', onScroll);
       document.documentElement.removeEventListener('pointerleave', onPointerLeave);
       document.removeEventListener('visibilitychange', onVisibility);
       canvas.removeEventListener('webglcontextlost', onContextLost);

@@ -10,6 +10,14 @@
   user-select: none;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0);
+}
+
+@media (max-width: 768px) {
+  .kinetic-ticker-root {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
 }
 
 .kinetic-ticker-track {

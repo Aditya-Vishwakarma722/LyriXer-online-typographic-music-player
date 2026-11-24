@@ -62,6 +62,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.recent-filter-strip::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-link {
@@ -74,6 +82,8 @@
   border: none;
   cursor: pointer;
   padding: 4px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all var(--transition-fast, 0.2s ease);
 }
 
@@ -170,6 +180,8 @@
   );
   overflow: hidden;
   cursor: pointer;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: border-color var(--transition-normal, 0.25s ease),
               box-shadow var(--transition-normal, 0.25s ease);
 }
@@ -192,6 +204,8 @@
   object-fit: cover;
   object-position: center 30%;
   filter: grayscale(85%) contrast(1.15) brightness(0.6);
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
 }
 
@@ -373,6 +387,8 @@
   );
   overflow: hidden;
   cursor: pointer;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: border-color var(--transition-normal, 0.25s ease),
               transform var(--transition-normal, 0.25s ease);
 }
@@ -395,6 +411,8 @@
   height: 100%;
   object-fit: cover;
   filter: grayscale(90%) contrast(1.15) brightness(0.5);
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: transform 0.5s ease, filter 0.5s ease;
 }
 

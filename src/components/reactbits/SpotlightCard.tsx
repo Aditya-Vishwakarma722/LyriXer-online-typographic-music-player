@@ -133,6 +133,7 @@ const SpotlightCard = ({
     if (!root || !light || !noise || !edge) return undefined;
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const isCoarse = window.matchMedia?.('(pointer: coarse)').matches ?? false;
     const state = { x: 0, y: 0, presence: 0, flare: 0, time: Math.random() * 60, pressed: false, visible: true };
     const pointer = { x: 0, y: 0, active: false };
     const drawn = { light: '', edge: '', noise: '' };
@@ -140,6 +141,8 @@ const SpotlightCard = ({
     let raf = 0;
     let last = 0;
     let alive = true;
+    let isScrolling = false;
+    let scrollTimeout = 0;
 
     const gradient = (s: Settings, size: number, x: number, y: number, stops: string) => {
       if (s.shape === 'beam') {
@@ -180,7 +183,7 @@ const SpotlightCard = ({
 
     const tick = (now: number) => {
       raf = 0;
-      if (!alive) return;
+      if (!alive || isScrolling) return;
       const s = settingsRef.current;
       const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
       last = now;
@@ -203,8 +206,9 @@ const SpotlightCard = ({
         if (gap === 0) target = 1;
         else if (s.proximity > 0) target = Math.max(0, 1 - gap / s.proximity) ** 2;
       }
-      if (target < 0.6 && s.ambient && state.visible) {
-        if (!reduce) state.time += dt;
+      const allowAmbient = s.ambient && state.visible && !reduce && !isCoarse;
+      if (target < 0.6 && allowAmbient) {
+        state.time += dt;
         const drift = 0.6 - target;
         tx += (rect.width * (0.5 + 0.34 * Math.sin(state.time * 0.43)) - tx) * (drift / 0.6);
         ty += (rect.height * (0.5 + 0.3 * Math.sin(state.time * 0.61 + 1.3)) - ty) * (drift / 0.6);
@@ -226,7 +230,7 @@ const SpotlightCard = ({
       paint(s);
       const moving = Math.abs(tx - state.x) > 0.1 || Math.abs(ty - state.y) > 0.1;
       const settled = !moving && state.presence === target && state.flare === press;
-      if (!settled || (s.ambient && state.visible && !reduce)) raf = requestAnimationFrame(tick);
+      if (!settled || allowAmbient) raf = requestAnimationFrame(tick);
     };
 
     const wake = () => {
@@ -279,7 +283,17 @@ const SpotlightCard = ({
     };
     const onScroll = () => {
       invalidateRect();
-      if (pointer.active || state.presence > 0) wake();
+      isScrolling = true;
+      if (raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        isScrolling = false;
+        const allowAmbient = settingsRef.current.ambient && state.visible && !reduce && !isCoarse;
+        if (state.visible && (allowAmbient || pointer.active)) wake();
+      }, 100);
     };
 
     const observer = new IntersectionObserver(entries => {
@@ -305,6 +319,7 @@ const SpotlightCard = ({
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
+      clearTimeout(scrollTimeout);
       observer.disconnect();
       root.removeEventListener('pointerenter', onEnter);
       root.removeEventListener('pointermove', onMove);

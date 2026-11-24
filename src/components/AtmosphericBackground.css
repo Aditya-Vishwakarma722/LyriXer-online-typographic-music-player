@@ -32,6 +32,8 @@
   filter: blur(80px);
   -webkit-filter: blur(80px);
   transform: translateZ(0);
+  will-change: transform;
+  contain: strict;
 }
 
 .aurora-glow-node {
@@ -179,8 +181,30 @@
 @media (max-width: 768px) {
   .aurora-mesh-container {
     opacity: 0.65;
+    filter: blur(36px);
+    -webkit-filter: blur(36px);
+  }
+  .node-primary {
+    width: 440px;
+    height: 280px;
+  }
+  .node-secondary {
+    width: 320px;
+    height: 320px;
+  }
+  .node-tertiary {
+    width: 340px;
+    height: 340px;
   }
   .threads-layer {
     opacity: 0.70;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-primary,
+  .node-secondary,
+  .node-tertiary {
+    animation: none !important;
   }
 }
